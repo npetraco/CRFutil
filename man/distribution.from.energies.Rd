@@ -2,7 +2,7 @@
 % Please edit documentation in R/distribution_util.R
 \name{distribution.from.energies}
 \alias{distribution.from.energies}
-\title{The function will XXXX}
+\title{Compute the joint distribution from the node and edge energies}
 \usage{
 distribution.from.energies(state.space, edges.mat, node.energies, edge.energies,
   energy.func, ff)

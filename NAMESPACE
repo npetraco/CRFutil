@@ -3,6 +3,7 @@
 export(Eone)
 export(Etwo)
 export(distribution.from.energies)
+export(distribution.from.potentials)
 export(energy)
 export(logsumexp)
 export(logsumexp2)

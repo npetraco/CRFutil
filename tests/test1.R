@@ -78,6 +78,7 @@ s2<-2
 st.sp <- expand.grid(c(s1,s2),c(s1,s2),c(s1,s2),c(s1,s2))
 st.sp
 pot.info <- make.gRbase.potentials(mc, node.names = gp@nodes)
+pot.info
 f0 <- function(y){ as.numeric(c((y==1),(y==2)))}    # CRF states ??
 
 energy.fun1(st.sp[1,], mc$edges, pot.info$node.energies, pot.info$edge.energies, f0)
@@ -107,3 +108,16 @@ sum(exp(E.vec2)/exp(infer.lbp(mc)$logZ))
 sum(exp(E.vec2)/exp(infer.trbp(mc)$logZ))
 sum(exp(E.vec2)/exp(infer.tree(mc)$logZ))
 
+pot.info <- make.gRbase.potentials(mc, node.names = gp@nodes)
+pot.info <- make.gRbase.potentials(mc, node.names = gp@nodes, state.nmes = c("+1","-1"))
+pot.info
+
+gR.dist.info <- distribution.from.potentials(pot.info$node.potentials, pot.info$edge.potentials)
+as.data.frame(as.table(gR.dist.info$state.probs))
+
+en.dist.info <- distribution.from.energies(st.sp, mc$edges, pot.info$node.energies, pot.info$edge.energies, energy, f0)
+cbind(st.sp,en.dist.info$state.probs)
+
+
+class(gR.dist.info$state.probs)
+class(en.dist.info$state.probs)
