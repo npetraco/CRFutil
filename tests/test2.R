@@ -64,6 +64,9 @@ exp(E.vec2) # prodPot's (P-tilde's)
 sum(exp(E.vec2)) # Z
 exp(E.vec2)/sum(exp(E.vec2)) # Prs
 
+distribution.from.energies(st.sp, mc$edges, pot.info$node.energies, pot.info$edge.energies, energy, f0)
+
+logsumexp2(E.vec2)
 log(sum(exp(E.vec2))) # logZ us
 infer.exact(mc)$logZ  # The correct logZ
 infer.junction(mc)$logZ

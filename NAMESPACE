@@ -2,7 +2,8 @@
 
 export(Eone)
 export(Etwo)
-export(energy.fun1)
+export(distribution.from.energies)
+export(energy)
 export(logsumexp)
 export(logsumexp2)
 export(make.gRbase.potentials)

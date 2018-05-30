@@ -28,25 +28,31 @@ Etwo  <- function(yA, yB, wAB, ff){ ff(yA) %*% wAB %*% ff(yB) }
 
 #' Energy function
 #'
-#' Energy function
+#' Compute total energy of a configuration
 #'
 #' The function will XXXX
 #'
-#' @param XX The XX
+#' @param config    A node configuration (state) vector
+#' @param edges.mat Matrix of connected node edges
+#' @param two.lgp   Log node potentials (one-body energies)
+#' @param two.lgp   Log edge potentials (two-body energies)
+#' @param ff        The feature function
 #' @return The function will XX
 #'
 #'
 #' @export
-energy.fun1 <- function(config, edges.mat, one.lgp, two.lgp, ff) {
+energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 
   num.nodes <- length(config)
   num.edges <- nrow(edges.mat)
 
+  # Sum One-body energies (log node-potentials)
   e.one <- 0
   for(i in 1:num.nodes){
     e.one <- e.one + Eone(config[i], one.lgp[[i]], ff)
   }
 
+  # Sum Two-body energies (log edge-potentials)
   e.two <- 0
   for(i in 1:num.edges){
     e.two <- e.two + Etwo(config[edges.mat[i,1]], config[edges.mat[i,2]], two.lgp[[i]], ff)
