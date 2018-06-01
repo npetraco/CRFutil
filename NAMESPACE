@@ -2,9 +2,10 @@
 
 export(Eone)
 export(Etwo)
+export(config.energy)
+export(config.potential)
 export(distribution.from.energies)
 export(distribution.from.potentials)
-export(energy)
 export(logsumexp)
 export(logsumexp2)
 export(make.gRbase.beliefs)

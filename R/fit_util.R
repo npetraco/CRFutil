@@ -26,9 +26,6 @@ mrf.standard.fit <- function(samples, net.graph.formula, num.states, mrf.nll.fun
     mrf.fit$edge.par[[i]][2,2,1] <- mrf.fit$n.nodes + i
   }
 
-  #print(mrf.fit$node.par)
-  #print(mrf.fit$edge.par)
-
   mrf.fit <- train.mrf(mrf.fit, nll = mrf.nll.func, samples, infer.method = infer.func)
   infer.info.fit <- infer.func(mrf.fit)
   logZZ <- infer.info.fit$logZ

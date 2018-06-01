@@ -26,9 +26,9 @@ Eone  <- function(yA, tA, ff){ tA %*% ff(yA) }
 Etwo  <- function(yA, yB, wAB, ff){ ff(yA) %*% wAB %*% ff(yB) }
 
 
-#' Energy function
+#' Energy function for a configuration of states
 #'
-#' Compute total energy of a configuration
+#' Compute total energy of a configuration. Assumes node/edge energies are in gRbase format
 #'
 #' The function will XXXX
 #'
@@ -41,7 +41,7 @@ Etwo  <- function(yA, yB, wAB, ff){ ff(yA) %*% wAB %*% ff(yB) }
 #'
 #'
 #' @export
-energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
+config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 
   num.nodes <- length(config)
   num.edges <- nrow(edges.mat)
