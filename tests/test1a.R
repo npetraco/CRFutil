@@ -99,3 +99,5 @@ gR.distQQ <- sapply(1:nrow(st.sp), function(xx){gR.dist.info$state.probs[st.sp[x
 
 cbind(st.sp, en.dist.info$state.probs, gR.distQQ, en.dist.info$state.probs-gR.distQQ)
 
+mc$n.nodes
+mc$n.edges

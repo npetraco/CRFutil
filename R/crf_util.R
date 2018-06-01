@@ -46,9 +46,9 @@ mrf.junction.nll <- function(par, crf, instances, infer.method = infer.junction,
 }
 
 
-#' Modify initalized mrf-object to make potehtials compatible with gRbase
+#' Decorate initalized mrf-object to make potentials compatible with gRbase
 #'
-#' Modify initalized mrf-object to make potehtials compatible with gRbase
+#' Decorate initalized mrf-object to make potentials compatible with gRbase
 #'
 #' The function will XXXX
 #'
@@ -92,5 +92,53 @@ make.gRbase.potentials <- function(crf, node.names, state.nmes=NULL){
   names(potential.info) <- c("node.potentials","edge.potentials","node.energies","edge.energies")
 
   return(potential.info)
+
+}
+
+
+#' Decorate fit node and edge marginal beliefs to make compatible with gRbase
+#'
+#' Decorate fit node and edge marginal beliefs to make compatible with gRbase
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=NULL){
+
+  num.nodes  <- nrow(inference.obj$node.bel)
+  num.edges  <- length(inference.obj$edge.bel)
+  num.states <- ncol(inference.obj$node.bel)
+
+  if(is.null(state.nmes)) {
+    state.nmes <- paste0("s",1:num.states)
+  }
+
+  # Decorate node beliefs:
+  gRbase.node.bels <- rep(list(NULL), num.nodes) #node beliefs
+  for(i in 1:num.nodes){
+    node.levs                 <- list(state.nmes)
+    names(node.levs)          <- node.names[i]
+    gRbase.node.bels[[i]]     <- ar_new(node.names[i], levels=node.levs, values=c(inference.obj$node.bel[i,]))
+  }
+
+  # Decorate edge beliefs:
+  gRbase.edge.bels <- rep(list(NULL), num.edges) # edge beliefs
+  for(i in 1:num.edges){
+    e1                        <- node.names[edge.mat[i,1]]
+    e2                        <- node.names[edge.mat[i,2]]
+    node.levs                 <- list(state.nmes,state.nmes)
+    names(node.levs)          <- c(e1,e2)
+    gRbase.edge.bels[[i]]     <- ar_new(c(e1,e2), levels=node.levs, values=as.numeric(inference.obj$edge.bel[[i]]))
+  }
+
+  belief.info        <- list(gRbase.node.bels,
+                             gRbase.edge.bels)
+  names(belief.info) <- c("node.beliefs","edge.beliefs")
+
+  return(belief.info)
 
 }

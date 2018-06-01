@@ -13,7 +13,7 @@ logsumexp2(logv)
 The function will XX
 }
 \description{
-Handy for calculating Z from a vector of negative log potentials........
+Handy for calculating Z from a vector of log potentials.
 A less readable but shorter Log sum exp:
 }
 \details{

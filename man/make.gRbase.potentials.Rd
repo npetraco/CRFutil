@@ -2,7 +2,7 @@
 % Please edit documentation in R/crf_util.R
 \name{make.gRbase.potentials}
 \alias{make.gRbase.potentials}
-\title{Modify initalized mrf-object to make potehtials compatible with gRbase}
+\title{Decorate initalized mrf-object to make potentials compatible with gRbase}
 \usage{
 make.gRbase.potentials(crf, node.names, state.nmes = NULL)
 }
@@ -13,7 +13,7 @@ make.gRbase.potentials(crf, node.names, state.nmes = NULL)
 The function will XX
 }
 \description{
-Modify initalized mrf-object to make potehtials compatible with gRbase
+Decorate initalized mrf-object to make potentials compatible with gRbase
 }
 \details{
 The function will XXXX
