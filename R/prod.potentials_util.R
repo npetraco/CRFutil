@@ -1,6 +1,6 @@
 #' Product of potentials function over a configuration of states
 #'
-#' Product of potentials function
+#' Product of potentials function. Expects potentials in gRbase format
 #'
 #' The function will XXXX
 #'
@@ -18,14 +18,11 @@ config.potential <- function(config, edges.mat, node.pots, edge.pots) {
   prod.node.pots <- 1
   for(i in 1:num.nodes){
     prod.node.pots <- prod.node.pots * node.pots[[i]][config[i]]
-    #print(node.pots[[i]][config[i]])
-    #print(prod.node.pots)
   }
 
   # Product of realized configuration edge potentials
   prod.edge.pots <- 1
   for(i in 1:num.edges){
-    #print(edge.pots[[i]][config[edges.mat[i,1]], config[edges.mat[i,2]]])
     prod.edge.pots <- prod.edge.pots * edge.pots[[i]][config[edges.mat[i,1]], config[edges.mat[i,2]]]
   }
 
