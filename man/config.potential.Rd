@@ -13,7 +13,7 @@ config.potential(config, edges.mat, node.pots, edge.pots)
 The function will XX
 }
 \description{
-Product of potentials function
+Product of potentials function. Expects potentials in gRbase format
 }
 \details{
 The function will XXXX
