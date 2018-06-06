@@ -66,3 +66,6 @@ cbind(Pr.pot2[rearrange.idxs,6],Pr.en, Pr.pot2[rearrange.idxs,6]-Pr.en)
 prodPots        <- Pr.en*exp(dist.en.info$logZ) # work backwards
 config.energies <- log(prodPots)                # work backwards
 cbind(config.mat, config.energies, prodPots, Pr.en, Pr.pot2[rearrange.idxs,6])
+
+
+mrf.stat

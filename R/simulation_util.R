@@ -1,8 +1,8 @@
-#' Simulate an MRF with random unary (node) and pair (edge) potentials:
+#' Simulate an MRF with random unary (node) and pair (edge) potentials.
 #'
-#' Simulate an MRF with random unary (node) and pair (edge) potentials:
+#' Simulate an MRF with random unary (node) and pair (edge) potentials.
 #'
-#' The function will XXXX
+#' Uses standard parameterization w11=w22, w12=w21
 #'
 #' @param XX The XX
 #' @return The function will XX
@@ -35,6 +35,85 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
       c(trans.1122, 1-trans.1122),
       c(1-trans.1122, trans.1122)
     )
+
+    mrf.sim.model$edge.pot[[i]] <- trans.prob
+  }
+
+  mrf.model.samples <- sample.junction(mrf.sim.model, num.sims)
+  colnames(mrf.model.samples) <- as.character(1:num.nodes)
+  mrf.sim.info <- list(
+    mrf.sim.model,
+    mrf.model.samples
+  )
+  names(mrf.sim.info) <- c("model", "samples")
+
+  return(mrf.sim.info)
+
+}
+
+
+#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#'
+#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#'
+#' Uses xx standard parameterization
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+sim.ising.field.random <- function(adjacentcy.matrix, parameterization.type="a", num.sims, seed=NULL) {
+
+  mrf.sim.model <- make.crf(adjacentcy.matrix, num.states)
+
+  # Make up random node weights:
+  num.nodes <- nrow(adjacentcy.matrix)
+  if(!is.null(seed)){
+    set.seed(seed)
+  }
+  pos <- runif(num.nodes)
+  neg <- 1-pos
+  mrf.sim.model$node.pot <- cbind(pos,neg)
+
+
+  for (i in 1:mrf.sim.model$n.edges) {
+    # Make up random symmetric edge weights
+    if(!is.null(seed)){
+      set.seed(seed)
+    }
+
+    # Standard parameterization a. w11=w22, w12=w21=1-w11
+    if(parameterization.type=="a") {
+      trans.1122 <- runif(1)
+      trans.prob <- rbind(
+        c(trans.1122, 1-trans.1122),
+        c(1-trans.1122, trans.1122)
+      )
+    }
+
+    # Standard parameterization b. w11 != w22, w12=w21
+    if(parameterization.type=="b") {
+      pots <- runif(3)
+      trans.prob <- rbind(
+        c(pots[1], pots[3]),
+        c(pots[3], pots[2])
+      )
+    }
+
+    # Standard parameterization c. w11 = 1-w12, w22=1-w21
+    if(parameterization.type=="c") {
+      pots <- runif(2)
+      trans.prob <- rbind(
+        c(  pots[1], 1-pots[2]),
+        c(1-pots[1], pots[2]  )
+      )
+    }
+
+    # Standard parameterization d. w11 != w12 != w22 != w21
+    if(parameterization.type=="d") {
+      trans.prob <- array(runif(4), c(2,2))
+    }
 
     mrf.sim.model$edge.pot[[i]] <- trans.prob
   }

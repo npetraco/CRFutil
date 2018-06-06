@@ -142,3 +142,4 @@ make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=
   return(belief.info)
 
 }
+
