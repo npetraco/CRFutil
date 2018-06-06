@@ -2,6 +2,7 @@
 
 export(Eone)
 export(Etwo)
+export(MRF_Stat_expt)
 export(config.energy)
 export(config.potential)
 export(distribution.from.energies)
