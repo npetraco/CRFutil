@@ -64,6 +64,8 @@ mrf.fit$node.par[3,1,1]    <- 3
 mrf.fit$node.par[4,1,1]    <- 4
 
 for(i in 1:mrf.fit$n.edges){
+  #mrf.fit$edge.par[[i]][1,1,1] <- 4
+  #mrf.fit$edge.par[[i]][2,2,1] <- 4
   mrf.fit$edge.par[[i]][1,1,1] <- 5
   mrf.fit$edge.par[[i]][2,2,1] <- 5
 }
@@ -78,10 +80,28 @@ sum(samps[,]==1) # ??
 39+86+52+89
 
 # NLL:
+mrf.fit$edge.par
+mrf.fit$edge.pot
+mrf.fit$gradient
+mrf.fit$nll
+mrf.fit$node.par
+mrf.fit$node.pot
+mrf.fit$par
+# mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact)
+# mrf.nll(mrf.fit$par, mrf.fit, as.data.frame(samps), infer.method=infer.exact)
+# mrf.nll(mrf.fit$par, mc, as.data.frame(samps), infer.method=infer.exact)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact)
+#mrf.fit$par.stat <- c(42,  87,  48,  93, 159)
+# For mrf.nll to work, the sufficient statistics need to be computed and placed in mrf.fit!!!!!
+mrf.fit$par.stat <- UGM_MRF_computeSuffStat(mrf.fit,samps)
+mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact) # Work now??
+
+
+
 
 # Fit pots
-#mrf.fit <- train.mrf(mrf.fit, nll = mrf.exact.nll, samps, infer.method = infer.exact)
+mrf.fit <- train.mrf(mrf.fit, nll = mrf.exact.nll, samps, infer.method = infer.exact)
+mrf.fit$par.stat
 #mrf.fit$nll
 mrf.fit$edge.par
 MRF_Stat_expt(mrf.fit,samps)

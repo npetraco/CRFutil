@@ -68,22 +68,38 @@ for(i in 1:mrf.fit$n.edges){
   mrf.fit$edge.par[[i]][2,2,1] <- 5
 }
 
+mrf.fit$par
+mrf.fit$node.pot
+mrf.fit$edge.pot
+
+
 # Suffient statistics:
 mrf.stat(mrf.fit, samps)
-sum(samps[,1]==1)
-sum(samps[,2]==1)
-sum(samps[,3]==1)
-sum(samps[,4]==1) # ??
-sum(samps[,]==1) # ??
-39+86+52+89
+UGM_MRF_computeSuffStat(mrf.fit,samps)
+
+#
+mrf.fit$node.par
+mrf.fit$edge.par
+UGM_MRF_makePotentials(mrf.fit$par, mrf.fit)
+UGM_MRF_makePotentials(log(c(1,2,3,4,5)), mrf.fit)
+mrf.fit$edge.pot
+#
+sfs <- UGM_MRF_computeSuffStat(mrf.fit,samps)
+sfs
+UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.exact)
+UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.junction)
+UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.chain)
+UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.lbp)
+#
 
 # NLL:
+mrf.fit$par.stat <- UGM_MRF_computeSuffStat(mrf.fit,samps)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact)
+mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.junction)
+
 
 # Fit pots
 #mrf.fit <- train.mrf(mrf.fit, nll = mrf.exact.nll, samps, infer.method = infer.exact)
 #mrf.fit$nll
-mrf.fit$edge.par
-MRF_Stat_expt(mrf.fit,samps)
-as.numeric(samps)
-mrf.fit$node.par[,1,1]
+mrf.fit$par
+mrf.fit$max.state

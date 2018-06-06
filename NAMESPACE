@@ -2,7 +2,9 @@
 
 export(Eone)
 export(Etwo)
-export(MRF_Stat_expt)
+export(UGM_MRF_NLL)
+export(UGM_MRF_computeSuffStat)
+export(UGM_MRF_makePotentials)
 export(config.energy)
 export(config.potential)
 export(distribution.from.energies)
