@@ -91,12 +91,14 @@ UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFun
 UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.chain)
 UGM_MRF_NLL(w = mrf.fit$par, nInstances = 100, suffStat = sfs, mrf.fit, inferFunc = infer.lbp)
 #
-
 # NLL:
 mrf.fit$par.stat <- UGM_MRF_computeSuffStat(mrf.fit,samps)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.junction)
+#
+#Gradient next
 
+#
 
 # Fit pots
 #mrf.fit <- train.mrf(mrf.fit, nll = mrf.exact.nll, samps, infer.method = infer.exact)
