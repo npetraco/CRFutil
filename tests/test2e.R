@@ -96,7 +96,6 @@ mrf.fit$par.stat <- UGM_MRF_computeSuffStat(mrf.fit,samps)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.exact)
 mrf.nll(mrf.fit$par, mrf.fit, samps, infer.method=infer.junction)
 #
-#Gradient next
 
 #
 
