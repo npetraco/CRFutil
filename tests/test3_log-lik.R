@@ -35,6 +35,10 @@ mrf.fit$edge.par[[3]][2,2,1] <- 6
 
 mrf.fit$node.par
 mrf.fit$edge.par
+mrf.fit$n.states
+mrf.fit$adj.nodes
+mrf.fit$edges
+
 
 fake.sample <- rbind(
   c(1,1,1),

@@ -62,3 +62,50 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 
   return(ener)
 }
+
+#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi)
+#'
+#' Compute
+#'
+#' The function will XXXX
+#'
+#' @param config    A node configuration (state) vector
+#' @param condition.element.number
+#' @param edges.mat Matrix of connected node edges
+#' @param two.lgp   Log node potentials (one-body energies)
+#' @param two.lgp   Log edge potentials (two-body energies)
+#' @param ff        The feature function
+#' @return The function will XX
+#'
+#'
+#' @export
+conditional.config.energy <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff) {
+
+  num.nodes <- length(config)
+
+  # One-body energy (log node-potentials)
+  e.one <- Eone(config[condition.element.number], one.lgp[[condition.element.number]], ff)
+
+  # Nodes connected to the condition node Xi
+  adj.nodes <- adj.node.list[[condition.element.number]]
+
+  e.two <- 0
+  for(i in 1:length(adj.nodes)){
+    edg         <- sort(c(condition.element.number, adj.nodes[i]))
+    edg.pot.idx <- row.match(edg, table = edge.mat)
+    e.two       <- e.two + Etwo(config[edg[1]], config[edg[2]], two.lgp[[edg.pot.idx]], ff)
+
+    # print(config)
+    # print(paste("CE-idx:", condition.element.number))
+    # print(paste("Edge 1:", edg[1], "    Edge 2:", edg[2]))
+    # print(paste("St-Edge 1:", config[edg[1]], "   St-Edge 2:", config[edg[2]]))
+    # print(paste("Edge Pot #:", edg.pot.idx))
+    # print(paste("e.two:",e.two))
+    # print(paste("e.one:",e.one))
+    # print("----------------------")
+
+  }
+
+  ener <- as.numeric(e.one + e.two)
+  return(ener)
+}
