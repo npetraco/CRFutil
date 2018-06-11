@@ -81,7 +81,7 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 #' @export
 conditional.config.energy <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff) {
 
-  num.nodes <- length(config)
+  #num.nodes <- length(config)
 
   # One-body energy (log node-potentials)
   e.one <- Eone(config[condition.element.number], one.lgp[[condition.element.number]], ff)
@@ -108,4 +108,5 @@ conditional.config.energy <- function(config, condition.element.number, adj.node
 
   ener <- as.numeric(e.one + e.two)
   return(ener)
+
 }

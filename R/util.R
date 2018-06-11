@@ -70,3 +70,30 @@ row.match <- function (x, table, nomatch = NA)
   match(cx, ct, nomatch = nomatch)
 }
 
+
+#' Convenience function to complement a node in a configuration.
+#' Assumes CRF 1,2 states
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+complement.at.idx <- function(configuration, complement.index){
+
+  new.configuration <- configuration
+  if(new.configuration[complement.index] == 1) {
+    new.configuration[complement.index] <- 2
+  } else if(new.configuration[complement.index] == 2){
+    new.configuration[complement.index] <- 1
+  } else {
+    stop("States must be CRF states, i.e. 1 or 2!")
+  }
+
+  return(new.configuration)
+
+}
