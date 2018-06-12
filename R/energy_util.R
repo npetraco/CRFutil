@@ -70,7 +70,8 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 #' The function will XXXX
 #'
 #' @param config    A node configuration (state) vector
-#' @param condition.element.number
+#' @param condition.element.number i of E(Xi | X/Xi)
+#' @param adj.node.list
 #' @param edges.mat Matrix of connected node edges
 #' @param two.lgp   Log node potentials (one-body energies)
 #' @param two.lgp   Log edge potentials (two-body energies)

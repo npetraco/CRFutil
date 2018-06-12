@@ -2,7 +2,7 @@
 % Please edit documentation in R/distribution_util.R
 \name{pseudolikelihoods.from.energies}
 \alias{pseudolikelihoods.from.energies}
-\title{Compute the pseudolikelihoods from the node and edge energies
+\title{Compute the pseudolikelihoods from the node and edge energies. Assumes only 2 states/node
 Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
 The function will XXXX}
 \usage{

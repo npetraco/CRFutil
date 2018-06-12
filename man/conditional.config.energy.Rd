@@ -10,6 +10,8 @@ conditional.config.energy(config, condition.element.number, adj.node.list,
 \arguments{
 \item{config}{A node configuration (state) vector}
 
+\item{condition.element.number}{i of E(Xi | X/Xi)}
+
 \item{two.lgp}{Log node potentials (one-body energies)}
 
 \item{ff}{The feature function}
