@@ -69,7 +69,13 @@ make.gRbase.potentials <- function(crf, node.names, state.nmes=NULL){
   for(i in 1:crf$n.nodes){
     node.levs                       <- list(state.nmes)
     names(node.levs)                <- node.names[i]
-    gRbase.node.potentials[[i]]     <- ar_new(node.names[i], levels=node.levs, values=c(crf$node.pot[i,]))
+    # train.mrf puts an extra dimension onto node.pot. To account for that:
+    if(length(dim(crf$node.pot))==3) {
+      vls <- crf$node.pot[i,,1]
+    } else {
+      vls <- crf$node.pot[i,]
+    }
+    gRbase.node.potentials[[i]]     <- ar_new(node.names[i], levels=node.levs, values=c(vls))
     gRbase.node.log.potentials[[i]] <- log(gRbase.node.potentials[[i]])
   }
 
