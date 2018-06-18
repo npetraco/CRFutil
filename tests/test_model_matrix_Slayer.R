@@ -130,13 +130,5 @@ config.energies                       # Check
 alt.config.energies                   # Check
 config.energies - alt.config.energies # Check
 
+cbind(config.energies, alt.config.energies, config.energies-alt.config.energies)
 
-config.energies <- sapply(1:nrow(all.configs),
-                          function(xx){
-                            ener.func(
-                              all.configs[xx,]
-                              -config.energy(config = config, edges.mat = fit$edges,
-                                             one.lgp = fit.node.en,
-                                             two.lgp = fit.edge.en,
-                                             ff = f)
-                            )})

@@ -47,7 +47,7 @@ UGM_MRF_NLL <- function(w,nInstances,suffStat,crf,inferFunc) {
     for(s in 1:nStates[n]){
       if(nodeMap[n,s,1] > 0){
         #g(nodeMap(n,s)) = g(nodeMap(n,s)) + nInstances*nodeBel(n,s);
-        g[nodeMap[n,s,1]] <- nodeMap[n,s,1] + nInstances*nodeBel[n,s]
+        g[nodeMap[n,s,1]] <- g[nodeMap[n,s,1]] + nInstances*nodeBel[n,s]
       }
     }
   }
