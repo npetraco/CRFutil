@@ -117,3 +117,40 @@ compute.model.matrix <- function(configs, edges.mat, node.par, edge.par, ff) {
   return(model.mat)
 
 }
+
+
+#' Utility function to compute mean vector of features with supplied theta in a CRF network object.
+#'
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+feature.means <- function(crf, inference.func = infer.exact) {
+
+  inference.info <- inference.func(crf)
+
+  # Compute \text{E}_{\hat{\theta}_i}[{\phi_i}] with marginals at the optimal theta:
+  # I.E. use "inference" to avoid computing X and Z directly. Use "junction tree":
+  # node.param.phi.means <- rowSums(inference.info$node.bel * (crf$node.par>0)[,,])
+  nodeMap <- crf$node.par[,,]    # IS THERE A BETTER WAY TO DO THIS THAN NESTED LOOPING??
+  # for(i in 1:nrow(nodeMap)) {
+  #   for(j in 1:ncol(nodeMap)){
+  #
+  #   }
+  # }
+
+  # edge.param.phi.means <- numeric(crf$n.edges)
+  # for(i in 1:crf$n.edges) {
+  #   edge.param.phi.means[i] <- sum(inference.info$edge.bel[[i]] * (crf$edge.par[[i]]>0)[,,])
+  # }
+  # mean.phi.vec <- c(node.param.phi.means,edge.param.phi.means)
+  #
+  # return(mean.phi.vec)
+
+}
+

@@ -39,9 +39,9 @@ mrf.standard.fit <- function(samples, net.graph.formula, num.states, mrf.nll.fun
 }
 
 
-#' Shift node potentials back to the originally fit parameter vector
+#' Experiment: Modified Port of Schmidt UGM_MRF_NLL.m
 #'
-#' For testing purposes
+#' Experiment
 #'
 #' The function will XXXX
 #'
@@ -50,48 +50,27 @@ mrf.standard.fit <- function(samples, net.graph.formula, num.states, mrf.nll.fun
 #'
 #'
 #' @export
-shift.pots <- function(crf) {
+loglik <- function(w, nInstances, suffStat, crf, inferFunc=infer.exact) {
 
-  parms <- crf$par
+  # Make potentials with the parameter vector passed in:
+  mpots       <- make.pots(w, crf)
+  crf$nodePot <- mpots$node.pot.shifted # Has to be done here because of arg structure to inferFunc
+  crf$edgePot <- mpots$edge.pot.shifted # Has to be done here because of arg structure to inferFunc
 
-  # Loop over elements of parameter index matrix (also called nodeMap and edgeMap in UGM)
-  # and put elements of exp(parms) where they belong
+  # Compute logZ:
+  infer.info <- inferFunc(crf)
+  logZZ      <- infer.info$logZ
 
-  node.par         <- crf$node.par[,,1]
-  node.pot.shifted <- array(1, c(dim(node.par),1) )
-  for(i in 1:nrow(node.par)) {
-    for(j in 1:ncol(node.par)) {
-      if(node.par[i,j] != 0) {
-        par.idx <- node.par[i,j]
-        node.pot.shifted[i,j,1] <- exp(parms[par.idx])
-      }
-    }
-  }
+  # Compute log likelihood:
+  llk <- w %*% suffStat + nInstances*infer.info$logZ
 
-
-  edge.par <- crf$edge.par
-  edge.pot.shifted <- rep(list(array(1,c(2,2))), length(edge.par))
-  for(k in 1:length(edge.par)) {
-    for(i in 1:nrow(edge.par[[k]])) {
-      for(j in 1:ncol(edge.par[[k]])) {
-        if(edge.par[[k]][i,j,1] != 0) {
-          par.idx <- edge.par[[k]][i,j,1]
-          edge.pot.shifted[[k]][i,j] <- exp(parms[par.idx])
-        }
-      }
-    }
-  }
-
-  crf$node.pot <- node.pot.shifted
-  crf$edge.pot <- edge.pot.shifted
-  print("Potentials shifted to parameter vector via node.par and edge.par")
-
+  return(llk)
 }
 
 
-#' Extract parameter vector theta from node and potentials written by trin.mrf
+#' Utility function to compute gradient of log likelihood
 #'
-#' For testing purposes. train.mrf par and potentials don't always match exactly because of shifting of the pots
+#' Assumes features are 0,1 valued and parameters are numbered.
 #'
 #' The function will XXXX
 #'
@@ -100,6 +79,16 @@ shift.pots <- function(crf) {
 #'
 #'
 #' @export
-extract.theta.from.pots <- function(crf) {
+grad.loglik <- function(crf, samples, inference.func = infer.exact) {
+
+  # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
+  emp.num.features <- mrf.stat(crf, samples)
+
+  # Second term of the gradient: N \times \text{E}_{\hat{\boldsymbol \theta}}[{\boldsymbol \phi}]
+  num.features.est <- nrow(samples) * feature.means(crf, inference.func)
+
+  grd <- emp.num.features - num.features.est
+
+  return(grd)
 
 }
