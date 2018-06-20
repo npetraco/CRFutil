@@ -4,7 +4,7 @@
 \alias{loglik}
 \title{Experiment: Modified Port of Schmidt UGM_MRF_NLL.m}
 \usage{
-loglik(w, nInstances, suffStat, crf, inferFunc)
+loglik(w, nInstances, suffStat, crf, inferFunc = infer.exact)
 }
 \arguments{
 \item{XX}{The XX}

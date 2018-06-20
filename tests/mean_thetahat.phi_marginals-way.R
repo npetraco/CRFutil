@@ -65,11 +65,14 @@ f  <- function(y){ as.numeric(c((y==s1),(y==s2))) }
 
 # Compute \text{E}_{\hat{\theta}_i}[{\phi_i}] with marginals at the optimal theta:
 # I.E. use "inference" to avoid computing X and Z directly. Use "junction tree":
-node.param.means <- rowSums(infr.info$node.bel * (fit$node.par>0)[,,])
+
+
+
+node.param.means <- rowSums(infr.info$node.bel * (fit$node.par>0)[,,]) #NOT GENERAL!
 
 edge.param.means <- numeric(fit$n.edges)
 for(i in 1:fit$n.edges) {
-  edge.param.means[i] <- sum(infr.info$edge.bel[[i]] * (fit$edge.par[[i]]>0)[,,])
+  edge.param.means[i] <- sum(infr.info$edge.bel[[i]] * (fit$edge.par[[i]]>0)[,,])  #NOT GENERAL!
 }
 E.hattheta.phi.approx <- c(node.param.means,edge.param.means)   #
 hatE.theta.phi        <- fit$par.stat/num.samps                 # Empirical estimate: \hat{E}_{\theta_i}[\phi_i]

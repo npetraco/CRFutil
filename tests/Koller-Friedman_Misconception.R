@@ -60,8 +60,8 @@ known.model$edge.pot
 pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes, state.nmes = c("0","1"))
 pot.info
 
-gR.dist.info <- distribution.from.potentials(pot.info$node.potentials, pot.info$edge.potentials)
-logZ         <- gR.dist.info$logZ
+gR.dist.info    <- distribution.from.potentials(pot.info$node.potentials, pot.info$edge.potentials)
+logZ            <- gR.dist.info$logZ
 joint.dist.info <- as.data.frame(as.table(gR.dist.info$state.probs))
 joint.dist.info
 
@@ -70,7 +70,7 @@ colnames(joint.dist.info2) <- c("A","B","C","D", "Unnormalized", "Normalized")
 joint.dist.info2 # Yup, we do.
 
 # So now sample from the model as if we obtained an experimental sample:
-num.samps <- 100
+num.samps <- 10
 set.seed(1)
 samps <- sample.exact(known.model, num.samps)
 
@@ -103,6 +103,14 @@ fit$edge.par[[4]][1,1,1] <- 11
 fit$edge.par[[4]][2,2,1] <- 12
 fit$edge.par
 
+
 mrf.stat(fit, samps)  # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
-feature.means(fit, infer.junction)
-num.samps * feature.means(fit, infer.junction)
+feature.means(fit, infer.junction)*num.samps
+
+# Fit model to samples from the known model and obtain an estimate for theta:
+train.mrf(fit, samps, nll=mrf.exact.nll, infer.method = infer.exact)
+shift.pots(fit)
+fit$par.stat     # Sample sufficient statistics: total number of appearances of each parameter in the sample
+cbind(fit$par.stat, feature.means(fit, infer.junction)*num.samps)
+
+

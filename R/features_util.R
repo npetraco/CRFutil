@@ -67,32 +67,18 @@ phi.features.explicit <- function(config, edges.mat, node.par, edge.par, ff) {
 
   # Nodes: \phi_i({\bf X}) = 1-\delta_{{\bf f}^{\dagger}(X_i) {\boldsymbol \tau}_i, 0}
   for(i in 1:num.nodes){
-    #phi.idx              <- as.numeric(ff(config[i]) %*% node.par[i,,1])
     phi.idx              <- Eone(config[i], node.par[i,,1], ff) # Just re-use the Eone code
     phi.i                <- 1 - (phi.idx == 0)
     phi.vec[phi.idx]     <- phi.i
     phi.vec.lbl[phi.idx] <- phi.idx
-    # if(phi.idx != 0) {
-    #   phi.vec[phi.idx] <- 1
-    # }
   }
 
   # Edges: \phi_{k_{[ij]}}({\bf X}) = 1-\delta_{{\bf f}^{\dagger}(X_i) {\boldsymbol \omega}_{ij} {\bf f}(X_j) , 0}
   for(i in 1:num.edges) {
-
-    # Check and see if we reached the end of phi. No point in doing the rest of the edges if we did:
-    # if(phi.idx == num.params) {
-    #   break()
-    # }
-
-    #phi.idx              <- as.numeric(ff(config[edges.mat[i,1]]) %*% edge.par[[i]][,,1] %*% ff(config[edges.mat[i,2]]))
     phi.idx              <- Etwo(config[edges.mat[i,1]], config[edges.mat[i,2]], edge.par[[i]][,,1], ff) # Just re-use the Etwo code
     phi.i                <- 1 - (phi.idx == 0)
     phi.vec[phi.idx]     <- phi.i
     phi.vec.lbl[phi.idx] <- phi.idx
-    # if(phi.idx != 0) {
-    #   phi.vec[phi.idx] <- 1
-    # }
   }
 
   return(list(phi.vec, phi.vec.lbl))
@@ -136,21 +122,26 @@ feature.means <- function(crf, inference.func = infer.exact) {
 
   # Compute \text{E}_{\hat{\theta}_i}[{\phi_i}] with marginals at the optimal theta:
   # I.E. use "inference" to avoid computing X and Z directly. Use "junction tree":
-  # node.param.phi.means <- rowSums(inference.info$node.bel * (crf$node.par>0)[,,])
-  nodeMap <- crf$node.par[,,]    # IS THERE A BETTER WAY TO DO THIS THAN NESTED LOOPING??
-  # for(i in 1:nrow(nodeMap)) {
-  #   for(j in 1:ncol(nodeMap)){
-  #
-  #   }
-  # }
+  nodeMap    <- as.numeric(crf$node.par[,,]) # Flatten node parameter index matrix into a vector
+  edgeMap    <- unlist(crf$edge.par)         # Flatten edge parameter index matries into a vector
+  num.params <- max(c(nodeMap,edgeMap))
 
-  # edge.param.phi.means <- numeric(crf$n.edges)
-  # for(i in 1:crf$n.edges) {
-  #   edge.param.phi.means[i] <- sum(inference.info$edge.bel[[i]] * (crf$edge.par[[i]]>0)[,,])
-  # }
-  # mean.phi.vec <- c(node.param.phi.means,edge.param.phi.means)
-  #
-  # return(mean.phi.vec)
+  nodeBel    <- as.numeric(inference.info$node.bel) # Flatten node marginals matrix into a vector
+  edgeBel    <- unlist(inference.info$edge.bel)     # Flatten edge marginals matrices into a vector
 
+  param.phi.means <- numeric(num.params)
+  for(i in 1:num.params) {
+    if(i %in% nodeMap) {
+      #print(paste("Param", i,"is a node parameter"))
+      param.idxs <- which(nodeMap == i) # indices for parameter i
+      param.phi.means[i] <- sum(nodeBel[param.idxs])
+    }
+    if(i %in% edgeMap) {
+      #print(paste("Param", i,"is an edge parameter"))
+      param.idxs <- which(edgeMap == i) # indices for parameter i
+      param.phi.means[i] <- sum(edgeBel[param.idxs])
+    }
+  }
+
+  return(param.phi.means)
 }
-
