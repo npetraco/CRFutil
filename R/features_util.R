@@ -99,7 +99,10 @@ phi.features.explicit <- function(config, edges.mat, node.par, edge.par, ff) {
 #' @export
 compute.model.matrix <- function(configs, edges.mat, node.par, edge.par, ff) {
 
-  model.mat <- t(sapply(1:nrow(configs), function(xx){phi.features(config = configs[xx,], edges.mat, node.par, edge.par, ff)}))
+  model.mat <- t(sapply(1:nrow(configs), function(xx){
+    phi.features(config = configs[xx,], edges.mat, node.par, edge.par, ff)
+  }))
+
   return(model.mat)
 
 }

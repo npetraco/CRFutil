@@ -109,8 +109,8 @@ feature.means(fit, infer.junction)*num.samps
 
 # Fit model to samples from the known model and obtain an estimate for theta:
 train.mrf(fit, samps, nll=mrf.exact.nll, infer.method = infer.exact)
-shift.pots(fit)
-fit$par.stat     # Sample sufficient statistics: total number of appearances of each parameter in the sample
-cbind(fit$par.stat, feature.means(fit, infer.junction)*num.samps)
+#shift.pots(fit)
+#fit$par.stat     # Sample sufficient statistics: total number of appearances of each parameter in the sample
+#cbind(fit$par.stat, feature.means(fit, infer.junction)*num.samps)
 
 
