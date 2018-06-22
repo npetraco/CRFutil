@@ -70,7 +70,7 @@ colnames(joint.dist.info2) <- c("A","B","C","D", "Unnormalized", "Normalized")
 joint.dist.info2 # Yup, we do.
 
 # So now sample from the model as if we obtained an experimental sample:
-num.samps <- 10
+num.samps <- 50
 set.seed(1)
 samps <- sample.exact(known.model, num.samps)
 
@@ -102,15 +102,81 @@ fit$edge.par[[3]][2,2,1] <- 10
 fit$edge.par[[4]][1,1,1] <- 11
 fit$edge.par[[4]][2,2,1] <- 12
 fit$edge.par
+#===================================
 
+
+# Gradient function of the log-likelihood
+grad.llk <- function(crf, inference.func, samples) {
+  N        <- nrow(samples)
+  dL       <- N*feature.means(crf, inference.func) - crf$par.stat
+  #crf$grad <- dL
+  return(dL)
+}
+
+# Test
+fit$par.stat <- mrf.stat(fit, samps)
+grad.llk(fit, infer.junction, samps)
+# Same?
+feature.means(fit, infer.junction)*num.samps - mrf.stat(fit, samps)
 
 mrf.stat(fit, samps)  # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
 feature.means(fit, infer.junction)*num.samps
 
-# Fit model to samples from the known model and obtain an estimate for theta:
-train.mrf(fit, samps, nll=mrf.exact.nll, infer.method = infer.exact)
-#shift.pots(fit)
-#fit$par.stat     # Sample sufficient statistics: total number of appearances of each parameter in the sample
-#cbind(fit$par.stat, feature.means(fit, infer.junction)*num.samps)
+
+#--------------------
+gradient <- function(par, fit, ...) { fit$gradient }
+fit$par.stat <- mrf.stat(fit, samps)
+opt.info <- stats::optim(fit$par, mrf.junction.nll, gradient, fit, samps, infer.junction,
+             method = "L-BFGS-B",
+             control = list(trace = 1, REPORT=1))
+opt.info$convergence
+opt.info$message
+
+# Reset:
+fit$par      <- numeric(length(fit$par))
+fit$gradient <- numeric(length(fit$gradient))
+
+mrf.junction.nll(fit$par, fit, samps, infer.junction)
+fit$gradient
+grad.llk(fit, infer.junction, samps)
+
+# [1]  0.59534139 -0.04613655 -0.16954273  0.13159944  0.12603018 -0.42317465  1.96125385  1.23431303  3.40588695
+# [10]  3.62156623 -2.57678713 -2.53884385
+#mrf.update(fit)
+
+#
+# Check
+train.mrf(fit, samps, nll=mrf.junction.nll, infer.method = infer.junction, trace=1)
+fit$par
+fit$gradient
+grad.llk(fit, infer.junction, samps)
+# [1]  0.59534139 -0.04613655 -0.16954273  0.13159944  0.12603018 -0.42317465  1.96125385  1.23431303  3.40588695
+# [10]  3.62156623 -2.57678713 -2.53884385
 
 
+#
+#--------------------
+gradient <- function(par, fit, ...) { fit$gradient }
+fit$par.stat <- mrf.stat(fit, samps)
+opt.info <- stats::optim(fit$par, mrf.exact.nll, gradient, fit, samps, infer.exact,
+             method = "L-BFGS-B",
+             control = list(trace = 1, REPORT=1))
+opt.info$convergence
+opt.info$message
+# Reset:
+fit$par      <- numeric(length(fit$par))
+fit$gradient <- numeric(length(fit$gradient))
+
+mrf.exact.nll(fit$par, fit, samps, infer.exact)
+fit$gradient
+grad.llk(fit, infer.lbp, samps)
+
+#----------------------
+opt.info <- stats::optim(fit$par, mrf.lbp.nll, gradient, fit, samps, infer.lbp,
+                         method = "L-BFGS-B",
+                         control = list(trace = 1, REPORT=1))
+opt.info$convergence
+opt.info$message
+# Reset:
+fit$par      <- numeric(length(fit$par))
+fit$gradient <- numeric(length(fit$gradient))

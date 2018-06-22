@@ -79,13 +79,15 @@ loglik <- function(w, nInstances, suffStat, crf, inferFunc=infer.exact) {
 #'
 #'
 #' @export
-grad.loglik <- function(crf, samples, inference.func = infer.exact) {
+grad.loglik <- function(crf, nInstances, suffStat, inference.func = infer.exact) {
 
   # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
-  emp.num.features <- mrf.stat(crf, samples)
+  #emp.num.features <- mrf.stat(crf, samples)
+  emp.num.features <- suffStat
 
   # Second term of the gradient: N \times \text{E}_{\hat{\boldsymbol \theta}}[{\boldsymbol \phi}]
-  num.features.est <- nrow(samples) * feature.means(crf, inference.func)
+  #num.features.est <- nrow(samples) * feature.means(crf, inference.func)
+  num.features.est <- nInstances * feature.means(crf, inference.func)
 
   grd <- emp.num.features - num.features.est
 

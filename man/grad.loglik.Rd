@@ -4,7 +4,7 @@
 \alias{grad.loglik}
 \title{Utility function to compute gradient of log likelihood}
 \usage{
-grad.loglik(crf, samples, inference.func = infer.exact)
+grad.loglik(crf, nInstances, suffStat, inference.func = infer.exact)
 }
 \arguments{
 \item{XX}{The XX}
