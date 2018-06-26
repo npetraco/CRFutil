@@ -59,9 +59,9 @@ negloglik <- function(w, crf, samples, infer.method = infer.exact) {
   # Make potentials with the parameter vector passed in.
   # Store in crf object for use with infer.method
   # They are needed to get the Z corresponding to w passed in!
-  mpots        <- make.pots(w, crf, rescaleQ = F) # Add substitution functionality eventually ????
-  crf$node.pot <- mpots[[1]]
-  crf$edge.pot <- mpots[[2]]
+  mpots        <- make.pots(w, crf, rescaleQ = F, replaceQ = T)
+  #crf$node.pot <- mpots[[1]]
+  #crf$edge.pot <- mpots[[2]]
 
   # Compute logZ:
   infer.info <- infer.method(crf)

@@ -48,10 +48,8 @@ shift.pots <- function(crf) {
 }
 
 
-#' Make stand alone potentials from input parameter vector.
+#' Make potentials from input parameter vector.
 #'
-#' Does same thing as shift.pots but returns potentials instead of putting them into the CRF object.
-#' Eventually this could be combined with shift.pots
 #'
 #' The function will XXXX
 #'
@@ -60,7 +58,7 @@ shift.pots <- function(crf) {
 #'
 #'
 #' @export
-make.pots <- function(parms, crf, rescaleQ=FALSE) {
+make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE) {
 
   # Loop over elements of parameter index matrix (also called nodeMap and edgeMap in UGM)
   # and put elements of exp(parms) where they belong
@@ -93,6 +91,13 @@ make.pots <- function(parms, crf, rescaleQ=FALSE) {
       #print(paste(k, " ", max(edge.pot.shifted[[k]]) ))
       edge.pot.shifted[[k]] <- edge.pot.shifted[[k]]/max(edge.pot.shifted[[k]])
     }
+
+  }
+
+  if(replaceQ==TRUE){
+    crf$node.pot <- node.pot.shifted
+    crf$edge.pot <- edge.pot.shifted
+    print("Potentials computed from parameter vector, node.par and edge.par were written to CRF object's node.pot and edge.pot.")
 
   }
 

@@ -2,9 +2,9 @@
 % Please edit documentation in R/potentials_util.R
 \name{make.pots}
 \alias{make.pots}
-\title{Make stand alone potentials from input parameter vector.}
+\title{Make potentials from input parameter vector.}
 \usage{
-make.pots(parms, crf, rescaleQ = FALSE)
+make.pots(parms, crf, rescaleQ = FALSE, replaceQ = FALSE)
 }
 \arguments{
 \item{XX}{The XX}
@@ -13,10 +13,6 @@ make.pots(parms, crf, rescaleQ = FALSE)
 The function will XX
 }
 \description{
-Does same thing as shift.pots but returns potentials instead of putting them into the CRF object.
-Eventually this could be combined with shift.pots
-}
-\details{
 The function will XXXX
 }
 
