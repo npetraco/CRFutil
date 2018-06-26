@@ -50,21 +50,48 @@ mrf.standard.fit <- function(samples, net.graph.formula, num.states, mrf.nll.fun
 #'
 #'
 #' @export
-loglik <- function(w, nInstances, suffStat, crf, inferFunc=infer.exact) {
+negloglik <- function(w, crf, samples, infer.method = infer.exact) {
+        # args were: (w, nInstances, suffStat, crf, inferFunc=infer.exact)
+  # args to mrf.nll: (par, crf, instances, infer.method = infer.chain, ...)
 
-  # Make potentials with the parameter vector passed in:
-  mpots       <- make.pots(w, crf)
-  crf$nodePot <- mpots$node.pot.shifted # Has to be done here because of arg structure to inferFunc
-  crf$edgePot <- mpots$edge.pot.shifted # Has to be done here because of arg structure to inferFunc
+  subst <- TRUE # Put at the end of arg list eventually ????
+
+  # Make potentials with the parameter vector passed in.
+  # Store in crf object for use with infer.method
+  # They are needed to get the Z corresponding to w passed in!
+  mpots        <- make.pots(w, crf, rescaleQ = F) # Add substitution functionality eventually ????
+  crf$node.pot <- mpots[[1]]
+  crf$edge.pot <- mpots[[2]]
 
   # Compute logZ:
-  infer.info <- inferFunc(crf)
+  infer.info <- infer.method(crf)
   logZZ      <- infer.info$logZ
 
-  # Compute log likelihood:
-  llk <- w %*% suffStat + nInstances*infer.info$logZ
+  # Compute neg log likelihood:
+  if(is.null(crf$par.stat)) {
+    stop("Compute sufficient statistics and store in crf object!")
+  }
+  nInstances <- nrow(samples)
+  suffStat   <- crf$par.stat
+  nllk       <- -w %*% suffStat + nInstances * infer.info$logZ
+  #print(paste("num samps:",nInstances))
+  #print(paste("logZ:",     infer.info$logZ))
+  #print(paste("offset:",   nInstances * infer.info$logZ))
+  #print("param vec:")
+  #print(w)
+  #print("suff stats")
+  #print(suffStat)
 
-  return(llk)
+  # Compute gradient of neg log likelihood, just like in mrf.XXXX.nll():
+  grad <- grad.negloglik(crf, nInstances, suffStat, infer.method)
+
+  if(subst == TRUE){
+    crf$par      <- w
+    crf$nll      <- nllk
+    crf$gradient <- grad
+  }
+
+  return(nllk)
 }
 
 
@@ -79,17 +106,17 @@ loglik <- function(w, nInstances, suffStat, crf, inferFunc=infer.exact) {
 #'
 #'
 #' @export
-grad.loglik <- function(crf, nInstances, suffStat, inference.func = infer.exact) {
+grad.negloglik <- function(crf, nInstances, suffStat, inference.func = infer.exact) {
 
-  # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
+  # Second term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
   #emp.num.features <- mrf.stat(crf, samples)
   emp.num.features <- suffStat
 
-  # Second term of the gradient: N \times \text{E}_{\hat{\boldsymbol \theta}}[{\boldsymbol \phi}]
+  # First term of the gradient: N \times \text{E}_{\hat{\boldsymbol \theta}}[{\boldsymbol \phi}]
   #num.features.est <- nrow(samples) * feature.means(crf, inference.func)
   num.features.est <- nInstances * feature.means(crf, inference.func)
 
-  grd <- emp.num.features - num.features.est
+  grd <- num.features.est - emp.num.features
 
   return(grd)
 

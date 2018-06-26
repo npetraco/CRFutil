@@ -4,7 +4,7 @@
 \alias{make.pots}
 \title{Make stand alone potentials from input parameter vector.}
 \usage{
-make.pots(parms, crf)
+make.pots(parms, crf, rescaleQ = FALSE)
 }
 \arguments{
 \item{XX}{The XX}

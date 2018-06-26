@@ -1,0 +1,59 @@
+library(CRFutil)
+
+load("/Users/npetraco/latex/papers/dust/steph_diss/CRFutil/tests/samps.RData")
+grphf <- ~A:B + B:C + C:D + D:A
+adj   <- ug(grphf, result="matrix")
+
+n.states <- 2
+#===================================
+# To compare with fit:
+com <- make.crf(adj, n.states)
+com <- make.features(com)
+com <- make.par(com, 12)
+
+# Fill the parameter index matrices with the standard parameterization
+# Standard parameterization, one param per node:
+for(i in 1:nrow(com$node.par)){
+  com$node.par[i,1,1] <- i
+}
+com$edge.par[[1]][1,1,1] <- 5
+com$edge.par[[1]][2,2,1] <- 6
+com$edge.par[[2]][1,1,1] <- 7
+com$edge.par[[2]][2,2,1] <- 8
+com$edge.par[[3]][1,1,1] <- 9
+com$edge.par[[3]][2,2,1] <- 10
+com$edge.par[[4]][1,1,1] <- 11
+com$edge.par[[4]][2,2,1] <- 12
+#===================================
+
+#mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
+set.seed(1)
+w.test <- runif(com$n.par,-1,1)
+w.test
+
+com$node.pot
+com$edge.pot
+
+com$par.stat <- mrf.stat(com, samps)
+com$par.stat
+com$gradient
+com$nll
+com$par
+
+mrf.exact.nll(w.test, com, samps, infer.exact)
+
+com$node.pot
+com$edge.pot
+
+com$par.stat
+com$gradient
+com$nll
+com$par
+
+
+mrf.update(com) # Rescales potentials
+com$node.pot
+com$edge.pot
+
+
+infer.exact(com)

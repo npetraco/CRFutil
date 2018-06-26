@@ -60,7 +60,7 @@ shift.pots <- function(crf) {
 #'
 #'
 #' @export
-make.pots <- function(parms, crf) {
+make.pots <- function(parms, crf, rescaleQ=FALSE) {
 
   # Loop over elements of parameter index matrix (also called nodeMap and edgeMap in UGM)
   # and put elements of exp(parms) where they belong
@@ -71,6 +71,9 @@ make.pots <- function(parms, crf) {
       if(node.par[i,j] != 0) {
         par.idx <- node.par[i,j]
         node.pot.shifted[i,j,1] <- exp(parms[par.idx])
+      }
+      if(rescaleQ==TRUE) {
+        node.pot.shifted[i,,1] <- node.pot.shifted[i,,1]/max(node.pot.shifted[i,,1])
       }
     }
   }
@@ -86,6 +89,11 @@ make.pots <- function(parms, crf) {
         }
       }
     }
+    if(rescaleQ==TRUE){
+      #print(paste(k, " ", max(edge.pot.shifted[[k]]) ))
+      edge.pot.shifted[[k]] <- edge.pot.shifted[[k]]/max(edge.pot.shifted[[k]])
+    }
+
   }
 
   # Don't worry about the .shifted extension. It's just so I could copy code from shift.pots.
