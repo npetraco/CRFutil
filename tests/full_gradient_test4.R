@@ -33,22 +33,26 @@ com$par.stat <- mrf.stat(com, samps)
 com$par
 com$par.stat
 
-mrf.lbp.nll(par = com$par, crf = com, instances = samps, infer.method = infer.lbp)
-com$nll
-com$gradient
+#mrf.lbp.nll(par = com$par, crf = com, instances = samps, infer.method = infer.lbp)
+#com$nll
+#com$gradient
 
 gradient <- function(par, crf, ...) { crf$gradient }
 opt.info <- stats::optim(par = com$par, fn = mrf.lbp.nll, gr = gradient, crf = com, instances = samps, infer.method = infer.lbp,
                          method = "L-BFGS-B",
                          control = list(trace = 1, REPORT=1))
+grad.negloglik(com, nrow(samps), com$par.stat, inference.func = infer.lbp)
+com$gradient
 opt.info$convergence
 opt.info$message
+
 
 # Optimized pots:
 com$node.pot
 com$edge.pot
 
 lbp.margials.info <- infer.lbp(com)
+lbp.margials.info
 # > infer.lbp(com)
 # $node.bel
 # [,1]      [,2]
@@ -87,14 +91,15 @@ com$par.stat <- mrf.stat(com, samps)
 com$par
 com$par.stat
 
-mrf.junction.nll(par = com$par, crf = com, instances = samps, infer.method = infer.junction)
-com$nll
-com$gradient
+#mrf.junction.nll(par = com$par, crf = com, instances = samps, infer.method = infer.junction)
+#com$nll
+#com$gradient
 
 gradient <- function(par, crf, ...) { crf$gradient }
 opt.info <- stats::optim(par = com$par, fn = mrf.junction.nll, gr = gradient, crf = com, instances = samps, infer.method = infer.junction,
                          method = "L-BFGS-B",
                          control = list(trace = 1, REPORT=1))
+com$gradient
 opt.info$convergence
 opt.info$message
 
@@ -157,6 +162,7 @@ com$node.pot
 com$edge.pot
 
 exact.margials.info <-infer.exact(com)
+exact.margials.info
 # > infer.exact(com)
 # $node.bel
 # [,1]      [,2]

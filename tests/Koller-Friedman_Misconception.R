@@ -104,79 +104,38 @@ fit$edge.par[[4]][2,2,1] <- 12
 fit$edge.par
 #===================================
 
-
-# Gradient function of the log-likelihood
-grad.llk <- function(crf, inference.func, samples) {
-  N        <- nrow(samples)
-  dL       <- N*feature.means(crf, inference.func) - crf$par.stat
-  #crf$grad <- dL
-  return(dL)
-}
-
-# Test
+# First compute the sufficient stats needed by the likelihood and its’ grad
 fit$par.stat <- mrf.stat(fit, samps)
-grad.llk(fit, infer.junction, samps)
-# Same?
-feature.means(fit, infer.junction)*num.samps - mrf.stat(fit, samps)
+fit$par.stat
 
-mrf.stat(fit, samps)  # First term of the gradient (its constant): N \times \hat{\text{E}}_{\boldsymbol \theta}[{\boldsymbol \phi}]
-feature.means(fit, infer.junction)*num.samps
+# Auxiliary, gradient convenience function. Follows train.mrf in CRF:
+gradient <- function(par, crf, ...) { crf$gradient }
 
-
-#--------------------
-gradient <- function(par, fit, ...) { fit$gradient }
-fit$par.stat <- mrf.stat(fit, samps)
-opt.info <- stats::optim(fit$par, mrf.junction.nll, gradient, fit, samps, infer.junction,
-             method = "L-BFGS-B",
-             control = list(trace = 1, REPORT=1))
+# Lets use loopy-belief (lbp) to compute any needed inference quantities (Z and Bels)
+# I had to run optim 3-times to reach convergence with LBP:
+opt.info <- stats::optim(
+  par          = fit$par,     # theta
+  fn           = negloglik,   # objective function
+  gr           = gradient,    # grad obj func
+  crf          = fit,         # passed to fn/gr
+  samples      = samps,       # passed to fn/gr
+  infer.method = infer.lbp,   # passed to fn/gr
+  method       = "L-BFGS-B",
+  control      = list(trace = 1, REPORT=1))
 opt.info$convergence
 opt.info$message
-
-# Reset:
-fit$par      <- numeric(length(fit$par))
-fit$gradient <- numeric(length(fit$gradient))
-
-mrf.junction.nll(fit$par, fit, samps, infer.junction)
 fit$gradient
-grad.llk(fit, infer.junction, samps)
 
-# [1]  0.59534139 -0.04613655 -0.16954273  0.13159944  0.12603018 -0.42317465  1.96125385  1.23431303  3.40588695
-# [10]  3.62156623 -2.57678713 -2.53884385
-#mrf.update(fit)
+# Optimized pots:
+fit$node.pot
+fit$edge.pot
+
+# Optimized marginals:
+lbp.margials.info <- infer.lbp(fit)
+lbp.margials.info
 
 #
 # Check
 train.mrf(fit, samps, nll=mrf.junction.nll, infer.method = infer.junction, trace=1)
 fit$par
 fit$gradient
-grad.llk(fit, infer.junction, samps)
-# [1]  0.59534139 -0.04613655 -0.16954273  0.13159944  0.12603018 -0.42317465  1.96125385  1.23431303  3.40588695
-# [10]  3.62156623 -2.57678713 -2.53884385
-
-
-#
-#--------------------
-gradient <- function(par, fit, ...) { fit$gradient }
-fit$par.stat <- mrf.stat(fit, samps)
-opt.info <- stats::optim(fit$par, mrf.exact.nll, gradient, fit, samps, infer.exact,
-             method = "L-BFGS-B",
-             control = list(trace = 1, REPORT=1))
-opt.info$convergence
-opt.info$message
-# Reset:
-fit$par      <- numeric(length(fit$par))
-fit$gradient <- numeric(length(fit$gradient))
-
-mrf.exact.nll(fit$par, fit, samps, infer.exact)
-fit$gradient
-grad.llk(fit, infer.lbp, samps)
-
-#----------------------
-opt.info <- stats::optim(fit$par, mrf.lbp.nll, gradient, fit, samps, infer.lbp,
-                         method = "L-BFGS-B",
-                         control = list(trace = 1, REPORT=1))
-opt.info$convergence
-opt.info$message
-# Reset:
-fit$par      <- numeric(length(fit$par))
-fit$gradient <- numeric(length(fit$gradient))
