@@ -74,13 +74,6 @@ negloglik <- function(w, crf, samples, infer.method = infer.exact) {
   nInstances <- nrow(samples)
   suffStat   <- crf$par.stat
   nllk       <- -w %*% suffStat + nInstances * infer.info$logZ
-  #print(paste("num samps:",nInstances))
-  #print(paste("logZ:",     infer.info$logZ))
-  #print(paste("offset:",   nInstances * infer.info$logZ))
-  #print("param vec:")
-  #print(w)
-  #print("suff stats")
-  #print(suffStat)
 
   # Compute gradient of neg log likelihood, just like in mrf.XXXX.nll():
   grad <- grad.negloglik(crf, nInstances, suffStat, infer.method)

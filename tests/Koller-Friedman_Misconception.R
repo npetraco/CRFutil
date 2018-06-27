@@ -12,7 +12,7 @@ adj
 n.states <- 2
 known.model <- make.crf(adj, n.states)
 
-# Node pots not in original Misconception example: ????
+# Node pots not in original Misconception example:
 PsiA <- c(1,1)
 PsiB <- c(1,1)
 PsiC <- c(1,1)

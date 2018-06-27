@@ -127,7 +127,7 @@ feature.means <- function(crf, inference.func = infer.exact) {
   # I.E. use "inference" to avoid computing X and Z directly. Use "junction tree":
   nodeMap    <- as.numeric(crf$node.par[,,]) # Flatten node parameter index matrix into a vector
   edgeMap    <- unlist(crf$edge.par)         # Flatten edge parameter index matries into a vector
-  num.params <- max(c(nodeMap,edgeMap))
+  num.params <- max(c(nodeMap,edgeMap))      # eventually change to crf$n.par
 
   nodeBel    <- as.numeric(inference.info$node.bel) # Flatten node marginals matrix into a vector
   edgeBel    <- unlist(inference.info$edge.bel)     # Flatten edge marginals matrices into a vector
