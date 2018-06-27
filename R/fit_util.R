@@ -50,18 +50,15 @@ mrf.standard.fit <- function(samples, net.graph.formula, num.states, mrf.nll.fun
 #'
 #'
 #' @export
-negloglik <- function(par, crf, samples, infer.method = infer.exact) {
+negloglik <- function(par, crf, samples, infer.method = infer.exact, update.crfQ = TRUE) {
         # args were: (w, nInstances, suffStat, crf, inferFunc=infer.exact)
   # args to mrf.nll: (par, crf, instances, infer.method = infer.chain, ...)
 
-  subst <- TRUE # Put at the end of arg list eventually ????
 
   # Make potentials with the parameter vector passed in.
   # Store in crf object for use with infer.method
   # They are needed to get the Z corresponding to w passed in!
-  mpots        <- make.pots(par, crf, rescaleQ = F, replaceQ = T)
-  #crf$node.pot <- mpots[[1]]
-  #crf$edge.pot <- mpots[[2]]
+  mpots <- make.pots(par, crf, rescaleQ = F, replaceQ = T, printQ = F)
 
   # Compute logZ:
   infer.info <- infer.method(crf)
@@ -78,7 +75,7 @@ negloglik <- function(par, crf, samples, infer.method = infer.exact) {
   # Compute gradient of neg log likelihood, just like in mrf.XXXX.nll():
   grad <- grad.negloglik(crf, nInstances, suffStat, infer.method)
 
-  if(subst == TRUE){
+  if(update.crfQ == TRUE){
     crf$par      <- par
     crf$nll      <- nllk
     crf$gradient <- grad

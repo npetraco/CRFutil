@@ -58,7 +58,7 @@ shift.pots <- function(crf) {
 #'
 #'
 #' @export
-make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE) {
+make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, printQ=FALSE) {
 
   # Loop over elements of parameter index matrix (also called nodeMap and edgeMap in UGM)
   # and put elements of exp(parms) where they belong
@@ -97,8 +97,9 @@ make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE) {
   if(replaceQ==TRUE){
     crf$node.pot <- node.pot.shifted
     crf$edge.pot <- edge.pot.shifted
-    print("Potentials computed from parameter vector, node.par and edge.par were written to CRF object's node.pot and edge.pot.")
-
+    if(printQ==TRUE){
+      print("Potentials computed from parameter vector, node.par and edge.par were written to CRF object's node.pot and edge.pot.")
+    }
   }
 
   # Don't worry about the .shifted extension. It's just so I could copy code from shift.pots.

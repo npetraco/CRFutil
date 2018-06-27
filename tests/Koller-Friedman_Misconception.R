@@ -113,18 +113,28 @@ gradient <- function(par, crf, ...) { crf$gradient }
 
 # Lets use loopy-belief (lbp) to compute any needed inference quantities (Z and Bels)
 # I had to run optim 3-times to reach convergence with LBP:
-opt.info <- stats::optim(
-  par          = fit$par,     # theta
-  fn           = negloglik,   # objective function
-  gr           = gradient,    # grad obj func
-  crf          = fit,         # passed to fn/gr
-  samples      = samps,       # passed to fn/gr
-  infer.method = infer.lbp,   # passed to fn/gr
+infr.meth <- infer.lbp        # inference method needed for Z and marginals calcs
+opt.info  <- stats::optim(    # optimize parameters
+  par          = fit$par,       # theta
+  fn           = negloglik,     # objective function
+  gr           = gradient,      # grad obj func
+  crf          = fit,           # passed to fn/gr
+  samples      = samps,         # passed to fn/gr
+  infer.method = infr.meth,     # passed to fn/gr
+  update.crfQ  = TRUE,          # passed to fn/gr
   method       = "L-BFGS-B",
   control      = list(trace = 1, REPORT=1))
 opt.info$convergence
 opt.info$message
 fit$gradient
+fit$nll
+
+# Examine the gradient terms at the minimum in more detail:
+N.E.hat.theta.phi <- num.samps * feature.means(fit, infr.meth)
+s                 <- fit$par.stat
+grad              <- E.hat.theta.phi - s
+cbind(N.E.hat.theta.phi, s, grad)
+
 
 # Optimized pots:
 fit$node.pot
