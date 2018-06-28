@@ -13,6 +13,18 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
 
   mrf.sim.model <- make.crf(adjacentcy.matrix, num.states)
 
+  # May be needed for other functionality, so include explicit (standard) parameterization:
+  mrf.sim.model <- make.features(mrf.sim.model)
+  mrf.sim.model <- make.par(mrf.sim.model, nrow(mrf.sim.model$node.pot) + length(mrf.sim.model$edge.pot))
+  for(i in 1:nrow(mrf.sim.model$node.par)){
+    mrf.sim.model$node.par[i,1,1] <- i
+  }
+  for(i in 1:length(mrf.sim.model$edge.par)){
+    mrf.sim.model$edge.par[[i]][1,1,1] <- nrow(mrf.sim.model$node.pot) + i
+    mrf.sim.model$edge.par[[i]][2,2,1] <- nrow(mrf.sim.model$node.pot) + i
+  }
+
+
   # Make up random node weights:
   num.nodes <- nrow(adjacentcy.matrix)
   if(!is.null(seed)){

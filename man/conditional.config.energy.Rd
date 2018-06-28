@@ -5,7 +5,7 @@
 \title{Energy function for energy of a conditional configuration of states E(Xi | X/Xi)}
 \usage{
 conditional.config.energy(config, condition.element.number, adj.node.list,
-  edge.mat, one.lgp, two.lgp, ff, printQ = NULL)
+  edge.mat, one.lgp, two.lgp, ff, printQ = FALSE)
 }
 \arguments{
 \item{config}{A node configuration (state) vector}

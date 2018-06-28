@@ -80,7 +80,7 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 #'
 #'
 #' @export
-conditional.config.energy <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff, printQ=NULL) {
+conditional.config.energy <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff, printQ=FALSE) {
 
   #num.nodes <- length(config)
 
