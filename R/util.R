@@ -97,3 +97,107 @@ complement.at.idx <- function(configuration, complement.index){
   return(new.configuration)
 
 }
+
+
+#' Function to find which nodes are associated with which parameters.
+#' XXXX
+#'
+#' The list produced maps node indices to the parameters they are asociated with
+#'
+#' The function will XXXX
+#'
+#' @param crf The XX
+#' @param storeQ Logical, whether or not to store the the node to parameter list in the crf object
+#' @return The function will XX
+#'
+#'
+#' @export
+nodes2params.list <- function(crf, storeQ = FALSE){
+
+  node.par.assoc <- rep(list(NULL), crf$n.nodes)
+
+  # Find the parameters associated with each node:
+  for(i in 1:crf$n.nodes) {
+    par.idxs  <- as.numeric(crf$node.par[i,,]) # parameters for the node
+
+    # Get rid of the 0s:
+    zeros.idxs <- which(par.idxs == 0)
+    if(length(zeros.idxs) != 0) {
+      par.idxs  <- par.idxs[-zeros.idxs]
+    }
+
+    if(length(par.idxs) == 0){
+      stop("No parameters found for node: ", i) # **** Is this ever allowed????
+    }
+
+    node.par.assoc[[i]] <- c(node.par.assoc[[i]], par.idxs)
+    node.par.assoc[[i]] <- unique(node.par.assoc[[i]])
+  }
+
+  # Find the parameters associated with the nodes of each edge:
+  for(i in 1:length(crf$edge.par)) {
+    node.idx1 <- crf$edges[i,1] # node 1 of edge
+    node.idx2 <- crf$edges[i,2] # node 2 of edge
+    par.idxs  <- as.numeric(crf$edge.par[[i]]) # parameters for the edge
+
+    # Get rid of the 0s:
+    zeros.idxs <- which(par.idxs == 0)
+    if(length(zeros.idxs) != 0) {
+      par.idxs  <- par.idxs[-zeros.idxs]
+    }
+
+    if(length(par.idxs) == 0){
+      stop("No parameters found for edge: ", i) # **** Is this ever allowed????
+    }
+
+    node.par.assoc[[node.idx1]] <- c(node.par.assoc[[node.idx1]], par.idxs)
+    node.par.assoc[[node.idx2]] <- c(node.par.assoc[[node.idx2]], par.idxs)
+    node.par.assoc[[node.idx1]] <- unique(node.par.assoc[[node.idx1]])
+    node.par.assoc[[node.idx2]] <- unique(node.par.assoc[[node.idx2]])
+  }
+
+  if(storeQ == TRUE) {
+    crf$nodes2pars <- node.par.assoc
+  }
+
+  return(node.par.assoc)
+}
+
+
+#' Function to find which parameters are associated with which nodes.
+#' XXXX
+#'
+#' The list produced maps parameters indices to the nodes they are asociated with
+#'
+#' The function will XXXX
+#'
+#' @param crf The XX
+#' @param storeQ Logical, whether or not to store the the parameter to node list in the crf object
+#' @return The function will XX
+#'
+#'
+#' @export
+params2nodes.list <- function(crf, storeQ = FALSE){
+
+  if(is.null(crf$nodes2par)){
+    nodes2par <- nodes2params.list(crf, storeQ = FALSE)
+  } else {
+    nodes2par <- crf$nodes2par
+  }
+
+  par.node.assoc <- rep(list(NULL), crf$n.par)
+  for(i in 1:crf$n.nodes) {
+    for(k in 1:length(nodes2par[[i]])) {
+      par.idx <- nodes2par[[i]][k]
+      par.node.assoc[[par.idx]] <- c(par.node.assoc[[par.idx]] , i)
+      par.node.assoc[[par.idx]] <- unique(par.node.assoc[[par.idx]])
+    }
+  }
+
+  if(storeQ == TRUE) {
+    crf$pars2nodes <- par.node.assoc
+  }
+
+  return(par.node.assoc)
+
+}

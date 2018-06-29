@@ -31,39 +31,15 @@ conditional.config.energy(config                   = samps[1,],
                           printQ                   = F)
 
 known.model$adj.nodes
-phi.features(
+phi1 <- phi.features(
   config    = samps[1,],
   edges.mat = known.model$edges,
   node.par  = known.model$node.par,
   edge.par  = known.model$edge.par,
   ff        = f0
 )
-#What nodes are associated with what parameter?
-known.model$edges
-known.model$edge.par
-known.model$node.par
 known.model$par
+#What nodes are associated with what parameter?
+nodes2params.list(known.model, storeQ = T)
+params2nodes.list(known.model, storeQ = T)
 
-# ACCOUNT FOR NO PARAMS IN A PAR CONTAINER
-j.node.par.assoc <- rep(list(NULL), known.model$n.nodes)
-for(i in 1:known.model$n.nodes) {
-  #print(i)
-  j.par.idxs  <- as.numeric(known.model$node.par[i,,])
-  j.par.idxs  <- j.par.idxs[-which(j.par.idxs == 0)]
-  j.node.par.assoc[[i]] <- c(j.node.par.assoc[[i]], j.par.idxs)
-  j.node.par.assoc[[i]] <- unique(j.node.par.assoc[[i]])
-}
-j.node.par.assoc
-
-
-for(i in 1:length(known.model$edge.par)) {
-  j.node.idx1 <- known.model$edges[i,1]
-  j.node.idx2 <- known.model$edges[i,2]
-  j.par.idxs  <- as.numeric(known.model$edge.par[[i]])
-  j.par.idxs  <- j.par.idxs[-which(j.par.idxs == 0)]
-  j.node.par.assoc[[j.node.idx1]] <- c(j.node.par.assoc[[j.node.idx1]], j.par.idxs)
-  j.node.par.assoc[[j.node.idx2]] <- c(j.node.par.assoc[[j.node.idx2]], j.par.idxs)
-  j.node.par.assoc[[j.node.idx1]] <- unique(j.node.par.assoc[[j.node.idx1]])
-  j.node.par.assoc[[j.node.idx2]] <- unique(j.node.par.assoc[[j.node.idx2]])
-}
-j.node.par.assoc
