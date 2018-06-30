@@ -2,7 +2,9 @@
 % Please edit documentation in R/potentials_util.R
 \name{make.par.from.potentials}
 \alias{make.par.from.potentials}
-\title{Make a new parameter vector from the potentials contained in the crf object.}
+\title{This version makes a parameter vector from the potentials according to the node/edge pars contained in the
+crf object. If the potentials are not scalled according to the codeing in node/edge par, they are re-scaled
+before being used.}
 \usage{
 make.par.from.potentials(crf)
 }
@@ -13,11 +15,6 @@ make.par.from.potentials(crf)
 The function will XX
 }
 \description{
-update.mrf within train reorders things to the point where
-we cannot determine which potentials it utimately re-normalizes. Therefore just
-make a new parameter vector.
-}
-\details{
 The function will XXXX
 }
 

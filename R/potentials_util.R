@@ -108,11 +108,9 @@ make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, printQ=FALSE) 
 }
 
 
-#' Make a new parameter vector from the potentials contained in the crf object.
-#'
-#' update.mrf within train reorders things to the point where
-#' we cannot determine which potentials it utimately re-normalizes. Therefore just
-#' make a new parameter vector.
+#' Make a new parameter vector from ALL of the potential values contained in the crf object.
+#' This makes new node/edge pars and returns them. If node/edge pars are contained in the crf object passed in,
+#' they are ignored.
 #'
 #' The function will XXXX
 #'
@@ -121,7 +119,7 @@ make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, printQ=FALSE) 
 #'
 #'
 #' @export
-make.par.from.potentials <- function(crf) {
+make.par.from.all.potentials <- function(crf) {
 
   num.states  <- ncol(crf$node.pot)
 
@@ -158,4 +156,82 @@ make.par.from.potentials <- function(crf) {
   names(new.potentials.info) <- c("par", "node.par", "edge.par")
 
   return(new.potentials.info)
+}
+
+
+#' This version makes a parameter vector from the potentials according to the node/edge pars contained in the
+#' crf object. If the potentials are not scalled according to the codeing in node/edge par, they are re-scaled
+#' before being used.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+make.par.from.potentials <- function(crf) {
+
+  nodeMap <- crf$node.par
+  edgeMap <- crf$edge.par
+  nodePot <- crf$node.pot
+  edgePot <- crf$edge.pot
+
+  # First make sure that the potentials are scaled according to the node/edge pars:
+  for(i in 1:nrow(nodePot)){
+
+    zero.idxs <- which(nodeMap[i,,1] == 0)
+    if(length(zero.idxs) == 1) {
+      nodePot[i, ] <- nodePot[i,]/nodePot[i, zero.idxs] # These are pots, so divide not subtract
+    }
+    if(length(zero.idxs) > 2) {
+      warning("More than 2 reference elements found in node.par row: ", i, ". Skipping that row.")
+    }
+    if(length(zero.idxs) == 0) {
+      warning("No reference elements found in node.par row: ", i, ". Skipping that row.")
+    }
+
+  }
+  #print(nodePot)
+
+  for(k in 1:length(edgePot)) {
+    for(i in 1:nrow(edgePot[[k]]) ) {
+
+      zero.idxs <- which( edgeMap[[k]][i,,1] == 0 )
+      if(length(zero.idxs) == 1) {
+        edgePot[[k]][i, ] <- edgePot[[k]][i,]/edgePot[[k]][i, zero.idxs] # These are pots, so divide not subtract
+      }
+      if(length(zero.idxs) > 2) {
+        warning("More than 2 reference elements found in edge.par: ", k, " row ", i, ". Skipping that row.")
+      }
+      if(length(zero.idxs) == 0) {
+        warning("No reference elements found in edge.par: ", k, " row ", i, ". Skipping that row.")
+      }
+    }
+
+  }
+  #print(edgePot)
+
+  # Now put log potentials into their corresponding places in a parameter vector:
+  w <- numeric(crf$n.par)
+  for(i in 1:nrow(nodePot)) {
+    for(j in 1:ncol(nodePot)) {
+      if(nodeMap[i,j,1] != 0) {
+        w[nodeMap[i,j,1]] <- log(nodePot[i,j])
+      }
+    }
+  }
+
+  for(k in 1:length(edgePot)){
+    for(i in 1:nrow(edgePot[[k]])){
+      for(j in 1:ncol(edgePot[[k]])){
+        if(edgeMap[[k]][i,j,1] != 0) {
+          w[edgeMap[[k]][i,j,1]] <- log(edgePot[[k]][i,j])
+        }
+      }
+    }
+  }
+
+  return(w)
+
 }

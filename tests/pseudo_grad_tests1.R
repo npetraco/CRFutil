@@ -30,7 +30,6 @@ conditional.config.energy(config                   = samps[1,],
                           ff                       = f0,
                           printQ                   = F)
 
-known.model$adj.nodes
 phi1 <- phi.features(
   config    = samps[1,],
   edges.mat = known.model$edges,
@@ -38,8 +37,20 @@ phi1 <- phi.features(
   edge.par  = known.model$edge.par,
   ff        = f0
 )
-known.model$par
+phi1
+known.model$par      <- make.par.from.potentials(known.model)
+# Scale the potentials to conform with the parameter vector:
+rescaled.pots        <- make.pots(known.model$par, known.model, rescaleQ=FALSE, replaceQ=FALSE, printQ=F)
+known.model$node.pot <- rescaled.pots[[1]][,,]
+known.model$edge.pot <- rescaled.pots[[2]]
+
 #What nodes are associated with what parameter?
 nodes2params.list(known.model, storeQ = T)
 params2nodes.list(known.model, storeQ = T)
+known.model$par
+phi1
+known.model$node.pot
+known.model$edge.pot
 
+known.model$nodes2pars
+known.model$pars2nodes
