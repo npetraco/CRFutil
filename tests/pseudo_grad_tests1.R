@@ -97,5 +97,3 @@ phi.Xn <- phi.features(
 en.Xn.i
 known.model$par[ known.model$nodes2pars[[elem.num]] ] %*% phi.Xn[ known.model$nodes2pars[[elem.num]] ]
 
-
-# SOMETHING IS WRONG...................????????
