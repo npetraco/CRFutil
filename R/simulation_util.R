@@ -51,6 +51,16 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
     mrf.sim.model$edge.pot[[i]] <- trans.prob
   }
 
+  # Extract parameter vector:
+  mrf.sim.model$par <- make.par.from.potentials(mrf.sim.model)
+
+  # Scale the potentials to conform with the parameter vector:
+  rescaled.pots     <- make.pots(mrf.sim.model$par, mrf.sim.model, rescaleQ=FALSE, replaceQ=TRUE, printQ=FALSE)
+
+  #What nodes are associated with what parameter?
+  nodes2parameters  <- nodes2params.list(mrf.sim.model, storeQ = TRUE)
+
+
   mrf.model.samples <- sample.junction(mrf.sim.model, num.sims)
   colnames(mrf.model.samples) <- as.character(1:num.nodes)
   mrf.sim.info <- list(

@@ -114,3 +114,44 @@ conditional.config.energy <- function(config, condition.element.number, adj.node
   return(ener)
 
 }
+
+
+#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi), computed in terms of phi features
+#'
+#' Compute
+#'
+#' The function will XXXX
+#'
+#' @param config    A node configuration (state) vector
+#' @param condition.element.number i of E(Xi | X/Xi)
+#' @param crf       CRF object
+#' @return          The function will XX
+#'
+#'
+#' @export
+conditional.config.energy2 <- function(config, phi.config = NULL, condition.element.number, crf, ff = NULL) {
+
+  if(is.null(crf$nodes2pars)){
+    stop("Compute nodes2parameters list and store in crf object!")
+  }
+
+  # Compute phi features of config if they were not passed in:
+  if(is.null(phi.config)){
+
+    if(is.null(ff)){
+      stop("Include a feature function (ff) or a phi.config!")
+    }
+    phi.config <- phi.features(
+      config    = config,
+      edges.mat = crf$edges,
+      node.par  = crf$node.par,
+      edge.par  = crf$edge.par,
+      ff        = ff
+    )
+  }
+
+  ener <- crf$par[ crf$nodes2pars[[condition.element.number]] ] %*% phi.config[ crf$nodes2pars[[condition.element.number]] ]
+
+  return(ener)
+
+}

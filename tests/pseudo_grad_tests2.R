@@ -61,3 +61,10 @@ for(i in 1: num.samps) {
   }
 }
 en.result
+en.result[,5]
+
+samp.num <- 2
+elem.num <- 3
+conditional.config.energy2(config = samps[samp.num,], condition.element.number = elem.num, crf = known.model, ff = f0)
+conditional.config.energy(config= samps[samp.num,],condition.element.number = elem.num,adj.node.list= known.model$adj.nodes,edge.mat= known.model$edges,one.lgp= pot.info$node.energies,two.lgp= pot.info$edge.energies,ff= f0,printQ= F)
+
