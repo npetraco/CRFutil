@@ -46,17 +46,32 @@ phi.X
 
 # Grab the parameters associated with node 3
 node.pars <- n2p[[node.num]]
-node.pars # Definitley derivs not with respect to these params are 0
-phi.X[node.pars] # Any phi_i =0 in here also have 0 derivs
+node.pars        # ** Definitley derivs not with respect to these params are 0
+phi.X[node.pars] # ** Any phi_i = 0 in here are also 0 derivs
 
 # Compute the energy:
 # E(X_1|{\bf X}\slash X_1) = \theta_1 \phi_1({\bf X}) + \sum_{ k \in \{3,7,10,13\} } \theta_k \phi_{k_{[1\sim j\in\{2,3,4,5\}]}}({\bf X})
 known.model$par[node.pars] %*% phi.X[node.pars]
 
-# Gradient at this energy:
+# Gradient at this energy: \frac{\partial}{\partial \theta_k} E(X_i|{\bf X}\slash X_i) = \phi_{k_{[ \sim i]}}({\bf X})
+# Gradient at this energy ????:
 dEX1.3 <- numeric(known.model$n.par)
 dEX1.3[node.pars] <- phi.X[node.pars]
 dEX1.3
 node.pars
 phi.X[node.pars]
 
+dE.mat <- NULL
+for(i in 1:known.model$n.nodes) {
+
+  node.num <- i
+  node.pars <- n2p[[node.num]]
+  dEX1.i <- numeric(known.model$n.par)
+  dEX1.i[node.pars] <- phi.X[node.pars]
+  print(dEX1.i)
+  dE.mat <- cbind(dE.mat, dEX1.i)
+}
+colnames(dE.mat) <- 1:known.model$n.nodes
+rownames(dE.mat) <- 1:known.model$n.par
+dE.mat
+# CHECK??
