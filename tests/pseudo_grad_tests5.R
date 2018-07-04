@@ -31,6 +31,7 @@ n2p <- nodes2params.list(known.model, storeQ = T)
 
 # Try out the new formula on the first sampled configuration, node 3:
 X <- samps[1,]
+X
 node.num <- 3
 
 #Compute phi for X_1:
@@ -61,17 +62,19 @@ dEX1.3
 node.pars
 phi.X[node.pars]
 
-dE.mat <- NULL
+dE.mat <- array(-1, c(known.model$n.par, known.model$n.nodes))
 for(i in 1:known.model$n.nodes) {
 
   node.num <- i
   node.pars <- n2p[[node.num]]
   dEX1.i <- numeric(known.model$n.par)
   dEX1.i[node.pars] <- phi.X[node.pars]
-  print(dEX1.i)
-  dE.mat <- cbind(dE.mat, dEX1.i)
+  #print(dEX1.i)
+  #dE.mat <- cbind(dE.mat, dEX1.i)
+  dE.mat[,i] <- dEX1.i
 }
 colnames(dE.mat) <- 1:known.model$n.nodes
 rownames(dE.mat) <- 1:known.model$n.par
 dE.mat
 # CHECK??
+# MATHEMATICA SYMBOLIC EXPANSION
