@@ -62,3 +62,8 @@ dE.mat.c
 
 ce.vec
 cce.vec
+
+n2p[[3]]
+samps[1,]
+
+conditional.config.energy.grad.test(config = X, crf = known.model, ff = f0)
