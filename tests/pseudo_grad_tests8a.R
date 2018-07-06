@@ -1,0 +1,116 @@
+library(CRFutil)
+
+# Graph formula for Slayer field:
+grphf <- ~A:B+A:C+A:D+A:E+B:C+B:D+B:E+C:D+D:E
+
+# Check the graph:
+gp <- ug(grphf, result = "graph")
+dev.off()
+iplot(gp)
+
+# Adjacenty matrix:
+adj <- ug(grphf, result="matrix")
+
+
+# Make up random potentials and return a CRF-object
+num.samps   <- 100
+n.states    <- 2
+slay    <- sim.field.random(adjacentcy.matrix=adj, num.states=n.states, num.sims=num.samps, seed=1)
+samps       <- slay$samples
+known.model <- slay$model
+mrf.sample.plot(samps)
+
+#pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes)
+s1<-1
+s2<-2
+f0 <- function(y){ as.numeric(c((y==1),(y==2)))}    # Feature function
+
+# First identify which nodes are associated with which parameters and store in the crf object:
+# These are needed for the sum over k. See CRFutil for implenentation.
+n2p <- nodes2params.list(known.model, storeQ = T)
+
+# Try out the new formula on the first sampled configuration, node 3:
+X <- samps[1,]
+X
+
+# Make vector of phi features for the selecteted configuration
+# a.
+phi.vec <- phi.features(
+  config    = X,
+  edges.mat = known.model$edges,
+  node.par  = known.model$node.par,
+  edge.par  = known.model$edge.par,
+  ff        = f0
+)
+phi.vec
+
+# Gradient "matrix" is #parameters by #nodes. I.E., each column
+# is a gradient of a condtional energy:
+grad.Ec.mat   <- array(NA, c(known.model$n.par, known.model$n.nodes))
+grad.Ec.c.mat <- array(NA, c(known.model$n.par, known.model$n.nodes))
+ce            <- array(NA, c(known.model$n.nodes))
+cce           <- array(NA, c(known.model$n.nodes))
+Zc            <- array(NA, c(known.model$n.nodes))
+dZc.mat       <- array(NA, c(known.model$n.par, known.model$n.nodes))
+# Loop over nodes:
+for(i in 1:known.model$n.nodes) {
+
+  # Definitley derivs NOT with respect to these params are 0:
+  node.pars <- known.model$nodes2pars[[i]]
+  # Initalize a conditional energy gradient vector for node i to 0s:
+  dEX.i     <- numeric(known.model$n.par)
+  dEXc.i    <- numeric(known.model$n.par)
+
+  # Get complement phi_i's
+  phi.vec.c <- phi.features(
+    config    = complement.at.idx(X,i),
+    edges.mat = known.model$edges,
+    node.par  = known.model$node.par,
+    edge.par  = known.model$edge.par,
+    ff        = f0
+  )
+
+  # Any phi_i = 0 in here are also 0 derivs:
+  dEX.i[node.pars]  <- phi.vec[node.pars]
+  dEXc.i[node.pars] <- phi.vec.c[node.pars]
+  # Store gradients column-wise:
+  grad.Ec.mat[,i]      <- dEX.i
+  grad.Ec.c.mat[,i]    <- dEXc.i
+
+  ce[i] <- conditional.config.energy(
+    config                   = X,
+    condition.element.number = i,
+    adj.node.list            = known.model$adj.nodes,
+    edge.mat                 = known.model$edges,
+    one.lgp                  = pot.info$node.energies,
+    two.lgp                  = pot.info$edge.energies,
+    ff                       = f0)
+
+  cce[i] <- conditional.config.energy(
+    config                   = complement.at.idx(X,i),
+    condition.element.number = i,
+    adj.node.list            = known.model$adj.nodes,
+    edge.mat                 = known.model$edges,
+    one.lgp                  = pot.info$node.energies,
+    two.lgp                  = pot.info$edge.energies,
+    ff                       = f0)
+
+  dZc.mat[, i] <- exp(ce[i]) * grad.Ec.mat[,i] + exp(cce[i]) * grad.Ec.c.mat[,i]
+  Zc[i]        <- exp(ce[i]) + exp(cce[i])
+
+}
+colnames(grad.Ec.mat)   <- 1:known.model$n.nodes
+rownames(grad.Ec.mat)   <- 1:known.model$n.par
+colnames(grad.Ec.c.mat) <- 1:known.model$n.nodes
+rownames(grad.Ec.c.mat) <- 1:known.model$n.par
+colnames(dZc.mat) <- 1:known.model$n.nodes
+rownames(dZc.mat) <- 1:known.model$n.par
+
+
+grad.Ec.mat
+grad.Ec.mat[7,3]
+grad.Ec.c.mat
+grad.Ec.c.mat[7,3]
+
+Zc
+dZc.mat
