@@ -117,7 +117,7 @@ pseudolikelihoods.from.energies <- function(state.space, adjacent.nodes, edges.m
                                 two.lgp = edge.energies,
                                 ff = ff)})
 
-    complement.condtional.energies[i,] <- node.condtional.energies
+    complement.condtional.energies[i,] <- node.complement.condtional.energies
 
     # Zs for each conditional:
     node.conditional.Zs <- exp(node.condtional.energies) + exp(node.complement.condtional.energies)

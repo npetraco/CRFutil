@@ -48,20 +48,25 @@ phi.vec
 # is a gradient of a condtional energy:
 grad.Ec.mat   <- array(NA, c(known.model$n.par, known.model$n.nodes))
 grad.Ec.c.mat <- array(NA, c(known.model$n.par, known.model$n.nodes))
+# Condtional and complement condtional energy:
 ce            <- array(NA, c(known.model$n.nodes))
 cce           <- array(NA, c(known.model$n.nodes))
+# Condtional partition functions:
 Zc            <- array(NA, c(known.model$n.nodes))
+# Gradients of condtional partition functions:
 dZc.mat       <- array(NA, c(known.model$n.par, known.model$n.nodes))
+
+# Compute all parts of pseudo-likelihood gradient:
 # Loop over nodes:
 for(i in 1:known.model$n.nodes) {
 
-  # Definitley derivs NOT with respect to these params are 0:
+  # **Definitley derivs NOT with respect to these params are 0:
   node.pars <- known.model$nodes2pars[[i]]
-  # Initalize a conditional energy gradient vector for node i to 0s:
+  # Initalize a conditional energy gradient vectors for node i to 0s:
   dEX.i     <- numeric(known.model$n.par)
   dEXc.i    <- numeric(known.model$n.par)
 
-  # Get complement phi_i's
+  # Get complement phi_i's needed for Zcs and dZcs:
   phi.vec.c <- phi.features(
     config    = complement.at.idx(X,i),
     edges.mat = known.model$edges,
@@ -70,10 +75,10 @@ for(i in 1:known.model$n.nodes) {
     ff        = f0
   )
 
-  # Any phi_i = 0 in here are also 0 derivs:
+  # **Any phi_i = 0 in here are also 0 derivs:
   dEX.i[node.pars]  <- phi.vec[node.pars]
   dEXc.i[node.pars] <- phi.vec.c[node.pars]
-  # Store gradients column-wise:
+  # Store condional energy gradients column-wise:
   grad.Ec.mat[,i]      <- dEX.i
   grad.Ec.c.mat[,i]    <- dEXc.i
 
@@ -95,7 +100,12 @@ for(i in 1:known.model$n.nodes) {
     two.lgp                  = pot.info$edge.energies,
     ff                       = f0)
 
+  # Store conditional Z gradients column-wise as well:
+  # NOTE: Assumes only two states per node
   dZc.mat[, i] <- exp(ce[i]) * grad.Ec.mat[,i] + exp(cce[i]) * grad.Ec.c.mat[,i]
+
+  # Condtional Zs:
+  # NOTE: Assumes only two states per node
   Zc[i]        <- exp(ce[i]) + exp(cce[i])
 
 }
@@ -106,6 +116,32 @@ rownames(grad.Ec.c.mat) <- 1:known.model$n.par
 colnames(dZc.mat) <- 1:known.model$n.nodes
 rownames(dZc.mat) <- 1:known.model$n.par
 
+exp(ce)/(exp(ce) + exp(cce))
+1-exp(ce)/(exp(ce) + exp(cce))
+exp(cce)/(exp(ce) + exp(cce))
+exp(ce)/Zc
+exp(cce)/Zc
+
+# GENERALIZE THIS TO WORK WITH conditional.config.energy2
+psl.info <- pseudolikelihoods.from.energies(
+  t(as.matrix(X)),
+  known.model$adj.nodes,
+  known.model$edges,
+  pot.info$node.energies,
+  pot.info$edge.energies,
+  conditional.config.energy,
+  f0)
+ck.ce    <- as.numeric(psl.info$condtional.energies)
+ck.cce   <- as.numeric(psl.info$complement.condtional.energies)
+ck.Zs    <- as.numeric(psl.info$conditional.Zs)
+ck.cPrs  <- as.numeric(psl.info$conditional.Prs)
+ck.ccPrs <- as.numeric(psl.info$complement.conditional.Prs)
+
+cbind(ce,ck.ce,ce-ck.ce)
+cbind(cce,ck.cce,cce-ck.cce)
+cbind(Zc,ck.Zs,Zc-ck.Zs)
+cbind(exp(ce)/Zc, ck.cPrs,exp(ce)/Zc-ck.cPrs)
+cbind(exp(cce)/Zc, ck.ccPrs,exp(cce)/Zc-ck.ccPrs)
 
 grad.Ec.mat
 grad.Ec.mat[7,3]
@@ -114,3 +150,14 @@ grad.Ec.c.mat[7,3]
 
 Zc
 dZc.mat
+n2p[[4]]
+
+# What happens with these if we have all possible configs??
+dZc.mat[,1]/Zc[1]
+dZc.mat[,2]/Zc[2]
+dZc.mat[,3]/Zc[3]
+dZc.mat[,4]/Zc[4]
+dZc.mat[,5]/Zc[5]
+# What is a intuitive meaning for E[phi] ??
+
+dZc.mat[7,3]
