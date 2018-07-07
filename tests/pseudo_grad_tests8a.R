@@ -153,6 +153,13 @@ dZc.mat
 n2p[[4]]
 
 # What happens with these if we have all possible configs??
+E.Xphi.mat <- array(NA, c(known.model$n.par, known.model$n.nodes))
+for(i in 1:known.model$n.nodes) {
+  E.Xphi.mat[,i] <- dZc.mat[,i]/Zc[i]
+}
+colnames(E.Xphi.mat) <- 1:known.model$n.nodes
+rownames(E.Xphi.mat) <- 1:known.model$n.par
+
 dZc.mat[,1]/Zc[1]
 dZc.mat[,2]/Zc[2]
 dZc.mat[,3]/Zc[3]
