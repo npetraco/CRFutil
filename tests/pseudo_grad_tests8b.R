@@ -165,4 +165,5 @@ E.Xphi.mat[7,3]
 
 # psl grad for a config????
 grad.psl.X <- rowSums(grad.Ec.mat - E.Xphi.mat)
+round(grad.psl.X,4)
 grad.psl.X[7]
