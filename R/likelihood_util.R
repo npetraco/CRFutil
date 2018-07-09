@@ -89,6 +89,11 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
   condtional.energies            <- array(NA, num.nodes)
   complement.condtional.energies <- array(NA, num.nodes)
   conditional.logZs              <- array(NA, num.nodes)
+  #----
+  # conditional.Zs                 <- array(NA, num.nodes)
+  # conditional.Prs                <- array(NA, num.nodes)
+  # complement.conditional.Prs     <- array(NA, num.nodes)
+  #----
 
   if(is.null(par)){
     theta.pars <- crf$par
@@ -129,12 +134,53 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
       crf                      = crf,
       ff                       = ff)
 
+    #----
+    #conditional.Zs[i]    <- exp(condtional.energies[i]) + exp(complement.condtional.energies[i])
+    #complement.conditional.Prs[i] <- 1 - conditional.Prs[i]
+    #----
+
     conditional.logZs[i] <- logsumexp2(c(condtional.energies[i], complement.condtional.energies[i]))
 
   }
 
+  #----
+  # print("CE")
+  # print(condtional.energies)
+  # print("CCE")
+  # print(complement.condtional.energies)
+  #
+  # print("Zc")
+  # print(conditional.Zs)
+  #
+  # print("cPrs")
+  # print(conditional.Prs)
+  # print("ccPrs")
+  # print(complement.conditional.Prs)
+  #----
+
   #neg.log.pseudo.lik <- -sum(condtional.energies - log(conditional.Zs))
   neg.log.pseudo.lik <- sum(conditional.logZs - condtional.energies)
+
+  #----
+  #take2 <- -log(prod(conditional.Prs))
+  # print(take2)
+  #
+  #take3 <- -sum(log(conditional.Prs))
+  # print(take3)
+  #take4 <- -sum(condtional.energies - log(conditional.Zs))
+  # print(take4)
+  #
+
+  # intermediate.info <- list(
+  #   condtional.energies,
+  #   complement.condtional.energies,
+  #   conditional.Zs,
+  #   conditional.logZs,
+  #   conditional.Prs,
+  #   complement.conditional.Prs,
+  #   neg.log.pseudo.lik,
+  #   take2,take3,take4)
+  #----
 
   return(neg.log.pseudo.lik)
 

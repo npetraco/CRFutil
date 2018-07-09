@@ -20,7 +20,7 @@ samps       <- slay$samples
 known.model <- slay$model
 mrf.sample.plot(samps)
 
-#pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes)
+pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes)
 s1<-1
 s2<-2
 f0 <- function(y){ as.numeric(c((y==1),(y==2)))}    # Feature function
