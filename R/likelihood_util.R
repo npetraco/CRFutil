@@ -83,16 +83,18 @@ grad.negloglik <- function(crf, nInstances, suffStat, inference.func = infer.exa
 #'
 #'
 #' @export
-neglogpseudolik.config <- function(config, crf, ff) {
+neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
 
-  num.nodes       <- crf$n.nodes
-
+  num.nodes                      <- crf$n.nodes
   condtional.energies            <- array(NA, num.nodes)
   complement.condtional.energies <- array(NA, num.nodes)
-  conditional.Prs                <- array(NA, num.nodes)
-  complement.conditional.Prs     <- array(NA, num.nodes)
-  #conditional.Zs                 <- array(NA, num.nodes)
   conditional.logZs              <- array(NA, num.nodes)
+
+  if(is.null(par)){
+    theta.pars <- crf$par
+  } else {
+    theta.pars <- par
+  }
 
   phi.config <- phi.features(
     config    = config,
@@ -103,7 +105,8 @@ neglogpseudolik.config <- function(config, crf, ff) {
 
   for(i in 1:num.nodes) {
 
-    condtional.energies[i] <- conditional.config.energy2(
+    condtional.energies[i] <- conditional.config.energy2a(
+      par                      = theta.pars,
       config                   = config,
       phi.config               = phi.config,
       condition.element.number = i,
@@ -117,7 +120,9 @@ neglogpseudolik.config <- function(config, crf, ff) {
       node.par  = crf$node.par,
       edge.par  = crf$edge.par,
       ff        = ff)
-    complement.condtional.energies[i] <- conditional.config.energy2(
+
+    complement.condtional.energies[i] <- conditional.config.energy2a(
+      par                      = theta.pars,
       config                   = config.c,
       phi.config               = phi.config.c,
       condition.element.number = i,
@@ -125,38 +130,55 @@ neglogpseudolik.config <- function(config, crf, ff) {
       ff                       = ff)
 
     conditional.logZs[i] <- logsumexp2(c(condtional.energies[i], complement.condtional.energies[i]))
-    #conditional.Zs[i]    <- exp(condtional.energies[i]) + exp(complement.condtional.energies[i])
-    conditional.Prs[i]   <- exp(condtional.energies[i])/conditional.Zs[i]
-    #
-    #complement.conditional.Prs[i] <- 1 - conditional.Prs[i]
 
   }
 
-
-  # print("CE")
-  # print(condtional.energies)
-  # print("CCE")
-  # print(complement.condtional.energies)
-  #
-  # print("Zc")
-  # print(conditional.Zs)
-  #
-  # print("cPrs")
-  # print(conditional.Prs)
-  # print("ccPrs")
-  # print(complement.conditional.Prs)
-
   #neg.log.pseudo.lik <- -sum(condtional.energies - log(conditional.Zs))
   neg.log.pseudo.lik <- sum(conditional.logZs - condtional.energies)
-  #print("neg log pliks:")
-  #print(neg.log.pseudo.lik)
-
-  # take2 <- -log(prod(conditional.Prs))
-  # print(take2)
-  #
-  # take3 <- -sum(log(conditional.Prs))
-  # print(take3)
 
   return(neg.log.pseudo.lik)
+
+}
+
+
+#' Utility function to compute gradient of negative log pseudo-likelihood
+#'
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+conditional.config.energy.grad.test <- function(config, crf, ff) {
+
+  if(is.null(crf$nodes2pars)){
+    stop("Compute node-parameter associations and store in crf object!")
+  }
+
+  config.phi.vec <- phi.features(
+    config    = config,
+    edges.mat = crf$edges,
+    node.par  = crf$node.par,
+    edge.par  = crf$edge.par,
+    ff        = ff
+  )
+
+  # Gradient "matrix" is #parameters by #nodes. I.E., each column is a gradient of a condtional energy:
+  gradient.mat <- array(NA, c(crf$n.par, crf$n.nodes))
+  for(i in 1:crf$n.nodes) {
+
+    node.pars             <- crf$nodes2pars[[i]]       # Definitley derivs NOT with respect to these params are 0
+    dEconfig.i            <- numeric(crf$n.par)        # Initalize a conditional energy gradient vector for node i to 0s
+    dEconfig.i[node.pars] <- config.phi.vec[node.pars] # Any phi_i = 0 in here are also 0 derivs
+
+    gradient.mat[,i] <- dEconfig.i
+  }
+  colnames(gradient.mat) <- 1:crf$n.nodes
+  rownames(gradient.mat) <- 1:crf$n.par
+
+  return(gradient.mat)
 
 }
