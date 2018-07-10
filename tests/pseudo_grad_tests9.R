@@ -1,12 +1,28 @@
 library(CRFutil)
 
-# Graph formula for Slayer field:
-grphf <- ~A:B+A:C+A:D+A:E+B:C+B:D+B:E+C:D+D:E
+# Graph formulas:
+models <- list(
+  ~A:B,
+  ~A:B + B:C + C:D,
+  ~A:B:C,
+  ~A:B:C:D,
+  ~A:B + B:C + C:D + D:A,
+  ~A:B:C + C:D,
+  ~A:B + A:C + A:D + A:E + B:C + B:D + B:E + C:D + D:E,
+  ~A:B:C + C:X + D:E:G + G:X + Q:R:S + S:X,
+  ~A:B + B:C + C:D + E:F + F:G + G:H + A:E + B:F + C:G + D:H + I:J + J:K + K:L + I:E + J:F + K:G + L:H + M:N + N:O + O:P + M:I + N:J + O:K + L:P)
+
+
+# Choose a model
+model.num <- 4
+grphf <- models[[model.num]]
 
 # Check the graph:
 gp <- ug(grphf, result = "graph")
 dev.off()
 iplot(gp)
+#library(Rgraphviz);dev.off()
+#plot(gp)
 
 # Adjacenty matrix:
 adj <- ug(grphf, result="matrix")
@@ -15,9 +31,9 @@ adj <- ug(grphf, result="matrix")
 # Make up random potentials and return a CRF-object
 num.samps   <- 100
 n.states    <- 2
-slay    <- sim.field.random(adjacentcy.matrix=adj, num.states=n.states, num.sims=num.samps, seed=NULL)
-samps       <- slay$samples
-known.model <- slay$model
+sim.mdl    <- sim.field.random(adjacentcy.matrix=adj, num.states=n.states, num.sims=num.samps, seed=NULL)
+samps       <- sim.mdl$samples
+known.model <- sim.mdl$model
 mrf.sample.plot(samps)
 
 pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes)
@@ -30,7 +46,8 @@ f0 <- function(y){ as.numeric(c((y==1),(y==2)))}    # Feature function
 n2p <- nodes2params.list(known.model, storeQ = T)
 
 # Try out the new formula on the first sampled configuration, node 3:
-X <- samps[1,]
+#X <- samps[1,]
+X <- samps[sample(1:num.samps, size = 1),]
 X
 
 # Make vector of phi features for the selecteted configuration
@@ -109,18 +126,7 @@ for(i in 1:known.model$n.nodes) {
   Zc[i]        <- exp(ce[i]) + exp(cce[i])
 
 }
-colnames(grad.Ec.mat)   <- 1:known.model$n.nodes
-rownames(grad.Ec.mat)   <- 1:known.model$n.par
-colnames(grad.Ec.c.mat) <- 1:known.model$n.nodes
-rownames(grad.Ec.c.mat) <- 1:known.model$n.par
-colnames(dZc.mat) <- 1:known.model$n.nodes
-rownames(dZc.mat) <- 1:known.model$n.par
 
-exp(ce)/(exp(ce) + exp(cce))
-1-exp(ce)/(exp(ce) + exp(cce))
-exp(cce)/(exp(ce) + exp(cce))
-exp(ce)/Zc
-exp(cce)/Zc
 
 # GENERALIZE THIS TO WORK WITH conditional.config.energy2
 psl.info <- pseudolikelihoods.from.energies(
@@ -131,26 +137,6 @@ psl.info <- pseudolikelihoods.from.energies(
   pot.info$edge.energies,
   conditional.config.energy,
   f0)
-ck.ce    <- as.numeric(psl.info$condtional.energies)
-ck.cce   <- as.numeric(psl.info$complement.condtional.energies)
-ck.Zs    <- as.numeric(psl.info$conditional.Zs)
-ck.cPrs  <- as.numeric(psl.info$conditional.Prs)
-ck.ccPrs <- as.numeric(psl.info$complement.conditional.Prs)
-
-cbind(ce,ck.ce,ce-ck.ce)
-cbind(cce,ck.cce,cce-ck.cce)
-cbind(Zc,ck.Zs,Zc-ck.Zs)
-cbind(exp(ce)/Zc, ck.cPrs,exp(ce)/Zc-ck.cPrs)
-cbind(exp(cce)/Zc, ck.ccPrs,exp(cce)/Zc-ck.ccPrs)
-
-grad.Ec.mat
-grad.Ec.mat[7,3]
-grad.Ec.c.mat
-grad.Ec.c.mat[7,3]
-
-Zc
-dZc.mat
-n2p[[4]]
 
 # What happens with these if we have all possible configs??
 # Average features with respect to states of X_i
@@ -158,18 +144,15 @@ E.Xphi.mat <- array(NA, c(known.model$n.par, known.model$n.nodes))
 for(i in 1:known.model$n.nodes) {
   E.Xphi.mat[,i] <- dZc.mat[,i]/Zc[i]
 }
-colnames(E.Xphi.mat) <- 1:known.model$n.nodes
-rownames(E.Xphi.mat) <- 1:known.model$n.par
 E.Xphi.mat
-E.Xphi.mat[7,3]
 
 # psl grad for a config????
 grad.psl.X <- rowSums(grad.Ec.mat - E.Xphi.mat)
-round(grad.psl.X,4)
-grad.psl.X[7]
+grad.psl.X
 
 
-junk <- grad.neglogpseudolik.config(config=samps[1,],
+#??????????????
+junk <- grad.neglogpseudolik.config(config=X,
                             phi.config=NULL,
                             node.conditional.energies=NULL,
                             node.complement.conditional.energies=NULL,
