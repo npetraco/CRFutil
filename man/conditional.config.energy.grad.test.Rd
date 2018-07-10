@@ -2,7 +2,7 @@
 % Please edit documentation in R/likelihood_util.R
 \name{conditional.config.energy.grad.test}
 \alias{conditional.config.energy.grad.test}
-\title{Utility function to compute gradient of negative log pseudo-likelihood}
+\title{TEST Utility function to compute gradient of negative log pseudo-likelihood}
 \usage{
 conditional.config.energy.grad.test(config, crf, ff)
 }

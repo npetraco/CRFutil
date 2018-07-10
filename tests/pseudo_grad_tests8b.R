@@ -15,7 +15,7 @@ adj <- ug(grphf, result="matrix")
 # Make up random potentials and return a CRF-object
 num.samps   <- 100
 n.states    <- 2
-slay    <- sim.field.random(adjacentcy.matrix=adj, num.states=n.states, num.sims=num.samps, seed=1)
+slay    <- sim.field.random(adjacentcy.matrix=adj, num.states=n.states, num.sims=num.samps, seed=NULL)
 samps       <- slay$samples
 known.model <- slay$model
 mrf.sample.plot(samps)
@@ -167,3 +167,33 @@ E.Xphi.mat[7,3]
 grad.psl.X <- rowSums(grad.Ec.mat - E.Xphi.mat)
 round(grad.psl.X,4)
 grad.psl.X[7]
+
+
+junk <- grad.neglogpseudolik.config(config=samps[1,],
+                            phi.config=NULL,
+                            node.conditional.energies=NULL,
+                            node.complement.conditional.energies=NULL,
+                            par=NULL,
+                            crf=known.model,
+                            ff=f0)
+
+junk$conditional.energies
+ce
+junk$complement.conditional.energies
+cce
+
+junk$gradients.conditional.energies - grad.Ec.mat
+junk$gradients.complement.conditional.energies - grad.Ec.c.mat
+
+junk$gradients.conditional.partition.functions
+dZc.mat
+junk$gradients.conditional.partition.functions - dZc.mat
+
+junk$gradients.log.conditional.partition.functions
+E.Xphi.mat
+junk$gradients.log.conditional.partition.functions - E.Xphi.mat
+
+junk$gradient.log.pseudolikelihood
+grad.psl.X
+junk$gradient.log.pseudolikelihood - grad.psl.X
+
