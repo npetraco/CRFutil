@@ -211,15 +211,15 @@ grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditiona
     stop("Compute node to parameter associations and store in crf object!")
   }
 
-  # Best to pass these in so that they are not needlessly re-computed if this function is in a loop.
-  # However, if they're not passed in, we need to compute them.
+  # Best to pass these in so that they are not needlessly re-computed if this function is in a loop...
+  # However, if they're not passed in, ir not in a loop with the same config we just as well may compute them.
   if(is.null(phi.config)) {
     phi.config <- phi.features(
       config    = config,
       edges.mat = crf$edges,
       node.par  = crf$node.par,
       edge.par  = crf$edge.par,
-      ff        = f0
+      ff        = ff
     )
   }
   if(is.null(node.conditional.energies)){
@@ -360,9 +360,9 @@ grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditiona
 }
 
 
-#' TEST Utility function to compute gradient of negative log pseudo-likelihood
+#' Sample negative log pseudo-likelihood
 #'
-#' Assumes features are 0,1 valued and parameters are numbered.
+#' Experiment
 #'
 #' The function will XXXX
 #'
@@ -371,33 +371,45 @@ grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditiona
 #'
 #'
 #' @export
-conditional.config.energy.grad.test <- function(config, crf, ff) {
+neglogpseudolik <- function(par, crf, samples, ff, update.crfQ = TRUE) {
 
-  if(is.null(crf$nodes2pars)){
-    stop("Compute node-parameter associations and store in crf object!")
-  }
+  nlpslk <- sum(sapply(1:nrow(samples), function(xx){
+    neglogpseudolik.config(
+      par = par,
+      config = samples[xx,],
+      crf = crf,
+      ff = ff) # ** can we eliminate ff??
+    }))
 
-  config.phi.vec <- phi.features(
-    config    = config,
-    edges.mat = crf$edges,
-    node.par  = crf$node.par,
-    edge.par  = crf$edge.par,
-    ff        = ff
-  )
+  return(nlpslk)
 
-  # Gradient "matrix" is #parameters by #nodes. I.E., each column is a gradient of a condtional energy:
-  gradient.mat <- array(NA, c(crf$n.par, crf$n.nodes))
-  for(i in 1:crf$n.nodes) {
+}
 
-    node.pars             <- crf$nodes2pars[[i]]       # Definitley derivs NOT with respect to these params are 0
-    dEconfig.i            <- numeric(crf$n.par)        # Initalize a conditional energy gradient vector for node i to 0s
-    dEconfig.i[node.pars] <- config.phi.vec[node.pars] # Any phi_i = 0 in here are also 0 derivs
 
-    gradient.mat[,i] <- dEconfig.i
-  }
-  colnames(gradient.mat) <- 1:crf$n.nodes
-  rownames(gradient.mat) <- 1:crf$n.par
+#' Gradient of sample negative log pseudo-likelihood
+#'
+#' Experiment
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+grad.neglogpseudolik <- function(par, crf, samples, ff) {
 
-  return(gradient.mat)
+  grd <- rowSums(sapply(1:nrow(samples), function(xx){
+    grad.neglogpseudolik.config(
+      config = samples[xx,],
+      phi.config = NULL,
+      node.conditional.energies = NULL,
+      node.complement.conditional.energies = NULL,
+      par = par,
+      crf = crf,
+      ff = ff)$gradient.log.pseudolikelihood
+    }))
+
+  return(grd)
 
 }
