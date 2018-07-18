@@ -164,6 +164,73 @@ nodes2params.list <- function(crf, storeQ = FALSE){
 }
 
 
+#' Function to find which nodes are associated with which parameters.
+#' Generalization experiment
+#'
+#' The list produced maps node indices to the parameters they are asociated with
+#'
+#' The function will XXXX
+#'
+#' @param crf The XX
+#' @param storeQ Logical, whether or not to store the the node to parameter list in the crf object
+#' @return The function will XX
+#'
+#'
+#' @export
+nodes2params.list2 <- function(crf, storeQ = FALSE){
+
+  node.par.assoc <- rep(list(NULL), crf$n.nodes)
+
+  # Find the parameters associated with each node:
+  for(i in 1:crf$n.nodes) {
+    par.idxs  <- as.numeric(crf$node.par[i,,]) # parameters for the node
+
+    # Get rid of the 0s:
+    zeros.idxs <- which(par.idxs == 0)
+    if(length(zeros.idxs) != 0) {
+      par.idxs  <- par.idxs[-zeros.idxs]
+    }
+
+    if(length(par.idxs) == 0){
+      warning("No parameters found for node: ", i) # **** This can happen when nodes or edges are not assigned parameters.
+    } else {
+      node.par.assoc[[i]] <- c(node.par.assoc[[i]], par.idxs)
+      node.par.assoc[[i]] <- unique(node.par.assoc[[i]])
+    }
+
+  }
+
+  # Find the parameters associated with the nodes of each edge:
+  for(i in 1:length(crf$edge.par)) {
+    node.idx1 <- crf$edges[i,1] # node 1 of edge
+    node.idx2 <- crf$edges[i,2] # node 2 of edge
+    par.idxs  <- as.numeric(crf$edge.par[[i]]) # parameters for the edge
+
+    # Get rid of the 0s:
+    zeros.idxs <- which(par.idxs == 0)
+    if(length(zeros.idxs) != 0) {
+      par.idxs  <- par.idxs[-zeros.idxs]
+    }
+
+    if(length(par.idxs) == 0){
+      warning("No parameters found for edge: ", i) # **** Is this ever allowed????
+    } else {
+      node.par.assoc[[node.idx1]] <- c(node.par.assoc[[node.idx1]], par.idxs)
+      node.par.assoc[[node.idx2]] <- c(node.par.assoc[[node.idx2]], par.idxs)
+      node.par.assoc[[node.idx1]] <- unique(node.par.assoc[[node.idx1]])
+      node.par.assoc[[node.idx2]] <- unique(node.par.assoc[[node.idx2]])
+    }
+
+  }
+
+  if(storeQ == TRUE) {
+    crf$nodes2pars <- node.par.assoc
+  }
+
+  return(node.par.assoc)
+}
+
+
 #' Function to find which parameters are associated with which nodes.
 #' XXXX
 #'
