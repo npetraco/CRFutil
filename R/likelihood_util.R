@@ -85,10 +85,10 @@ grad.negloglik <- function(crf, nInstances, suffStat, inference.func = infer.exa
 #' @export
 neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
 
-  num.nodes                      <- crf$n.nodes
+  num.nodes                       <- crf$n.nodes
   conditional.energies            <- array(NA, num.nodes)
   complement.conditional.energies <- array(NA, num.nodes)
-  conditional.logZs              <- array(NA, num.nodes)
+  conditional.logZs               <- array(NA, num.nodes)
   #----
   # conditional.Zs                 <- array(NA, num.nodes)
   # conditional.Prs                <- array(NA, num.nodes)
@@ -110,6 +110,11 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
 
   for(i in 1:num.nodes) {
 
+    # print(i)
+    # print(theta.pars)
+    # print(config)
+    # print(phi.config)
+
     conditional.energies[i] <- conditional.config.energy2a(
       par                      = theta.pars,
       config                   = config,
@@ -117,6 +122,8 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
       condition.element.number = i,
       crf                      = crf,
       ff                       = ff)
+
+    # print(conditional.energies[i])
 
     config.c     <- complement.at.idx(configuration = config, complement.index = i)
     phi.config.c <- phi.features(

@@ -127,7 +127,7 @@ nodes2params.list <- function(crf, storeQ = FALSE){
     }
 
     if(length(par.idxs) == 0){
-      stop("No parameters found for node: ", i) # **** Is this ever allowed????
+      stop("No parameters found for node: ", i) # **** This can happen when nodes or edges are not assigned parameters.
     }
 
     node.par.assoc[[i]] <- c(node.par.assoc[[i]], par.idxs)
