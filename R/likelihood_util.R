@@ -321,8 +321,8 @@ grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditiona
 
   }
 
-  # Gradient of pseudolikelihood for a config: \nabla_{\boldsymbol \theta} {\cal L}_{\text{PL}}
-  grad.psl.config <- rowSums(grad.cond.E.mat - E.phi.config.mat)
+  # Gradient of NEGATIVE pseudolikelihood for a config: \nabla_{\boldsymbol \theta} {\cal L}_{\text{PL}}
+  grad.psl.config <- rowSums(E.phi.config.mat - grad.cond.E.mat)
 
   colnames(grad.cond.E.mat)      <- 1:crf$n.nodes
   rownames(grad.cond.E.mat)      <- 1:crf$n.par
