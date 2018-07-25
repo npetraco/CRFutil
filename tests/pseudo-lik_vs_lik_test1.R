@@ -66,6 +66,7 @@ fit$edge.par[[3]][2,2,1] <- 9
 fit$edge.par
 n2p <- nodes2params.list2(fit, storeQ = T)
 n2p
+fit$adj.nodes
 
 
 X.all <- expand.grid(c(1,2),c(1,2),c(1,2))
