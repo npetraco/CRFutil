@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     25471,        719]
-NotebookOptionsPosition[     24374,        677]
-NotebookOutlinePosition[     24728,        693]
-CellTagsIndexPosition[     24685,        690]
+NotebookDataLength[     35771,       1035]
+NotebookOptionsPosition[     34139,        975]
+NotebookOutlinePosition[     34492,        991]
+CellTagsIndexPosition[     34449,        988]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -494,25 +494,28 @@ Cell[BoxData[
   RowBox[{
    RowBox[{
     RowBox[{"n", "=", "3"}], ";"}], "\[IndentingNewLine]", 
-   RowBox[{"Total", "[", 
-    RowBox[{"Map", "[", 
-     RowBox[{
+   RowBox[{"pllk", "=", 
+    RowBox[{"Total", "[", 
+     RowBox[{"Map", "[", 
       RowBox[{
        RowBox[{
-        RowBox[{"EnerC", "[", 
-         RowBox[{
-          RowBox[{"samp", "[", 
-           RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}], " ", "-", " ", 
-        RowBox[{"Zc", "[", 
-         RowBox[{
-          RowBox[{"samp", "[", 
-           RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}]}], "&"}], ",", 
-      RowBox[{"{", 
-       RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "]"}], "]"}]}]}]], "Input",\
-
+        RowBox[{
+         RowBox[{"EnerC", "[", 
+          RowBox[{
+           RowBox[{"samp", "[", 
+            RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}], " ", "-", " ", 
+         
+         RowBox[{"Zc", "[", 
+          RowBox[{
+           RowBox[{"samp", "[", 
+            RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}]}], "&"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "]"}], 
+     "]"}]}]}]}]], "Input",
  CellChangeTimes->{{3.741473908608911*^9, 3.7414739162329273`*^9}, {
   3.741473953464279*^9, 3.74147397321594*^9}, {3.741474010182291*^9, 
-  3.741474063613804*^9}, {3.741474095324236*^9, 3.741474095596817*^9}}],
+  3.741474063613804*^9}, {3.741474095324236*^9, 3.741474095596817*^9}, {
+  3.7415093350912247`*^9, 3.741509337466627*^9}}],
 
 Cell[BoxData[
  RowBox[{
@@ -546,7 +549,174 @@ Cell[BoxData[
    SubscriptBox["\[Theta]", "6"]}]}]], "Output",
  CellChangeTimes->{{3.741473913095831*^9, 3.741473916979838*^9}, 
    3.7414739784592943`*^9, {3.741474013788636*^9, 3.741474044814989*^9}, 
-   3.74147409637542*^9}]
+   3.74147409637542*^9, 3.741509338643742*^9}]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"pllks", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"For", "[", 
+  RowBox[{
+   RowBox[{"n", " ", "=", "1"}], ",", 
+   RowBox[{"n", "\[LessEqual]", "8"}], ",", 
+   RowBox[{"n", "++"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"AppendTo", "[", 
+    RowBox[{"pllks", ",", 
+     RowBox[{"Total", "[", 
+      RowBox[{"Map", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{
+          RowBox[{"EnerC", "[", 
+           RowBox[{
+            RowBox[{"samp", "[", 
+             RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}], " ", "-", " ", 
+          RowBox[{"Zc", "[", 
+           RowBox[{
+            RowBox[{"samp", "[", 
+             RowBox[{"[", "n", "]"}], "]"}], ",", "#"}], "]"}]}], "&"}], ",", 
+        
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "]"}], "]"}]}], "]"}]}], 
+  "\[IndentingNewLine]", "]"}]}], "Input",
+ CellChangeTimes->{{3.741509987281773*^9, 3.741510052504715*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Total", "[", "pllks", "]"}]], "Input",
+ CellChangeTimes->{{3.741510061324081*^9, 3.7415100924614077`*^9}, {
+  3.741510225315792*^9, 3.741510227658951*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"-", "2"}], " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "5"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "6"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{"1", "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "4"], "+", 
+       SubscriptBox["\[Theta]", "6"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "4"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "7"]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "1"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "5"], "+", 
+       SubscriptBox["\[Theta]", "7"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "5"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "7"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{"1", "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "4"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{"1", "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "6"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "4"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "9"]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "6"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "9"]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "2"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "5"], "+", 
+       SubscriptBox["\[Theta]", "9"]}]]}], "]"}]}], "-", 
+  RowBox[{"2", " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      SubscriptBox["\[Theta]", "3"]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "7"], "+", 
+       SubscriptBox["\[Theta]", "9"]}]]}], "]"}]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "1"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "2"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "3"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "4"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "5"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "6"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "7"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "8"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "9"]}]}]], "Output",
+ CellChangeTimes->{{3.74151006294305*^9, 3.741510073063218*^9}, 
+   3.741510120873399*^9, {3.7415102173344603`*^9, 3.741510228263543*^9}}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -616,12 +786,14 @@ Cell[BoxData[
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{
-  RowBox[{"Ener", "[", 
-   RowBox[{"samp", "[", 
-    RowBox[{"[", "3", "]"}], "]"}], "]"}], "-", "logZ"}]], "Input",
+ RowBox[{"llk", "=", 
+  RowBox[{
+   RowBox[{"Ener", "[", 
+    RowBox[{"samp", "[", 
+     RowBox[{"[", "3", "]"}], "]"}], "]"}], "-", "logZ"}]}]], "Input",
  CellChangeTimes->{{3.7414743176561737`*^9, 3.741474333659494*^9}, {
-  3.741474391581253*^9, 3.7414743921962547`*^9}}],
+  3.741474391581253*^9, 3.7414743921962547`*^9}, {3.741509348026153*^9, 
+  3.7415093498738422`*^9}}],
 
 Cell[BoxData[
  RowBox[{
@@ -672,11 +844,137 @@ Cell[BoxData[
   SubscriptBox["\[Theta]", "3"], "+", 
   SubscriptBox["\[Theta]", "6"]}]], "Output",
  CellChangeTimes->{{3.7414743250846577`*^9, 3.741474344754449*^9}, 
-   3.741474392521954*^9}]
+   3.741474392521954*^9, 3.741509351612067*^9}]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"llks", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"For", "[", 
+  RowBox[{
+   RowBox[{"n", " ", "=", "1"}], ",", 
+   RowBox[{"n", "\[LessEqual]", "8"}], ",", 
+   RowBox[{"n", "++"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"AppendTo", "[", 
+    RowBox[{"llks", ",", 
+     RowBox[{
+      RowBox[{"Ener", "[", 
+       RowBox[{"samp", "[", 
+        RowBox[{"[", "n", "]"}], "]"}], "]"}], "-", "logZ"}]}], "]"}]}], 
+  "\[IndentingNewLine]", "]"}]}], "Input",
+ CellChangeTimes->{{3.741510286451499*^9, 3.741510302417388*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Total", "[", "llks", "]"}]], "Input",
+ CellChangeTimes->{{3.741510311283575*^9, 3.7415103170086393`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"-", "8"}], " ", 
+   RowBox[{"Log", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "4"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "5"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "6"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "7"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "2"], "+", 
+       SubscriptBox["\[Theta]", "3"], "+", 
+       SubscriptBox["\[Theta]", "4"], "+", 
+       SubscriptBox["\[Theta]", "6"], "+", 
+       SubscriptBox["\[Theta]", "8"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "1"], "+", 
+       SubscriptBox["\[Theta]", "9"]}]], "+", 
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       SubscriptBox["\[Theta]", "5"], "+", 
+       SubscriptBox["\[Theta]", "7"], "+", 
+       SubscriptBox["\[Theta]", "9"]}]]}], "]"}]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "1"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "2"]}], "+", 
+  RowBox[{"4", " ", 
+   SubscriptBox["\[Theta]", "3"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "4"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "5"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "6"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "7"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "8"]}], "+", 
+  RowBox[{"2", " ", 
+   SubscriptBox["\[Theta]", "9"]}]}]], "Output",
+ CellChangeTimes->{3.74151031754661*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TeXForm", "[", "pllk", "]"}]], "Input",
+ CellChangeTimes->{{3.7415093563295193`*^9, 3.7415093628411922`*^9}}],
+
+Cell["\<\
+\\theta _1+\\theta _3+2 \\theta _6-\\log \\left(e^{\\theta _5}+e^{\\theta _1+\
+\\theta
+   _6}\\right)-\\log \\left(e^{\\theta _2+\\theta _4+\\theta \
+_8}+1\\right)-\\log
+   \\left(e^{\\theta _3+\\theta _6}+e^{\\theta _9}\\right)\
+\>", "Output",
+ CellChangeTimes->{3.741509363427167*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"TeXForm", "[", "llk", "]"}]], "Input",
+ CellChangeTimes->{{3.741509558628498*^9, 3.741509564556876*^9}}],
+
+Cell["\<\
+\\theta _1+\\theta _3+\\theta _6-\\log \\left(e^{\\theta _1+\\theta \
+_2+\\theta _4}+e^{\\theta
+   _3+\\theta _5}+e^{\\theta _1+\\theta _3+\\theta _6}+e^{\\theta _2+\\theta \
+_7}+e^{\\theta
+   _2+\\theta _3+\\theta _8}+e^{\\theta _1+\\theta _2+\\theta _3+\\theta \
+_4+\\theta _6+\\theta
+   _8}+e^{\\theta _1+\\theta _9}+e^{\\theta _5+\\theta _7+\\theta _9}\\right)\
+\
+\>", "Output",
+ CellChangeTimes->{3.7415095656755457`*^9}]
 }, Open  ]]
 },
 WindowSize->{798, 616},
-WindowMargins->{{Automatic, 304}, {Automatic, 0}},
+WindowMargins->{{27, Automatic}, {Automatic, 0}},
 FrontEndVersion->"10.2 for Mac OS X x86 (32-bit, 64-bit Kernel) (July 29, \
 2015)",
 StyleDefinitions->"Default.nb"
@@ -710,16 +1008,34 @@ Cell[17649, 473, 240, 6, 28, "Output"]
 }, Open  ]],
 Cell[17904, 482, 111, 1, 46, "Input"],
 Cell[CellGroupData[{
-Cell[18040, 487, 949, 27, 63, "Input"],
-Cell[18992, 516, 1137, 32, 34, "Output"]
+Cell[18040, 487, 1056, 30, 63, "Input"],
+Cell[19099, 519, 1159, 32, 34, "Output"]
+}, Open  ]],
+Cell[20273, 554, 986, 28, 80, "Input"],
+Cell[CellGroupData[{
+Cell[21284, 586, 179, 3, 28, "Input"],
+Cell[21466, 591, 4253, 127, 100, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20166, 553, 499, 14, 46, "Input"],
-Cell[20668, 569, 1566, 43, 34, "Output"]
+Cell[25756, 723, 499, 14, 46, "Input"],
+Cell[26258, 739, 1566, 43, 34, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22271, 617, 259, 6, 28, "Input"],
-Cell[22533, 625, 1825, 49, 86, "Output"]
+Cell[27861, 787, 338, 8, 28, "Input"],
+Cell[28202, 797, 1847, 49, 52, "Output"]
+}, Open  ]],
+Cell[30064, 849, 583, 16, 80, "Input"],
+Cell[CellGroupData[{
+Cell[30672, 869, 129, 2, 28, "Input"],
+Cell[30804, 873, 2246, 64, 86, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[33087, 942, 133, 2, 28, "Input"],
+Cell[33223, 946, 296, 7, 70, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[33556, 958, 128, 2, 28, "Input"],
+Cell[33687, 962, 436, 10, 85, "Output"]
 }, Open  ]]
 }
 ]
