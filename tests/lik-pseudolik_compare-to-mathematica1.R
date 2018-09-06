@@ -30,7 +30,8 @@ num.samps <- 25
 set.seed(1)
 samps <- sample.exact(known.model, num.samps)
 samps
-mrf.sample.plot(samps)
+junk <- write.csv(samps, file = "/Users/npetraco/latex/papers/dust/steph_diss/CRFutil/tests/samps.csv")
+#mrf.sample.plot(samps)
 
 #----------------------------------------------------------------------
 # Now fit a model using a sample from the known model.
@@ -65,20 +66,26 @@ dim(theta.grid)
 #-----------PSEUDO LOG LIKELIHOOD-------------------------
 # Now lets try looping over the different parameter vectors contained in theta.grid. For each compute the
 # corresponding sample pseudolikelihood:
-neg.log.psls      <- array(NA, nrow(theta.grid))
-grad.neg.log.psls <- array(NA, c(nrow(theta.grid), 2))
-for(i in 1:nrow(theta.grid)) {
+num.theta         <- 5
+neg.log.psls      <- array(NA, num.theta)
+grad.neg.log.psls <- array(NA, c(num.theta, 2))
+for(i in 1:num.theta) {
 
   print(i)
   theta                 <- theta.grid[i,]
-  neg.log.psls[i]       <- neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0, update.crfQ = TRUE)
-  grad.neg.log.psls[i,] <- grad.neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0)
+  print(paste(theta[1], theta[2]))
+  neg.log.psls[i]       <- neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0, update.crfQ = FALSE)
+  print(neg.log.psls[i])
+  #grad.neg.log.psls[i,] <- grad.neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0)
 
 }
 neg.log.psls
 hist(neg.log.psls)
 min(neg.log.psls)
 
+theta.grid[1:5,]
+
+#STOP HERE FOR NOW
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -94,16 +101,32 @@ lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],
 
 
 #-----------LOG LIKELIHOOD-------------------------
+theta1 <- seq(from =  -10, to=10, by = 0.1)
+theta2 <- seq(from =  -10, to=10, by = 0.1)
+
+#epsl <- 0.005
+#theta1 <- seq(from = theta.grid[min.idx,1] - epsl, to=theta.grid[min.idx,1] + epsl, by = 0.0003)
+#theta2 <- seq(from = theta.grid[min.idx,2] - epsl, to=theta.grid[min.idx,2] + epsl, by = 0.0003)
+
+length(theta1)
+length(theta2)
+length(theta1)*length(theta2)
+theta.grid <- as.matrix(expand.grid(theta1,theta2))
+dim(theta.grid)
+
 neg.log.lik      <- array(NA, nrow(theta.grid))
 grad.neg.log.lik <- array(NA, c(nrow(theta.grid), 2))
+fit2$par.stat    <- mrf.stat(crf = fit2, instances = samps)
+fit2$par.stat
 for(i in 1:nrow(theta.grid)) {
 
   print(i)
   theta                 <- theta.grid[i,]
-  neg.log.lik[i]        <- neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0, update.crfQ = TRUE)
-  grad.neg.log.psls[i,] <- grad.neglogpseudolik(par = theta, crf = fit2, samples = samps, ff = f0)
+  neg.log.lik[i]        <- negloglik(par = theta, crf = fit2, samples = samps, infer.method = infer.exact, update.crfQ = F)
+  #grad.neg.log.lik[i,] <- grad.negloglik(par = theta, crf = fit2, samples = samps, ff = f0)
 
 }
-neg.log.psls
-hist(neg.log.psls)
-min(neg.log.psls)
+neg.log.lik
+hist(neg.log.lik)
+min(neg.log.lik)
+plot3d(theta.grid[,1], theta.grid[,2], neg.log.lik)

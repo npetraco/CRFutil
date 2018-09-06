@@ -26,7 +26,7 @@ conditional.config.energy(config, condition.element.number, adj.node.list,
 The function will XX
 }
 \description{
-Compute
+Assumes log-potentials are in gRbase format
 }
 \details{
 The function will XXXX

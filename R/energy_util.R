@@ -65,7 +65,7 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 
 #' Energy function for energy of a conditional configuration of states E(Xi | X/Xi)
 #'
-#' Compute
+#' Assumes log-potentials are in gRbase format
 #'
 #' The function will XXXX
 #'
@@ -114,6 +114,9 @@ conditional.config.energy <- function(config, condition.element.number, adj.node
   return(ener)
 
 }
+
+
+
 
 
 #' Energy function for energy of a conditional configuration of states E(Xi | X/Xi), computed in terms of phi features

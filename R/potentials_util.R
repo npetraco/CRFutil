@@ -235,3 +235,31 @@ make.par.from.potentials <- function(crf) {
   return(w)
 
 }
+
+
+#' Reformat parameter vector to CRF object forms node.pot and edge.pot BUT don't
+#' exponentiate, i.e. leave them as logpots (energies).
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+par2logpots <- function(par, crf) {
+
+  pots  <- make.pots(parms = par, crf = crf, rescaleQ = F, replaceQ = F, printQ = F)
+
+  one.body.ens <- rep(list(NULL), nrow(pots[[1]]))
+  for(i in 1:length(one.body.ens)){
+    one.body.ens[[i]] <- log(pots[[1]])[i,,1]
+  }
+
+  two.body.ens <- rep(list(NULL), length(pots[[2]]))
+  for(i in 1:length(pots[[2]])) {
+    two.body.ens[[i]] <- log(pots[[2]][[i]])
+  }
+
+  return(list(one.body.ens, two.body.ens))
+}
