@@ -2,23 +2,24 @@
 % Please edit documentation in R/energy_util.R
 \name{conditional.config.energy}
 \alias{conditional.config.energy}
-\title{Energy function for energy of a conditional configuration of states E(Xi | X/Xi)}
+\title{Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
+Uses the feature function formulation. Eliminates dependency on gRbase format for potentials}
 \usage{
-conditional.config.energy(config, condition.element.number, adj.node.list,
-  edge.mat, one.lgp, two.lgp, ff, printQ = FALSE)
+conditional.config.energy(config, condition.element.number, crf, ff,
+  printQ = FALSE)
 }
 \arguments{
 \item{config}{A node configuration (state) vector}
 
 \item{condition.element.number}{i of E(Xi | X/Xi)}
 
-\item{adj.node.list}{XXXX}
-
-\item{two.lgp}{Log node potentials (one-body energies)}
-
 \item{ff}{The feature function}
 
+\item{adj.node.list}{XXXX}
+
 \item{edges.mat}{Matrix of connected node edges}
+
+\item{two.lgp}{Log node potentials (one-body energies)}
 
 \item{two.lgp}{Log edge potentials (two-body energies)}
 }

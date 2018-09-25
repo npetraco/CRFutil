@@ -63,7 +63,8 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
   return(ener)
 }
 
-#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi)
+#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
+#' Uses the feature function formulation. Eliminates dependency on gRbase format for potentials
 #'
 #' Assumes log-potentials are in gRbase format
 #'
@@ -80,7 +81,63 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 #'
 #'
 #' @export
-conditional.config.energy <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff, printQ=FALSE) {
+conditional.config.energy <- function(config, condition.element.number, crf, ff, printQ=FALSE) {
+
+  node.pot      <- crf$node.pot
+  edge.pot      <- crf$edge.pot
+  adj.node.list <- crf$adj.nodes
+  edge.mat      <- crf$edges
+
+  # One-body energy (log node-potentials)
+  e.one <- Eone(config[condition.element.number], log(node.pot[condition.element.number,]), ff)
+
+  # Nodes connected to the condition node Xi
+  adj.nodes <- adj.node.list[[condition.element.number]]
+
+  e.two <- 0
+  for(i in 1:length(adj.nodes)){
+    edg         <- sort(c(condition.element.number, adj.nodes[i]))
+    edg.pot.idx <- row.match(edg, table = edge.mat)
+    e.two       <- e.two + Etwo(config[edg[1]], config[edg[2]], log(edge.pot[[edg.pot.idx]]), ff)
+
+    # For checks:
+    if(printQ==TRUE){
+      print(config)
+      print(paste("CE-idx:", condition.element.number))
+      print(paste("Edge 1:", edg[1], "    Edge 2:", edg[2]))
+      print(paste("St-Edge 1:", config[edg[1]], "   St-Edge 2:", config[edg[2]]))
+      print(paste("Edge Pot #:", edg.pot.idx))
+      print(paste("e.two:",e.two))
+      print(paste("e.one:",e.one))
+      print("----------------------")
+    }
+
+  }
+
+  ener <- as.numeric(e.one + e.two)
+  return(ener)
+
+}
+
+#' Older implementation of Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
+#' Uses the feature function formulation.
+#'
+#' Assumes log-potentials are in gRbase format
+#'
+#' The function will XXXX
+#'
+#' @param config    A node configuration (state) vector
+#' @param condition.element.number i of E(Xi | X/Xi)
+#' @param adj.node.list XXXX
+#' @param edges.mat Matrix of connected node edges
+#' @param two.lgp   Log node potentials (one-body energies)
+#' @param two.lgp   Log edge potentials (two-body energies)
+#' @param ff        The feature function
+#' @return The function will XX
+#'
+#'
+#' @export
+conditional.config.energy.old <- function(config, condition.element.number, adj.node.list, edge.mat, one.lgp, two.lgp, ff, printQ=FALSE) {
 
   #num.nodes <- length(config)
 
@@ -116,85 +173,101 @@ conditional.config.energy <- function(config, condition.element.number, adj.node
 }
 
 
-
-
-
-#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi), computed in terms of phi features
+#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
+#' Uses the feature formulation.
 #'
-#' Compute
+#' Assumes log-potentials are in gRbase format
 #'
 #' The function will XXXX
 #'
 #' @param config    A node configuration (state) vector
 #' @param condition.element.number i of E(Xi | X/Xi)
-#' @param crf       CRF object
-#' @return          The function will XX
+#' @param adj.node.list XXXX
+#' @param edges.mat Matrix of connected node edges
+#' @param two.lgp   Log node potentials (one-body energies)
+#' @param two.lgp   Log edge potentials (two-body energies)
+#' @param ff        The feature function
+#' @return The function will XX
 #'
 #'
 #' @export
-conditional.config.energy2 <- function(config, phi.config = NULL, condition.element.number, crf, ff = NULL) {
+conditional.config.energy2 <- function(config, condition.element.number, crf, ff, printQ=FALSE) {
 
-  if(is.null(crf$nodes2pars)){
-    stop("Compute nodes2parameters list and store in crf object!")
-  }
+  # Node component:
+  l     <- get.par.idx(config = config, i=condition.element.number, node.par=crf$node.par, ff=ff)
+  phi.l <- phi.component(config = config, i=condition.element.number, node.par=crf$node.par, ff=ff)
 
-  # Compute phi features of config if they were not passed in:
-  if(is.null(phi.config)){
-
-    if(is.null(ff)){
-      stop("Include a feature function (ff) or a phi.config!")
+  #print(l)
+  #print(l.phi)
+  if(l==0){
+    if(phi.l != 0) {
+      stop("Something is wrong. l-idx is 0 but its phi is not.")
     }
-    phi.config <- phi.features(
-      config    = config,
-      edges.mat = crf$edges,
-      node.par  = crf$node.par,
-      edge.par  = crf$edge.par,
-      ff        = ff
-    )
   }
 
-  ener <- crf$par[ crf$nodes2pars[[condition.element.number]] ] %*% phi.config[ crf$nodes2pars[[condition.element.number]] ]
-
-  return(ener)
-
-}
-
-
-#' Energy function for energy of a conditional configuration of states E(Xi | X/Xi), computed in terms of phi features
-#' This time however pass in a par (theta) vector instead of using the one with the crf object/
-#'
-#' The function will XXXX
-#'
-#' @param config    A node configuration (state) vector
-#' @param condition.element.number i of E(Xi | X/Xi)
-#' @param crf       CRF object
-#' @return          The function will XX
-#'
-#'
-#' @export
-conditional.config.energy2a <- function(par, config, phi.config = NULL, condition.element.number, crf, ff = NULL) {
-
-  if(is.null(crf$nodes2pars)){
-    stop("Compute nodes2parameters list and store in crf object!")
-  }
-
-  # Compute phi features of config if they were not passed in:
-  if(is.null(phi.config)){
-
-    if(is.null(ff)){
-      stop("Include a feature function (ff) or a phi.config!")
+  if(phi.l==0){
+    if(l != 0) {
+      stop("Something is wrong. phi for this l is 0 but l is not.")
     }
-    phi.config <- phi.features(
-      config    = config,
-      edges.mat = crf$edges,
-      node.par  = crf$node.par,
-      edge.par  = crf$edge.par,
-      ff        = ff
-    )
   }
 
-  ener <- par[ crf$nodes2pars[[condition.element.number]] ] %*% phi.config[ crf$nodes2pars[[condition.element.number]] ]
+  configE <- 0
+  if(phi.l !=0) {
+    configE <- configE + crf$par[l]
+  }
 
-  return(ener)
+  adj.nodes <- crf$adj.nodes[[condition.element.number]]
+  for(ii in 1:length(adj.nodes)) {
+
+    edge.nods <- sort(c(condition.element.number, adj.nodes[ii]))
+
+    if(printQ==T){
+      # print(config)
+      print(paste("ii: ", ii))
+      print("Edge-Nodes:")
+      print(edge.nods[1])
+      print(edge.nods[2])
+      # print(crf$edge.par)
+      # print(crf$edges)
+    }
+
+    k <- get.par.idx(config = config,
+                     i        = edge.nods[1],
+                     j        = edge.nods[2],
+                     edge.par = crf$edge.par,
+                     edge.mat = crf$edges,
+                     ff       = ff)
+    if(printQ==T){
+      print("phi.component calls get.par.idx again:")
+    }
+    phi.k <- phi.component(config = config,
+                     i        = edge.nods[1],
+                     j        = edge.nods[2],
+                     edge.par = crf$edge.par,
+                     edge.mat = crf$edges,
+                     ff       = ff)
+
+    if(k==0){
+      if(phi.k != 0) {
+        stop(paste("Something is wrong. k-idx is 0 but its phi is not. k=", k, " phi.k=", phi.k))
+      }
+    }
+
+    if(phi.k==0){
+      if(k != 0) {
+        stop(paste("Something is wrong. phi for this k is 0 but k is not. k=", k, " phi.k=", phi.k))
+      }
+    }
+
+    # print(k)
+    # print(phi.k)
+
+    if(phi.k !=0) {
+      configE <- configE + crf$par[k]
+    }
+
+  }
+
+ return(configE)
 
 }

@@ -58,7 +58,7 @@ shift.pots <- function(crf) {
 #'
 #'
 #' @export
-make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, printQ=FALSE) {
+make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, format="regular", printQ=FALSE) {
 
   # Loop over elements of parameter index matrix (also called nodeMap and edgeMap in UGM)
   # and put elements of exp(parms) where they belong
@@ -92,6 +92,16 @@ make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, printQ=FALSE) 
       edge.pot.shifted[[k]] <- edge.pot.shifted[[k]]/max(edge.pot.shifted[[k]])
     }
 
+  }
+
+  if(format=="regular"){
+    #REMOVE the CRF formatting with an extra dimension:
+    node.pot.shifted <- node.pot.shifted[,,1]
+    # for(i in 1:length(edge.pot.shifted)){
+    #   #tmp <- edge.pot.shifted[[i]]
+    #   print(edge.pot.shifted[[i]])
+    #   edge.pot.shifted[[i]] <- tmp[,,1]
+    # }
   }
 
   if(replaceQ==TRUE){

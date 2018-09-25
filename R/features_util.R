@@ -90,6 +90,145 @@ phi.features.explicit <- function(config, edges.mat, node.par, edge.par, ff) {
   return(list(phi.vec, phi.vec.lbl))
 }
 
+#' Utility function to convert node and edge indices to the
+#' parameter index they are associated with.
+#'
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+get.par.idx <- function(config, i=NULL, j=NULL, node.par=NULL, edge.par=NULL, edge.mat=NULL, ff, printQ=FALSE) {
+
+  if(!is.null(i) & !is.null(j)) {
+    if(!is.null(node.par)) {
+      stop("Two node indices specified but node.par entered. Enter ONLY edge.par with two node indices.")
+    }
+  }
+
+  if(is.null(i) & is.null(j)){
+    stop("No node indices entered!")
+  } else if(!is.null(i)){
+    if(!is.null(j)) { # Compute an edge parameter index
+      if(is.null(edge.par)){
+        stop("Two node indices entered but no edge.par input!")
+      } else {
+        if(is.null(edge.mat)) {
+          stop("edge.par specified but there is no edge.mat!")
+        } else {
+          edge.idx <- row.match(c(i,j), edge.mat)
+          if(length(edge.idx)==0){
+            stop("Edge not found! Check i, j, and edge.mat entered.")
+          } else {
+
+            if(printQ==T){
+              print(paste("Node i:", i))
+              print(paste("Node j:", j))
+
+              print("f0(i):")
+              print(ff(config[i]))
+              print(paste("class f0i:",class(ff(config[i]))))
+
+              print("f0(j):")
+              print(ff(config[j]))
+              print(paste("class f0j:",class(ff(config[i]))))
+
+              print(paste("Edge index: ",edge.idx))
+              print("Edge:")
+              print(edge.mat[edge.idx,])
+
+              print("edge.par matrix for edge:")
+              print(edge.par[[edge.idx]][,,1])
+              print(paste("class: ", class(edge.par[[edge.idx]][,,1])))
+
+              print("===================================")
+            }
+
+            par.idx <- as.numeric(ff(config[i]) %*% edge.par[[edge.idx]][,,1] %*% ff(config[j]))
+          }
+        }
+      }
+    } else { # Compute a node parameter index
+      if(is.null(node.par)) {
+        stop("One node indices entered but no node.par input!")
+      } else {
+        if(!is.null(edge.mat)){
+          warning("Node parameter index calculation requested but an edge.mat is specified. Ignoring edge.mat.")
+        }
+        par.idx <- as.numeric(ff(config[i]) %*% node.par[i,,1])
+      }
+    }
+  } else {
+    stop("No node i index entered!")
+  }
+
+  return(par.idx)
+
+}
+
+
+#' Utility function to convert a parameter index to the node/edge indices it is associated with.
+#'
+#' Sort of an inverse function of get.par.idx. Intended primarily for checking/debugging.
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+get.node.idxs <- function(par.idx, node.par=NULL, edge.par=NULL, edge.mat=NULL) {
+  node.idxs <- NULL
+  edge.idxs <- NULL
+  all.idxs  <- NULL
+
+  if(is.null(edge.par)){
+    warning("No edge.par specified.")
+  }
+
+  node.idxs <- c(which(node.par[,1,1]==par.idx), which(node.par[,2,1]==par.idx))
+  for(i in 1:nrow(edge.mat)){
+    #print(edge.par[[i]][,,1])
+    if(par.idx %in% edge.par[[i]][,,1]) {
+      #print("HERE")
+      edge.idxs <- rbind(edge.idxs, edge.mat[i,])
+    }
+  }
+
+  all.idxs <- list(node.idxs, edge.idxs) # Just unlist and unique to put into a vector
+  names(all.idxs) <- c("node.idxs","edge.idxs")
+
+  return(all.idxs)
+
+}
+
+
+#' Utility function to compute phi component for specific node or edge
+#'
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+phi.component <- function(config, i=NULL, j=NULL, node.par=NULL, edge.par=NULL, edge.mat=NULL, ff) {
+
+  par.idx <- get.par.idx(config, i, j, node.par, edge.par, edge.mat, ff)
+  comp <- 1 - (par.idx == 0)
+
+  return(comp)
+
+}
+
 
 #' Utility function to compute model matrix
 #'
