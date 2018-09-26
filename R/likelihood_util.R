@@ -101,12 +101,12 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
     theta.pars <- par
   }
 
-  phi.config <- phi.features(
-    config    = config,
-    edges.mat = crf$edges,
-    node.par  = crf$node.par,
-    edge.par  = crf$edge.par,
-    ff        = ff)
+  # phi.config <- phi.features(
+  #   config    = config,
+  #   edges.mat = crf$edges,
+  #   node.par  = crf$node.par,
+  #   edge.par  = crf$edge.par,
+  #   ff        = ff)
 
   for(i in 1:num.nodes) {
 
@@ -115,31 +115,48 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
     # print(config)
     # print(phi.config)
 
-    conditional.energies[i] <- conditional.config.energy2a(
-      par                      = theta.pars,
-      config                   = config,
-      phi.config               = phi.config,
-      condition.element.number = i,
-      crf                      = crf,
-      ff                       = ff)
+    # conditional.energies[i] <- conditional.config.energy2a(
+    #   par                      = theta.pars,
+    #   config                   = config,
+    #   phi.config               = phi.config,
+    #   condition.element.number = i,
+    #   crf                      = crf,
+    #   ff                       = ff)
+
+    conditional.energies[i] <-
+      conditional.config.energy2(
+        theta.par                = theta.pars,
+        config                   = config,
+        condition.element.number = i,
+        crf                      = crf,
+        ff                       = ff,
+        printQ                   = FALSE)
 
     # print(conditional.energies[i])
 
     config.c     <- complement.at.idx(configuration = config, complement.index = i)
-    phi.config.c <- phi.features(
-      config    = config.c,
-      edges.mat = crf$edges,
-      node.par  = crf$node.par,
-      edge.par  = crf$edge.par,
-      ff        = ff)
+    # phi.config.c <- phi.features(
+    #   config    = config.c,
+    #   edges.mat = crf$edges,
+    #   node.par  = crf$node.par,
+    #   edge.par  = crf$edge.par,
+    #   ff        = ff)
 
-    complement.conditional.energies[i] <- conditional.config.energy2a(
-      par                      = theta.pars,
+    # complement.conditional.energies[i] <- conditional.config.energy2a(
+    #   par                      = theta.pars,
+    #   config                   = config.c,
+    #   phi.config               = phi.config.c,
+    #   condition.element.number = i,
+    #   crf                      = crf,
+    #   ff                       = ff)
+    complement.conditional.energies[i] <- conditional.config.energy2(
+      theta.par                = theta.pars,
       config                   = config.c,
-      phi.config               = phi.config.c,
       condition.element.number = i,
       crf                      = crf,
-      ff                       = ff)
+      ff                       = ff,
+      printQ                   = FALSE)
+
 
     #----
     #conditional.Zs[i]    <- exp(conditional.energies[i]) + exp(complement.conditional.energies[i])

@@ -81,10 +81,18 @@ config.energy <- function(config, edges.mat, one.lgp, two.lgp, ff) {
 #'
 #'
 #' @export
-conditional.config.energy <- function(config, condition.element.number, crf, ff, printQ=FALSE) {
+conditional.config.energy <- function(theta.par=NULL, config, condition.element.number, crf, ff, printQ=FALSE) {
 
-  node.pot      <- crf$node.pot
-  edge.pot      <- crf$edge.pot
+  # Use input theta if one is supplied, otherwise use theta that is in crf object
+  if(is.null(theta.par)) {
+    node.pot      <- crf$node.pot
+    edge.pot      <- crf$edge.pot
+  } else {
+    pots <- make.pots(parms=theta.par, crf = crf, rescaleQ=F, replaceQ=F, format = "regular", printQ=F)
+    node.pot <- pots[[1]]
+    edge.pot <- pots[[2]]
+  }
+
   adj.node.list <- crf$adj.nodes
   edge.mat      <- crf$edges
 
@@ -191,7 +199,7 @@ conditional.config.energy.old <- function(config, condition.element.number, adj.
 #'
 #'
 #' @export
-conditional.config.energy2 <- function(config, condition.element.number, crf, ff, printQ=FALSE) {
+conditional.config.energy2 <- function(theta.par=NULL, config, condition.element.number, crf, ff, printQ=FALSE) {
 
   # Node component:
   l     <- get.par.idx(config = config, i=condition.element.number, node.par=crf$node.par, ff=ff)
@@ -211,9 +219,16 @@ conditional.config.energy2 <- function(config, condition.element.number, crf, ff
     }
   }
 
+  # Use input theta if one is supplied, otherwise use theta that is in crf object
+  if(is.null(theta.par)) {
+    local.par <- crf$par
+  } else {
+    local.par <- theta.par
+  }
+
   configE <- 0
   if(phi.l !=0) {
-    configE <- configE + crf$par[l]
+    configE <- configE + local.par[l]
   }
 
   adj.nodes <- crf$adj.nodes[[condition.element.number]]
@@ -263,7 +278,7 @@ conditional.config.energy2 <- function(config, condition.element.number, crf, ff
     # print(phi.k)
 
     if(phi.k !=0) {
-      configE <- configE + crf$par[k]
+      configE <- configE + local.par[k]
     }
 
   }
