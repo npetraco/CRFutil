@@ -4,7 +4,9 @@
 \alias{neglogpseudolik}
 \title{Sample negative log pseudo-likelihood}
 \usage{
-neglogpseudolik(par, crf, samples, ff, update.crfQ = TRUE)
+neglogpseudolik(par, crf, samples,
+  conditional.energy.function.type = "feature.function", ff,
+  update.crfQ = TRUE)
 }
 \arguments{
 \item{XX}{The XX}

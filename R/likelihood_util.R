@@ -83,48 +83,35 @@ grad.negloglik <- function(crf, nInstances, suffStat, inference.func = infer.exa
 #'
 #'
 #' @export
-neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
+neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="feature.function") {
 
   num.nodes                       <- crf$n.nodes
   conditional.energies            <- array(NA, num.nodes)
   complement.conditional.energies <- array(NA, num.nodes)
   conditional.logZs               <- array(NA, num.nodes)
-  #----
-  # conditional.Zs                 <- array(NA, num.nodes)
-  # conditional.Prs                <- array(NA, num.nodes)
-  # complement.conditional.Prs     <- array(NA, num.nodes)
-  #----
 
-  if(is.null(par)){
+  # Use input theta if supplied:
+  if(is.null(param)){
     theta.pars <- crf$par
   } else {
-    theta.pars <- par
+    theta.pars <- param
   }
-
-  # phi.config <- phi.features(
-  #   config    = config,
-  #   edges.mat = crf$edges,
-  #   node.par  = crf$node.par,
-  #   edge.par  = crf$edge.par,
-  #   ff        = ff)
 
   for(i in 1:num.nodes) {
 
-    # print(i)
-    # print(theta.pars)
-    # print(config)
-    # print(phi.config)
+    if(cond.en.form=="feature.function"){
+      cond.en.func <- conditional.config.energy
+    } else {
+      if(cond.en.form=="feature"){
+        cond.en.func <- conditional.config.energy2
+      } else {
+        stop("Conditional energy formula not properly specified! Use key word feature.function or feature for cond.en.form arguement.")
+      }
+    }
 
-    # conditional.energies[i] <- conditional.config.energy2a(
-    #   par                      = theta.pars,
-    #   config                   = config,
-    #   phi.config               = phi.config,
-    #   condition.element.number = i,
-    #   crf                      = crf,
-    #   ff                       = ff)
-
+    # E(Xi | X/Xi)
     conditional.energies[i] <-
-      conditional.config.energy2(
+      cond.en.func(
         theta.par                = theta.pars,
         config                   = config,
         condition.element.number = i,
@@ -132,68 +119,23 @@ neglogpseudolik.config <- function(par = NULL, config, crf, ff) {
         ff                       = ff,
         printQ                   = FALSE)
 
-    # print(conditional.energies[i])
-
+    # E(Xi' | X/Xi')
     config.c     <- complement.at.idx(configuration = config, complement.index = i)
-    # phi.config.c <- phi.features(
-    #   config    = config.c,
-    #   edges.mat = crf$edges,
-    #   node.par  = crf$node.par,
-    #   edge.par  = crf$edge.par,
-    #   ff        = ff)
+    complement.conditional.energies[i] <-
+      cond.en.func(
+        theta.par                = theta.pars,
+        config                   = config.c,
+        condition.element.number = i,
+        crf                      = crf,
+        ff                       = ff,
+        printQ                   = FALSE)
 
-    # complement.conditional.energies[i] <- conditional.config.energy2a(
-    #   par                      = theta.pars,
-    #   config                   = config.c,
-    #   phi.config               = phi.config.c,
-    #   condition.element.number = i,
-    #   crf                      = crf,
-    #   ff                       = ff)
-    complement.conditional.energies[i] <- conditional.config.energy2(
-      theta.par                = theta.pars,
-      config                   = config.c,
-      condition.element.number = i,
-      crf                      = crf,
-      ff                       = ff,
-      printQ                   = FALSE)
-
-
-    #----
-    #conditional.Zs[i]    <- exp(conditional.energies[i]) + exp(complement.conditional.energies[i])
-    #complement.conditional.Prs[i] <- 1 - conditional.Prs[i]
-    #----
-
+    # Using above conditional energies, compute corresponding conditional logZ
     conditional.logZs[i] <- logsumexp2(c(conditional.energies[i], complement.conditional.energies[i]))
 
   }
 
-  #----
-  # print("CE")
-  # print(conditional.energies)
-  # print("CCE")
-  # print(complement.conditional.energies)
-  #
-  # print("Zc")
-  # print(conditional.Zs)
-  #
-  # print("cPrs")
-  # print(conditional.Prs)
-  # print("ccPrs")
-  # print(complement.conditional.Prs)
-  #----
-
-  #neg.log.pseudo.lik <- -sum(conditional.energies - log(conditional.Zs))
   neg.log.pseudo.lik <- sum(conditional.logZs - conditional.energies)
-
-  #----
-  #take2 <- -log(prod(conditional.Prs))
-  # print(take2)
-  #
-  #take3 <- -sum(log(conditional.Prs))
-  # print(take3)
-  #take4 <- -sum(conditional.energies - log(conditional.Zs))
-  # print(take4)
-  #
 
   # intermediate.info <- list(
   #   conditional.energies,
@@ -388,15 +330,18 @@ grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditiona
 #'
 #'
 #' @export
-neglogpseudolik <- function(par, crf, samples, ff, update.crfQ = TRUE) {
+neglogpseudolik <- function(par, crf, samples, conditional.energy.function.type="feature.function", ff, update.crfQ = TRUE) {
 
   nlpslk <- sum(sapply(1:nrow(samples), function(xx){
-    neglogpseudolik.config(
+    neglogpseudolik.config( # neglogpseudolik.config(param = NULL, config, crf, ff, cond.en.form="feature.function")
       par = par,
       config = samples[xx,],
       crf = crf,
-      ff = ff) # ** can we eliminate ff??
+      ff = ff,
+      cond.en.form=conditional.energy.function.type)
     }))
+
+
 
   return(nlpslk)
 

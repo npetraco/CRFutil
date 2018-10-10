@@ -4,7 +4,8 @@
 \alias{neglogpseudolik.config}
 \title{Utility function to compute negative log pseudo-likelihood}
 \usage{
-neglogpseudolik.config(par = NULL, config, crf, ff)
+neglogpseudolik.config(param = NULL, config, crf, ff,
+  cond.en.form = "feature.function")
 }
 \arguments{
 \item{XX}{The XX}

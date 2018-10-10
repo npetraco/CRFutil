@@ -57,15 +57,19 @@ theta2 <- seq(from =  -2.0, to=1.0, by = 0.05)
 theta.grid <- as.matrix(expand.grid(theta1,theta2))
 dim(theta.grid)
 
-
-neglogpseudolik(par = theta.grid[1,], crf = fit, samples = samps, ff = f0, update.crfQ = TRUE)
+# Test new condtional energy/log pseudo likelihood functions:
+# thi <- sample(1:nrow(theta.grid), size = 1)
+# neglogpseudolik(par = theta.grid[thi,], crf = fit, samples = samps, conditional.energy.function.type = "feature.function", ff = f0, update.crfQ = TRUE)
+# neglogpseudolik(par = theta.grid[thi,], crf = fit, samples = samps, conditional.energy.function.type = "feature", ff = f0, update.crfQ = TRUE)
 
 # Compute the sample pseudolikelihoods over the theta grid:
 neg.log.psls <- array(NA, nrow(theta.grid))
+neg.log.psls2 <- array(NA, nrow(theta.grid))
 for(i in 1:nrow(theta.grid)) {
   print(i)
-  theta.i           <- theta.grid[i,]
-  neg.log.psls[i] <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, ff = f0, update.crfQ = TRUE)
+  theta.i          <- theta.grid[i,]
+  neg.log.psls[i]  <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature.function", ff = f0, update.crfQ = TRUE)
+  neg.log.psls2[i] <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature", ff = f0, update.crfQ = TRUE)
 
   #negloglik(par, crf, samples, infer.method = infer.exact, update.crfQ = TRUE)
 
@@ -74,15 +78,36 @@ for(i in 1:nrow(theta.grid)) {
 # Look for the rough minimum:
 hist(neg.log.psls)
 min(neg.log.psls)
+max(neg.log.psls)
 min.idx <- which(neg.log.psls == min(neg.log.psls))
 # Rough minimum:
 c(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls[min.idx])
 
+# Look for the rough minimum, check the other formulation:
+hist(neg.log.psls2)
+min(neg.log.psls2)
+max(neg.log.psls2)
+min.idx <- which(neg.log.psls2 == min(neg.log.psls2))
+# Rough minimum:
+c(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls2[min.idx])
+# Minimum in the right ball park?
+log(known.model$node.pot)                                            # True theta1
+log(known.model$edge.pot[[1]]) - max(log(known.model$edge.pot[[1]])) # True theta2
+
+
 # Plot the sample pseudo-likelihood over the theta grid and the rough minimum:
-plot3d(theta.grid[,1], theta.grid[,2], neg.log.psls, xlab="theta1", ylab="theta2", zlab="")
+plot3d(theta.grid[,1], theta.grid[,2], neg.log.psls, xlab="theta1", ylab="theta2", zlab="", main="feature.func")
 text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls[min.idx], texts = "min")
 lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],theta.grid[min.idx,2]), c(neg.log.psls[min.idx], max(neg.log.psls)))
 text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], max(neg.log.psls), texts = "min")
+
+# Checking the other formulation:
+open3d()
+# Plot the sample pseudo-likelihood over the theta grid and the rough minimum:
+plot3d(theta.grid[,1], theta.grid[,2], neg.log.psls2, xlab="theta1", ylab="theta2", zlab="", main="feature")
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls2[min.idx], texts = "min")
+lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],theta.grid[min.idx,2]), c(neg.log.psls2[min.idx], max(neg.log.psls2)))
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], max(neg.log.psls2), texts = "min")
 
 # Gradient of the sample neg. log pseudo-likelihood:
 # Compute and plot gradient:
