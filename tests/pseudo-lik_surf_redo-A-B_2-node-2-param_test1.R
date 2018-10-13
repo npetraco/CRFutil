@@ -9,6 +9,7 @@ n.states <- 2
 known.model <- make.crf(adj, n.states)
 
 # First lets get a sample of configurations from a "true" model:
+# The "true" theta is: (1.098612, -0.7096765) which translates to the potentials below.
 # True node pots:
 PsiA <- c(3,1)
 PsiB <- c(3,1)
@@ -62,17 +63,18 @@ dim(theta.grid)
 # neglogpseudolik(par = theta.grid[thi,], crf = fit, samples = samps, conditional.energy.function.type = "feature.function", ff = f0, update.crfQ = TRUE)
 # neglogpseudolik(par = theta.grid[thi,], crf = fit, samples = samps, conditional.energy.function.type = "feature", ff = f0, update.crfQ = TRUE)
 
-# Compute the sample pseudolikelihoods over the theta grid:
-neg.log.psls <- array(NA, nrow(theta.grid))
+# Compute the sample log pseudolikelihoods and likelihoods over the theta grid:
+neg.log.psls  <- array(NA, nrow(theta.grid))
 neg.log.psls2 <- array(NA, nrow(theta.grid))
+neg.log.lik   <- array(NA, nrow(theta.grid))
+fit$par.stat <- mrf.stat(crf = fit, instances = samps)
+
 for(i in 1:nrow(theta.grid)) {
   print(i)
   theta.i          <- theta.grid[i,]
-  neg.log.psls[i]  <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature.function", ff = f0, update.crfQ = TRUE)
-  neg.log.psls2[i] <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature", ff = f0, update.crfQ = TRUE)
-
-  #negloglik(par, crf, samples, infer.method = infer.exact, update.crfQ = TRUE)
-
+  neg.log.psls[i]  <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature.function", ff = f0, update.crfQ = F)
+  neg.log.psls2[i] <- neglogpseudolik(par = theta.i, crf = fit, samples = samps, conditional.energy.function.type = "feature", ff = f0, update.crfQ = F)
+  neg.log.lik[i]   <-       negloglik(par = theta.i, crf = fit, samples = samps, infer.method = infer.exact, update.crfQ = F)
 }
 
 # Look for the rough minimum:
@@ -90,6 +92,17 @@ max(neg.log.psls2)
 min.idx <- which(neg.log.psls2 == min(neg.log.psls2))
 # Rough minimum:
 c(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls2[min.idx])
+# Minimum in the right ball park?
+log(known.model$node.pot)                                            # True theta1
+log(known.model$edge.pot[[1]]) - max(log(known.model$edge.pot[[1]])) # True theta2
+
+# Look for the rough minimum of the likelihood formulation:
+hist(neg.log.lik)
+min(neg.log.lik)
+max(neg.log.lik)
+min.idx <- which(neg.log.lik == min(neg.log.lik))
+# Rough minimum:
+c(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.lik[min.idx])
 # Minimum in the right ball park?
 log(known.model$node.pot)                                            # True theta1
 log(known.model$edge.pot[[1]]) - max(log(known.model$edge.pot[[1]])) # True theta2
