@@ -1,4 +1,4 @@
-#' XXXX
+#' Spit out latex expression for E(Xi|X/Xi) given i, X and a crf
 #'
 #' @param XXXX XXXX
 #'
