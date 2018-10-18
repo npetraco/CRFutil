@@ -286,3 +286,77 @@ conditional.config.energy2 <- function(theta.par=NULL, config, condition.element
  return(configE)
 
 }
+
+
+#' Gradient of a condtional energy for a node and a configuration
+#'
+#' @param XXXX XXXX
+#' @details This function compute the vector: \nabla_{\boldsymbol \theta}E(X_i|{\bf X}\slash X_i). The vector is the same length as the
+#'          number of parameters.
+#' @return The function will XX
+#'
+#' @export
+conditional.energy.gradient <- function(config, condition.element.number, crf, ff, printQ=FALSE){
+
+  param.num.vec <- NULL
+  cond.phi.vec  <- NULL
+
+  # Parameter (if any) associated with conditioned node
+  l     <- get.par.idx(config = config, i=condition.element.number, node.par=crf$node.par, ff=ff)
+  phi.l <- phi.component(config = config, i=condition.element.number, node.par=crf$node.par, ff=ff)
+  if(printQ==TRUE){
+    print(paste0("For node i: ", condition.element.number, " in state Xi=", config[condition.element.number], ", param# assoc l=", l, " and thus phi_l=", phi.l))
+  }
+
+  param.num.vec <- c(param.num.vec, l)
+  cond.phi.vec  <- c(cond.phi.vec, phi.l)
+
+  # Parameter (if any) associated with edge containing conditioned node
+  adj.nodes <- crf$adj.nodes[[condition.element.number]]
+  if(printQ==TRUE){
+    print(paste0("The nodes below are connected to node i=", condition.element.number))
+    print(adj.nodes)
+  }
+
+  for(ii in 1:length(adj.nodes)) {
+
+    edge.nods <- sort(c(condition.element.number, adj.nodes[ii]))
+
+    k <- get.par.idx(
+      config   = config,
+      i        = edge.nods[1],
+      j        = edge.nods[2],
+      edge.par = crf$edge.par,
+      edge.mat = crf$edges,
+      ff       = ff)
+
+    phi.k <- phi.component(
+      config   = config,
+      i        = edge.nods[1],
+      j        = edge.nods[2],
+      edge.par = crf$edge.par,
+      edge.mat = crf$edges,
+      ff       = ff)
+
+    param.num.vec <- c(param.num.vec, k)
+    cond.phi.vec  <- c(cond.phi.vec, phi.k)
+
+    if(printQ==TRUE){
+      print(paste0("For edge #", ii, " edge: ", edge.nods[1],"-",edge.nods[2],
+                   " in states Xi=", config[edge.nods[1]], " Xj=", config[edge.nods[2]],
+                   ", param# assoc k=", k, " and thus phi_k=", phi.k))
+    }
+  }
+
+  conditional.grad <- numeric(crf$n.par) # The components of this are \alpha_{k_{[ \sim i]}}({\bf X})
+  theta.counts <- table(param.num.vec)
+  thetas <- as.numeric(names(theta.counts))
+  for(i in 1:length(thetas)){
+    conditional.grad[ thetas[i] ] <- theta.counts[i]
+  }
+
+  param.info        <- list(cond.phi.vec, param.num.vec, conditional.grad)
+  names(param.info) <- c("conditional.phi.components", "parameter.numbers", "conditional.grad")
+  return(param.info)
+
+}

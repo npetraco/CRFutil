@@ -164,7 +164,7 @@ neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="
 #'
 #'
 #' @export
-grad.neglogpseudolik.config <- function(config, phi.config=NULL, node.conditional.energies=NULL, node.complement.conditional.energies=NULL, par=NULL, crf, ff) {
+grad.neglogpseudolik.config.WRONG <- function(config, phi.config=NULL, node.conditional.energies=NULL, node.complement.conditional.energies=NULL, par=NULL, crf, ff) {
 
   if(is.null(crf$nodes2pars)) {
     stop("Compute node to parameter associations and store in crf object!")

@@ -100,9 +100,9 @@ log(known.model$edge.pot[[1]]) - max(log(known.model$edge.pot[[1]])) # True thet
 hist(neg.log.lik)
 min(neg.log.lik)
 max(neg.log.lik)
-min.idx <- which(neg.log.lik == min(neg.log.lik))
+min.idx.lik <- which(neg.log.lik == min(neg.log.lik))
 # Rough minimum:
-c(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.lik[min.idx])
+c(theta.grid[min.idx.lik,1], theta.grid[min.idx.lik,2], neg.log.lik[min.idx.lik])
 # Minimum in the right ball park?
 log(known.model$node.pot)                                            # True theta1
 log(known.model$edge.pot[[1]]) - max(log(known.model$edge.pot[[1]])) # True theta2
@@ -121,6 +121,23 @@ plot3d(theta.grid[,1], theta.grid[,2], neg.log.psls2, xlab="theta1", ylab="theta
 text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls2[min.idx], texts = "min")
 lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],theta.grid[min.idx,2]), c(neg.log.psls2[min.idx], max(neg.log.psls2)))
 text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], max(neg.log.psls2), texts = "min")
+
+# Examine the likelihood now:
+open3d()
+# Plot the sample likelihood over the theta grid and the rough minimum:
+plot3d(theta.grid[,1], theta.grid[,2], neg.log.lik, xlab="theta1", ylab="theta2", zlab="", main="negloglik")
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.lik[min.idx], texts = "min")
+lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],theta.grid[min.idx,2]), c(neg.log.lik[min.idx], max(neg.log.lik)))
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], max(neg.log.lik), texts = "min")
+
+# Plot the sample pseudo-likelihood over the theta grid and the rough minimum:
+open3d()
+plot3d(theta.grid[,1], theta.grid[,2], neg.log.psls, xlab="theta1", ylab="theta2", zlab="", main="neglogpseudolik")
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], neg.log.psls[min.idx], texts = "min")
+lines3d(c(theta.grid[min.idx,1],theta.grid[min.idx,1]), c(theta.grid[min.idx,2],theta.grid[min.idx,2]), c(neg.log.psls[min.idx], max(neg.log.psls)))
+text3d(theta.grid[min.idx,1], theta.grid[min.idx,2], max(neg.log.psls), texts = "min")
+
+
 
 # Gradient of the sample neg. log pseudo-likelihood:
 # Compute and plot gradient:
