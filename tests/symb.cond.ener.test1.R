@@ -49,15 +49,33 @@ dE.X3.Xbc <- dE.X3.Xbc$conditional.grad # complement derivative needed
 dZ.X3.Xb.th7 <- P.X3.Xb * dE.X3.Xb[7] + P.X3.Xbc * dE.X3.Xbc[7]
 dZ.X3.Xb.th7
 
+# c. First compute the required Z
+logZ.X3.Xb <- logsumexp2(c(E.X3.Xb, E.X3.Xbc))
+Z.X3.Xb    <- exp(logZ.X3.Xb)
 
+# Compute the required probabilities
+Pr.X3.Xb   <- P.X3.Xb/Z.X3.Xb
+Pr.X3.Xbc  <- P.X3.Xbc/Z.X3.Xb
+
+# Assemble \frac{\partial}{\partial \theta_7}\log\Big( Z_{X_3|{\bf X}_1\slash X_3} \Big)
+Pr.X3.Xb * dE.X3.Xb[7] + Pr.X3.Xbc * dE.X3.Xbc[7]
+
+# Or we can do this:
+1/Z.X3.Xb * dZ.X3.Xb.th7
 
 known.model$par
-neglogpseudolik.config(param = NULL,
-                       config = X,
-                       crf = known.model,
-                       cond.en.form = "feature",
-                       ff = f0)
+nlpl.info <- neglogpseudolik.config(
+  param = NULL,
+  config = X,
+  crf = known.model,
+  cond.en.form = "feature",
+  ff = f0,gradQ = T)
+int.infj <- nlpl.info[[2]]
+int.infj$alpha
+int.infj$dZ
+int.infj$Ealpha
 
+conditional.energy.gradient(config = X,   condition.element.number = 1, crf = known.model, ff = f0)
 symbolic.conditional.energy(config = c(2,2,1,1,2), condition.element.number = 3, crf = known.model, ff = f0, printQ = F)
 symbolic.conditional.energy(config = complement.at.idx(configuration = c(2,2,1,1,2), complement.index = 3), condition.element.number = 3, crf = known.model, ff = f0, printQ = F)
 

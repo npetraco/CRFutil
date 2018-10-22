@@ -83,7 +83,133 @@ grad.negloglik <- function(crf, nInstances, suffStat, inference.func = infer.exa
 #'
 #'
 #' @export
-neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="feature.function") {
+neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="feature.function", gradQ=FALSE) {
+
+  # Use input theta if supplied:
+  if(is.null(param)){
+    theta.pars <- crf$par
+  } else {
+    theta.pars <- param
+  }
+
+  num.nodes                       <- crf$n.nodes
+  conditional.energies            <- array(NA, num.nodes)
+  complement.conditional.energies <- array(NA, num.nodes)
+  conditional.logZs               <- array(NA, num.nodes)
+  if(gradQ==TRUE) {
+    en.grad.mat             <- array(NA, c(length(theta.pars), num.nodes)) # Call alpha.mat??
+    en.grad.mat.c           <- array(NA, c(length(theta.pars), num.nodes)) # Call alpha.mat.c??
+    Z.grad.mat              <- array(NA, c(length(theta.pars), num.nodes))
+    logZ.grad.mat           <- array(NA, c(length(theta.pars), num.nodes)) # Call Ealpha.mat??
+    grad.neg.log.pseudo.lik <- numeric(length(theta.pars))
+  }
+
+
+  for(i in 1:num.nodes) {
+
+    if(cond.en.form=="feature.function"){
+      cond.en.func <- conditional.config.energy
+    } else {
+      if(cond.en.form=="feature"){
+        cond.en.func <- conditional.config.energy2
+      } else {
+        stop("Conditional energy formula not properly specified! Use key word feature.function or feature for cond.en.form arguement.")
+      }
+    }
+
+    # E(Xi | X/Xi)
+    conditional.energies[i] <-
+      cond.en.func(
+        theta.par                = theta.pars,
+        config                   = config,
+        condition.element.number = i,
+        crf                      = crf,
+        ff                       = ff,
+        printQ                   = FALSE)
+
+    # E(Xi' | X/Xi')
+    config.c     <- complement.at.idx(configuration = config, complement.index = i)
+    complement.conditional.energies[i] <-
+      cond.en.func(
+        theta.par                = theta.pars,
+        config                   = config.c,
+        condition.element.number = i,
+        crf                      = crf,
+        ff                       = ff,
+        printQ                   = FALSE)
+
+    # Using above conditional energies, compute corresponding conditional logZ
+    conditional.logZs[i] <- logsumexp2(c(conditional.energies[i], complement.conditional.energies[i]))
+
+    if(gradQ==TRUE){
+      # Conditional energy gradients, stored as columnns. These are \alpha_{[~i]}
+      en.grad.mat[,i]   <- conditional.energy.gradient(config = config,   condition.element.number = i, crf = crf, ff = ff)$conditional.grad
+      en.grad.mat.c[,i] <- conditional.energy.gradient(config = config.c, condition.element.number = i, crf = crf, ff = ff)$conditional.grad
+
+      # Conditional partition function gradients, stored as columns.
+      Z.grad.mat[,i] <- (exp(conditional.energies[i]) * en.grad.mat[,i] +
+                         exp(complement.conditional.energies[i]) * en.grad.mat.c[,i])
+
+      # Conditional log partition function gradients, stored as columns.
+      # These are \text{E}[{\boldsymbol \alpha}_{[~i]}] = \nabla_{\boldsymbol \theta} \log(Z_{X_i|{\bf X}/X_i}) = \textbf{E}_{X_i} [{\boldsymbol \alpha}_{[\sim i]}]
+      # with components \frac{\partial}{\partial \theta_k}\log\Big( Z_{X_i|{\bf X}\slash X_i} \Big) = \frac{1}{Z_{X_i|{\bf X}\slash X_i}} \frac{\partial}{\partial \theta_k} Z_{X_i|{\bf X}\slash X_i}
+      logZ.grad.mat[,i] <- (1/exp(conditional.logZs[i])) * Z.grad.mat[,i] # COMBINE WITH ABOVE??
+
+      # Gradient of neg log psedolikelihood for a configuration:
+      # \nabla_{\boldsymbol \theta}{\cal L}_{\text{PL}}= \sum_{i=1}^p {\boldsymbol \alpha}_{[ \sim i]}({\bf X}) - \text{E}_{X_i} [{\boldsymbol \alpha}_{[\sim i]}]
+      # do with colSums outside loop instead?
+      #print(i)
+      #print(grad.neg.log.pseudo.lik)
+      grad.neg.log.pseudo.lik <- grad.neg.log.pseudo.lik + (en.grad.mat[,i] - logZ.grad.mat[,i])
+    }
+
+  }
+
+  neg.log.pseudo.lik <- sum(conditional.logZs - conditional.energies)
+
+  if(gradQ==TRUE){
+    neg.log.pseudo.lik.info <- list(
+      neg.log.pseudo.lik,
+      grad.neg.log.pseudo.lik
+    )
+  } else {
+    neg.log.pseudo.lik.info <- list(
+      neg.log.pseudo.lik,
+      NULL
+    )
+  }
+
+  #----
+  intermediate.info <- list(
+    en.grad.mat,   #  alpha.mat
+    en.grad.mat.c, #  alpha.mat.c
+    Z.grad.mat,
+    logZ.grad.mat #  E[alpha.mat]
+  )
+  names(intermediate.info) <- c("alpha","alpha.c","dZ","Ealpha")
+  #----
+
+  names(neg.log.pseudo.lik.info) <- c("neglogpseudolik","grad.neglogpseudolik")
+
+  return(list(neg.log.pseudo.lik.info, intermediate.info))
+  #return(neg.log.pseudo.lik.info)
+
+}
+
+
+
+#' Utility function to compute negative log pseudo-likelihood
+#'
+#' Assumes features are 0,1 valued and parameters are numbered.
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+neglogpseudolik.config.OLD <- function(param = NULL, config, crf, ff, cond.en.form="feature.function") {
 
   num.nodes                       <- crf$n.nodes
   conditional.energies            <- array(NA, num.nodes)
