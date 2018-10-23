@@ -313,25 +313,54 @@ grad.neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.f
 #'
 #'
 #' @export
-neglogpseudolik <- function(par, crf, samples, conditional.energy.function.type="feature.function", ff, update.crfQ = TRUE) {
+neglogpseudolik <- function(param, crf, samples, conditional.energy.function.type="feature.function", ff, gradQ = FALSE, update.crfQ = TRUE) {
 
-  # nlpslk <- sum(sapply(1:nrow(samples), function(xx){
-  #   neglogpseudolik.config( # neglogpseudolik.config(param = NULL, config, crf, ff, cond.en.form="feature.function")
-  #     par = par,
-  #     config = samples[xx,],
-  #     crf = crf,
-  #     ff = ff,
-  #     cond.en.form=conditional.energy.function.type)
-  #   }))
+  # Use input theta if supplied:
+  if(is.null(param)){
+    theta.pars <- crf$par
+  } else {
+    theta.pars <- param
+  }
 
+  # **** Good candidate for a parallelized loop????
+  nliks  <- array(NA,nrow(samples))
+  gnliks <- array(NA,c(nrow(samples),length(theta.pars)))
+  nlik <- 0
+  gnlik <- numeric(length(theta.pars))
   for(i in 1:nrow(samples)) {
-    #neglogpseudolik.config(param = NULL, config, crf, ff, cond.en.form="feature.function", gradQ=FALSE) {
+
+    #print(paste("Sample:",i))
+    nlik.info  <- neglogpseudolik.config(param = theta.pars, config = samples[i,], crf = crf, ff = ff, cond.en.form = conditional.energy.function.type, gradQ = gradQ)
+    nliks[i]   <- nlik.info$neglogpseudolik
+    nlik       <- nlik + nliks[i]
+    if(gradQ==TRUE){
+      gnliks[i,] <- nlik.info$grad.neglogpseudolik
+      gnlik <- gnlik + gnliks[i,]
+    }
+    #print(nliks[i])
+    #print(gnliks[i,])
 
   }
 
+  if(gradQ==TRUE){
+    samp.neg.log.pseudo.lik.info <- list(
+      nlik,
+      gnlik,
+      nliks,
+      gnliks
+    )
+  } else {
+    samp.neg.log.pseudo.lik.info <- list(
+      nlik,
+      NULL,
+      nliks,
+      NULL
+    )
+  }
 
+  names(samp.neg.log.pseudo.lik.info) <- c("samp.neglogpseudolik","samp.grad.neglogpseudolik","nliks","gnliks")
 
-  return(nlpslk)
+  return(samp.neg.log.pseudo.lik.info)
 
 }
 

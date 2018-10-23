@@ -64,6 +64,17 @@ Pr.X3.Xb * dE.X3.Xb[7] + Pr.X3.Xbc * dE.X3.Xbc[7]
 1/Z.X3.Xb * dZ.X3.Xb.th7
 
 known.model$par
+
+nlpl.info <- neglogpseudolik.config(
+  param        = NULL,
+  config       = X,
+  crf          = known.model,
+  cond.en.form = "feature",
+  gradQ        = T,
+  ff           = f0)
+nlpl.info
+
+
 gnlpl.info <-grad.neglogpseudolik.config(
   param                      = NULL,
   config                     = X,
