@@ -64,16 +64,23 @@ Pr.X3.Xb * dE.X3.Xb[7] + Pr.X3.Xbc * dE.X3.Xbc[7]
 1/Z.X3.Xb * dZ.X3.Xb.th7
 
 known.model$par
-nlpl.info <- neglogpseudolik.config(
-  param = NULL,
-  config = X,
-  crf = known.model,
-  cond.en.form = "feature",
-  ff = f0,gradQ = T)
-int.infj <- nlpl.info[[2]]
-int.infj$alpha
-int.infj$dZ
-int.infj$Ealpha
+gnlpl.info <-grad.neglogpseudolik.config(
+  param                      = NULL,
+  config                     = X,
+  crf                        = known.model,
+  cond.en.form               = "feature",
+  ff                         = f0)
+
+gnlpl.info$grad.neglogpseudolik
+
+gnlpl.info$alpha
+gnlpl.info$alpha[7,3]
+
+gnlpl.info$dZ
+gnlpl.info$dZ[7,3]
+
+gnlpl.info$Ealpha
+gnlpl.info$Ealpha[7,3]
 
 conditional.energy.gradient(config = X,   condition.element.number = 1, crf = known.model, ff = f0)
 symbolic.conditional.energy(config = c(2,2,1,1,2), condition.element.number = 3, crf = known.model, ff = f0, printQ = F)

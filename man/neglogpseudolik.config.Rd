@@ -2,7 +2,7 @@
 % Please edit documentation in R/likelihood_util.R
 \name{neglogpseudolik.config}
 \alias{neglogpseudolik.config}
-\title{Utility function to compute negative log pseudo-likelihood}
+\title{Utility function to compute negative log pseudo-likelihood. Can also request the gradient.}
 \usage{
 neglogpseudolik.config(param = NULL, config, crf, ff,
   cond.en.form = "feature.function", gradQ = FALSE)
