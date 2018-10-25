@@ -160,11 +160,13 @@ neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="
       # do with colSums outside loop instead?
       #print(i)
       #print(grad.neg.log.pseudo.lik)
-      grad.neg.log.pseudo.lik <- grad.neg.log.pseudo.lik + (en.grad.mat[,i] - logZ.grad.mat[,i])
+      # Note: gradient of the NEGATIVE log pseudo likelihood
+      grad.neg.log.pseudo.lik <- grad.neg.log.pseudo.lik + (logZ.grad.mat[,i] - en.grad.mat[,i])
     }
 
   }
 
+  # Note: NEGATIVE log pseudo likelihood
   neg.log.pseudo.lik <- sum(conditional.logZs - conditional.energies)
 
   if(gradQ==TRUE){
@@ -282,7 +284,8 @@ grad.neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.f
     # do with colSums outside loop instead?
     #print(i)
     #print(grad.neg.log.pseudo.lik)
-    grad.neg.log.pseudo.lik <- grad.neg.log.pseudo.lik + (en.grad.mat[,i] - logZ.grad.mat[,i])
+    # Note: gradient of the NEGATIVE log pseudo likelihood
+    grad.neg.log.pseudo.lik <- grad.neg.log.pseudo.lik + (logZ.grad.mat[,i] - en.grad.mat[,i])
   }
 
   #----
@@ -358,9 +361,84 @@ neglogpseudolik <- function(param, crf, samples, conditional.energy.function.typ
     )
   }
 
+  if(update.crfQ == TRUE){
+    crf$par      <- theta.pars
+    crf$nll      <- nlik
+    crf$gradient <- gnlik
+  }
+
   names(samp.neg.log.pseudo.lik.info) <- c("samp.neglogpseudolik","samp.grad.neglogpseudolik","nliks","gnliks")
 
   return(samp.neg.log.pseudo.lik.info)
+
+}
+
+
+#' Sample negative log pseudo-likelihood
+#'
+#' Experiment
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+neglogpseudolik2 <- function(param, crf, samples, conditional.energy.function.type="feature.function", ff, gradQ = FALSE, update.crfQ = TRUE) {
+
+  # Use input theta if supplied:
+  if(is.null(param)){
+    theta.pars <- crf$par
+  } else {
+    theta.pars <- param
+  }
+
+  # **** Good candidate for a parallelized loop????
+  nliks  <- array(NA,nrow(samples))
+  gnliks <- array(NA,c(nrow(samples),length(theta.pars)))
+  nlik <- 0
+  gnlik <- numeric(length(theta.pars))
+  for(i in 1:nrow(samples)) {
+
+    #print(paste("Sample:",i))
+    nlik.info  <- neglogpseudolik.config(param = theta.pars, config = samples[i,], crf = crf, ff = ff, cond.en.form = conditional.energy.function.type, gradQ = gradQ)
+    nliks[i]   <- nlik.info$neglogpseudolik
+    nlik       <- nlik + nliks[i]
+    if(gradQ==TRUE){
+      gnliks[i,] <- nlik.info$grad.neglogpseudolik
+      gnlik <- gnlik + gnliks[i,]
+    }
+    #print(nliks[i])
+    #print(gnliks[i,])
+
+  }
+
+  if(gradQ==TRUE){
+    samp.neg.log.pseudo.lik.info <- list(
+      nlik,
+      gnlik,
+      nliks,
+      gnliks
+    )
+  } else {
+    samp.neg.log.pseudo.lik.info <- list(
+      nlik,
+      NULL,
+      nliks,
+      NULL
+    )
+  }
+
+  if(update.crfQ == TRUE){
+    crf$par      <- theta.pars
+    crf$nll      <- nlik
+    crf$gradient <- gnlik
+  }
+
+  #names(samp.neg.log.pseudo.lik.info) <- c("samp.neglogpseudolik","samp.grad.neglogpseudolik","nliks","gnliks")
+
+  return(nlik)
 
 }
 

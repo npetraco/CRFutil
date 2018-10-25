@@ -247,7 +247,7 @@ make.par.from.potentials <- function(crf) {
 }
 
 
-#' Reformat parameter vector to CRF object forms node.pot and edge.pot BUT don't
+#' Reformat parameter vector to CRF object from node.pot and edge.pot BUT don't
 #' exponentiate, i.e. leave them as logpots (energies).
 #'
 #' The function will XXXX

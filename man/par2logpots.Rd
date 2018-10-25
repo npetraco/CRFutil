@@ -2,7 +2,7 @@
 % Please edit documentation in R/potentials_util.R
 \name{par2logpots}
 \alias{par2logpots}
-\title{Reformat parameter vector to CRF object forms node.pot and edge.pot BUT don't
+\title{Reformat parameter vector to CRF object from node.pot and edge.pot BUT don't
 exponentiate, i.e. leave them as logpots (energies).}
 \usage{
 par2logpots(par, crf)
