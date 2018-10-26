@@ -86,12 +86,17 @@ make.pots <- function(parms, crf, rescaleQ=FALSE, replaceQ=FALSE, format="regula
           edge.pot.shifted[[k]][i,j] <- exp(parms[par.idx])
         }
       }
+      # Rescales with respect to the biggest row elements in edge matrix
+      if(rescaleQ==TRUE){
+        #print(paste(k,i, " ", max(edge.pot.shifted[[k]][i,]) ))
+        edge.pot.shifted[[k]][i,] <- edge.pot.shifted[[k]][i,]/max(edge.pot.shifted[[k]][i,])
+      }
     }
-    if(rescaleQ==TRUE){
-      #print(paste(k, " ", max(edge.pot.shifted[[k]]) ))
-      edge.pot.shifted[[k]] <- edge.pot.shifted[[k]]/max(edge.pot.shifted[[k]])
-    }
-
+    # Rescales with respect to the biggest edge matrix element
+    #if(rescaleQ==TRUE){
+    #  #print(paste(k, " ", max(edge.pot.shifted[[k]]) ))
+    #  edge.pot.shifted[[k]] <- edge.pot.shifted[[k]]/max(edge.pot.shifted[[k]])
+    #}
   }
 
   if(format=="regular"){

@@ -104,18 +104,16 @@ neglogpseudolik.config <- function(param = NULL, config, crf, ff, cond.en.form="
     grad.neg.log.pseudo.lik <- numeric(length(theta.pars))
   }
 
-
-  for(i in 1:num.nodes) {
-
-    if(cond.en.form=="feature.function"){
-      cond.en.func <- conditional.config.energy
+  if(cond.en.form=="feature.function"){
+    cond.en.func <- conditional.config.energy
+  } else {
+    if(cond.en.form=="feature"){
+      cond.en.func <- conditional.config.energy2
     } else {
-      if(cond.en.form=="feature"){
-        cond.en.func <- conditional.config.energy2
-      } else {
-        stop("Conditional energy formula not properly specified! Use key word feature.function or feature for cond.en.form arguement.")
-      }
+      stop("Conditional energy formula not properly specified! Use key word feature.function or feature for cond.en.form arguement.")
     }
+  }
+  for(i in 1:num.nodes) {
 
     # E(Xi | X/Xi)
     conditional.energies[i] <-
