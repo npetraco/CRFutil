@@ -116,6 +116,13 @@ lik.dist.en.info <- distribution.from.energies(
   ff = f0)
 lik.Pr.en <- lik.dist.en.info$state.probs
 lik.Pr.en
+# lik.Pr.en <- c(
+#   0.0021716292, 0.0386245402, 0.0031101772, 0.1046094041, 0.0014832579, 0.0064702929, 0.0003827932, 0.0031577621,
+#   0.1381024870, 0.1487270649, 0.0410532160, 0.0836071894, 0.0509489664, 0.0134571624, 0.0027291608, 0.0013631862,
+#   0.0011578398, 0.0059426214, 0.0078831526, 0.0765133925, 0.0106933988, 0.0134609269, 0.0131194398, 0.0312307509,
+#   0.0192741150, 0.0059898355, 0.0272378059, 0.0160073890, 0.0961489639, 0.0073284928, 0.0244844497, 0.0035291355
+# )
+
 
 # Likelihood distribution from pseudolikelihood estimate of theta
 psl.Pr.en <- c(
@@ -142,26 +149,26 @@ true.config.Prs <- c(
 trup    <- round(100*true.config.Prs)
 likp    <- round(100*lik.Pr.en)
 psllikp <- round(100*psl.Pr.en)
-pslp    <- round(100*psl2.Pr.en)
+pslp    <- round(100*psl2.Pr.en); sum(pslp) #????
 cbind(config.mat,trup,likp,psllikp,pslp)
 
 
 # Examine differences between the estimated distributions and the true distribution:
-zero.eps <- runif(1,0,1) * 1e-5
-trup.mod <- trup
-trup.mod[which(trup==0)] <- zero.eps
+#zero.eps <- runif(1,0,1) * 1e-7
+trup.mod <- true.config.Prs
+#trup.mod[which(trup==0)] <- zero.eps
 trup.mod
 
-likp.mod <- likp
-likp.mod[which(likp==0)] <- zero.eps
+likp.mod <- lik.Pr.en
+#likp.mod[which(likp==0)] <- zero.eps
 likp.mod
 
-psllikp.mod <- psllikp
-psllikp.mod[which(psllikp==0)] <- zero.eps
+psllikp.mod <- psl2.Pr.en
+#psllikp.mod[which(psllikp==0)] <- zero.eps
 psllikp.mod
 
-pslp.mod <- pslp
-pslp.mod[which(pslp==0)] <- zero.eps
+pslp.mod <- psl.Pr.en
+#pslp.mod[which(pslp==0)] <- zero.eps
 pslp.mod
 
 # KL divergences:
@@ -180,3 +187,17 @@ pslp.kld <- sum(trup.mod * log(trup.mod/pslp.mod))
 likp.kld
 psllikp.kld
 pslp.kld
+
+sum(likp.mod)
+sum(trup.mod)
+sum(psllikp.mod)
+
+sum(true.config.Prs)
+sum(lik.Pr.en)
+sum(psl.Pr.en)
+sum(psl2.Pr.en) #????????? Normalized with respect to complements. Re-normalize with L1???
+#Re-normalized psl2.Pr.en:
+psl2.Pr.en.ren <- psl2.Pr.en/sum(psl2.Pr.en)
+sum(psl2.Pr.en.ren)
+
+round(100* cbind(true.config.Prs, lik.Pr.en, psl.Pr.en, psl2.Pr.en, psl2.Pr.en.ren))

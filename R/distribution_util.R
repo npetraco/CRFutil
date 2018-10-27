@@ -138,13 +138,18 @@ pseudolikelihoods.from.energies <- function(state.space, adjacent.nodes, edges.m
 
   }
 
+  # Product pseudo likelihoods are not normalized wrt to \Pr({\bf X}), so lets just renormalize them
+  # so atleast they sum to 1 (ie L1 normalize the product pseudo likelihoods)
+  renormed.pseudo.likelihoods <- pseudo.likelihoods/sum(pseudo.likelihoods)
+
   dist.info <- list(
     condtional.energies,
     complement.condtional.energies,
     conditional.Zs,
     conditional.Prs,
     complement.conditional.Prs,
-    pseudo.likelihoods
+    pseudo.likelihoods,
+    renormed.pseudo.likelihoods
   )
   names(dist.info) <- c(
     "condtional.energies",
@@ -152,7 +157,8 @@ pseudolikelihoods.from.energies <- function(state.space, adjacent.nodes, edges.m
     "conditional.Zs",
     "conditional.Prs",
     "complement.conditional.Prs",
-    "pseudo.likelihoods"
+    "pseudo.likelihoods",
+    "L1.renormalized.pseudo.likelihoods"
   )
 
   return(dist.info)

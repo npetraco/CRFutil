@@ -75,7 +75,7 @@ cbind(psl$par,true.theta)
 # Ensure stored potentials conform to fit theta
 psl$node.pot
 psl$edge.pot
-junk.psl <- make.pots(parms = psl$par,  crf = psl,  rescaleQ = T, replaceQ = T)
+junk.psl <- make.pots(parms = psl$par,  crf = psl,  rescaleQ = F, replaceQ = T)
 psl$node.pot
 psl$edge.pot
 
@@ -140,3 +140,12 @@ true.config.Prs <- c(
   0.043902920, 0.032824296, 0.003151263, 0.007493629, 0.067636492, 0.009664142, 0.034559644, 0.015705688)
 
 cbind(config.mat,round(100*true.config.Prs) , round(100*psl.Pr.en) ,round(100*psl2.Pr.en))
+
+
+psl2.dist.pot.info$condtional.energies
+psl2.dist.pot.info$complement.condtional.energies
+psl2.dist.pot.info$conditional.Zs
+psl2.dist.pot.info$conditional.Prs
+psl2.dist.pot.info$complement.conditional.Prs
+
+psl2.dist.pot.info$conditional.Prs + psl2.dist.pot.info$complement.conditional.Prs
