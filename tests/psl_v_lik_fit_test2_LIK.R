@@ -175,14 +175,17 @@ pslp.mod
 trup.mod/likp.mod
 trup.mod * log(trup.mod/likp.mod)
 likp.kld <- sum(trup.mod * log(trup.mod/likp.mod))
+likp.kld
 
 trup.mod/psllikp.mod
 trup.mod * log(trup.mod/psllikp.mod)
 psllikp.kld <- sum(trup.mod * log(trup.mod/psllikp.mod))
+psllikp.kld
 
 trup.mod/pslp.mod
 trup.mod * log(trup.mod/pslp.mod)
 pslp.kld <- sum(trup.mod * log(trup.mod/pslp.mod))
+pslp.kld
 
 likp.kld
 psllikp.kld
@@ -190,7 +193,7 @@ pslp.kld
 
 sum(likp.mod)
 sum(trup.mod)
-sum(psllikp.mod)
+sum(psllikp.mod) #?????
 
 sum(true.config.Prs)
 sum(lik.Pr.en)
@@ -199,5 +202,14 @@ sum(psl2.Pr.en) #????????? Normalized with respect to complements. Re-normalize 
 #Re-normalized psl2.Pr.en:
 psl2.Pr.en.ren <- psl2.Pr.en/sum(psl2.Pr.en)
 sum(psl2.Pr.en.ren)
+pslp.ren.kld <- sum(trup.mod * log(trup.mod/psl2.Pr.en.ren))
+pslp.ren.kld
 
 round(100* cbind(true.config.Prs, lik.Pr.en, psl.Pr.en, psl2.Pr.en, psl2.Pr.en.ren))
+
+likp.kld
+psllikp.kld
+pslp.kld
+pslp.ren.kld
+
+sum(trup.mod * log(trup.mod/trup.mod))

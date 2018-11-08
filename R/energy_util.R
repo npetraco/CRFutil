@@ -353,11 +353,13 @@ symbolic.conditional.energy <- function(config, condition.element.number, crf, f
   }
 
   zero.idxs <- which(param.num.vec==0)
+  #print(zero.idxs)
   if(length(zero.idxs) == 0) { # No zero idxs
     theta.idxs <- param.num.vec
   } else {                     # Drop zero idxs if found
     theta.idxs <- param.num.vec[-which(param.num.vec==0)]
   }
+  #print(theta.idxs)
 
   if(printQ==TRUE){
     print("Final theta indices: ")
@@ -370,9 +372,11 @@ symbolic.conditional.energy <- function(config, condition.element.number, crf, f
   } else {
     sne <- paste0("th_",theta.idxs[1])
     sne.tex <- paste0("\theta_{",theta.idxs[1],"}")
-    for(i in 2:length(theta.idxs)){
-      sne <- paste0(sne," + th_",theta.idxs[i])
-      sne.tex <- paste0(sne.tex," + \theta_{",theta.idxs[i],"}")
+    if(length(theta.idxs) >=2 ) {
+      for(i in 2:length(theta.idxs)){
+        sne <- paste0(sne," + th_",theta.idxs[i])
+        sne.tex <- paste0(sne.tex," + \theta_{",theta.idxs[i],"}")
+      }
     }
   }
 
@@ -389,6 +393,14 @@ symbolic.conditional.energy <- function(config, condition.element.number, crf, f
 
   if(format=="tex"){
     out.eq <- symb.ener.tex
+  } else if(format=="conditional.phi"){
+    conditional.phi.tmp <- array(0,c(1,crf$n.par))
+    conditional.phi.tmp[theta.idxs] <- 1
+    out.eq <- conditional.phi.tmp
+    colnames(out.eq) <- 1:crf$n.par
+    #print(theta.idxs)
+    #print(cond.phi.vec)
+
   } else {
     out.eq <- symb.ener
   }
