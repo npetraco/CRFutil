@@ -37,10 +37,12 @@ configs <- rbind(
   c(2,2,2)  #X8
 )
 
-X  <- configs[8,]
-Xc <- complement.at.idx(configuration = X, complement.index = 3)
-symbolic.conditional.energy(config = X,  condition.element.number = 3, crf = psl, ff = f0, printQ = F)
-symbolic.conditional.energy(config = Xc, condition.element.number = 3, crf = psl, ff = f0, printQ = F)
+node.numb   <- 1
+config.numb <- 2
+X  <- configs[config.numb,]
+Xc <- complement.at.idx(configuration = X, complement.index = node.numb)
+symbolic.conditional.energy(config = X,  condition.element.number = node.numb, crf = psl, ff = f0, printQ = F)
+symbolic.conditional.energy(config = Xc, condition.element.number = node.numb, crf = psl, ff = f0, printQ = F)
 
 #phi.component(config = X, i=3, node.par=psl$node.par, ff=f0)
 #phi.component(config = X, i=1, j=3, edge.par = psl$edge.par, edge.mat = psl$edges, ff = f0)
@@ -62,8 +64,10 @@ ec3-ecc3
 MX <- array(NA,c(nrow(configs)*psl$n.nodes, psl$n.par))
 
 count <- 1
-for(i in 1:nrow(configs)) {
-  for(j in 1:psl$n.nodes) {
+#for(i in 1:nrow(configs)) {
+#  for(j in 1:psl$n.nodes) {
+for(j in 1:psl$n.nodes) {
+  for(i in 1:nrow(configs)) {
     ec  <- symbolic.conditional.energy(config = configs[i,],  condition.element.number = j, crf = psl, ff = f0, printQ = F, format = "conditional.phi")
     ecc <- symbolic.conditional.energy(config = complement.at.idx(configuration = configs[i,], complement.index = j),  condition.element.number = j, crf = psl, ff = f0, printQ = F, format = "conditional.phi")
     print(paste("sample X:", i, "Node:", j) )
@@ -76,4 +80,15 @@ for(i in 1:nrow(configs)) {
 }
 MX
 
-nrow(configs)*psl$n.nodes
+
+y <-c(configs[,1], configs[,2],configs[,3])
+y
+y[which(y==2)] <- 0
+y
+
+M1 <- glm(y ~ MX[,1] + MX[,2] + MX[,3] + MX[,4] + MX[,5] + MX[,6] - 1, family=binomial(link="logit"))
+summary(M1)
+
+library(lme4)
+M2 <- glmer(y ~ MX[,1] + MX[,2] + MX[,3] + MX[,4] + MX[,5] + MX[,6], family=binomial(link="logit"))
+
