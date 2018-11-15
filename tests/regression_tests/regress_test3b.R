@@ -25,14 +25,14 @@ knm$edge.par[[2]][2,2,1] <- 5
 knm$edge.par[[3]][1,1,1] <- 6
 knm$edge.par[[3]][2,2,1] <- 6
 
-set.seed(6)
+#set.seed(6)
 knm$par <- runif(6,-1.5,1.1)
 knm$par # "true" theta
 out.pot <- make.pots(parms = knm$par,  crf = knm,  rescaleQ = T, replaceQ = T)
 
 # So now sample from the model as if we obtained an experimental sample:
-num.samps <- 1000
-set.seed(1)
+num.samps <- 25
+#set.seed(1)
 samps <- sample.exact(knm, num.samps)
 mrf.sample.plot(samps)
 
@@ -107,5 +107,7 @@ joint.dist.info.knm
 
 psl.cp <- round(joint.dist.info[,4]*100, 1)
 knm.cp <- round(joint.dist.info.knm[,4]*100, 1)
-cbind(joint.dist.info[,1:3], psl.cp, knm.cp)
+cbind(joint.dist.info[,c(2,3,1)], psl.cp, knm.cp)
 
+sum(psl.cp)
+sum(knm.cp)

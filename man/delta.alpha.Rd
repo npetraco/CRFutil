@@ -13,7 +13,7 @@ delta.alpha(crf, samples, printQ = FALSE)
 The function will XX
 }
 \description{
-Needed for determination of parameters via logistic regression scheme
+Needed for determination of parameters via logistic regression schemes
 }
 \details{
 The function will XXXX

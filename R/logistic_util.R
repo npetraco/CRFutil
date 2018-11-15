@@ -1,6 +1,6 @@
 #' Compute the delta-alpha matrix {\boldsymbol \Delta}_{X_i=1}
 #'
-#' Needed for determination of parameters via logistic regression scheme
+#' Needed for determination of parameters via logistic regression schemes
 #'
 #' The function will XXXX
 #'
@@ -11,7 +11,7 @@
 #' @export
 delta.alpha <- function(crf, samples, printQ=FALSE) {
 
-  Da.mat      <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
+  Da.mat        <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
   cond.alp.mat  <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
   cond.alpc.mat <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
 
@@ -21,7 +21,7 @@ delta.alpha <- function(crf, samples, printQ=FALSE) {
 
       X.cfg     <- samples[n,]
       Xc.cfg    <- X.cfg
-      X.cfg[i]  <- 1          # **** CAUTION: assumes 1/2 states. GENERALIZE
+      X.cfg[i]  <- 1          # **** CAUTION: assumes states are labeled 1 or 2. GENERALIZE!!!!
       Xc.cfg[i] <- 2
 
       cond.alp  <- symbolic.conditional.energy(config = X.cfg,  condition.element.number = i, crf = crf, ff = f0, printQ = F, format = "conditional.phi")
