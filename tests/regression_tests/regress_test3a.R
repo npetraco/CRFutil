@@ -25,6 +25,7 @@ knm$edge.par[[2]][2,2,1] <- 5
 knm$edge.par[[3]][1,1,1] <- 6
 knm$edge.par[[3]][2,2,1] <- 6
 
+set.seed(6)
 knm$par <- runif(6,-1.5,1.1)
 knm$par # "true" theta
 #knm$par <-
