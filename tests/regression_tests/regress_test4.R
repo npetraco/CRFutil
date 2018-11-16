@@ -1,6 +1,7 @@
 library(CRFutil)
 library(rstan)
 library(shinystan)
+library(coda)
 
 # Fully connected
 grphf <- ~1:2+1:3+2:3
@@ -31,6 +32,7 @@ set.seed(6)
 knm$par <- runif(6,-1.5,1.1)
 knm$par # "true" theta
 out.pot <- make.pots(parms = knm$par,  crf = knm,  rescaleQ = T, replaceQ = T)
+
 
 # So now sample from the model as if we obtained an experimental sample:
 num.samps <- 25
@@ -184,3 +186,66 @@ cbind(joint.dist.info[,c(2,3,1)], psl.cp, psl2.cp, knm.cp)
 
 sum(psl.cp)
 sum(knm.cp)
+
+process.logistic.fit.stan(bfit)
+junk <- HPDinterval(as.mcmc(beta), prob = 0.95)
+class(junk)
+junk
+
+#mrf.nll(par = psl2$par, crf = psl2, instances = t(as.matrix(c(1,1,1))), infer.method = infer.exact)
+psl2.bel$logZ
+logZ2
+
+
+# Some checks:
+
+# Enumerate all the state configurations
+s1 <- 1
+s2 <- 2
+all.configs <- expand.grid(c(s1,s2),c(s1,s2),c(s1,s2))
+colnames(all.configs) <- gp@nodes
+all.configs
+
+fit.params.info <- make.gRbase.potentials(psl2, node.names=gp@nodes, state.nmes=c(s1,s2))
+fit.params.info
+
+
+config.energies <- sapply(1:nrow(all.configs),
+                          function(xx){
+                            config.energy(config = all.configs[xx,], edges.mat = psl2$edges,
+                                          one.lgp = fit.params.info$node.energies,
+                                          two.lgp = fit.params.info$edge.energies,
+                                          ff = f0)
+                          })
+config.energies
+logZ2
+
+# Compare config energies with energies computed as theta \dot phi:
+# First compute the “features” (phi) for all each possible configuration
+M.all  <- compute.model.matrix(all.configs, psl2$edges, psl2$node.par, psl2$edge.par, f0)
+M.all
+
+# Now get the energy of each config with the dot-porduct formula:
+w <- psl2$par
+alt.config.energies <- sapply(1:nrow(M.all), function(xx){w%*%M.all[xx,]})
+config.energies                       # Check: All config energies with feature functions
+alt.config.energies                   # Check: All config energies with features
+
+
+#   ?????? did we re-normalize at some point?????
+
+psl2a <- copy.crf(psl2)
+
+out.pot3 <- make.pots(parms = psl2a$par,  crf = psl2a,  rescaleQ = F, replaceQ = T)
+lz.unsc <- infer.exact(crf = psl2a)$logZ
+alt.config.energies - lz.unsc
+config.energies - logZ2
+
+# yup
+
+config.energies - alt.config.energies # Check: Differences
+
+
+# So be careful when computing config probs that you are using the correct normalization constant!
+# IE did you re-scale the potentials?????
+

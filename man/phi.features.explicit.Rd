@@ -2,7 +2,7 @@
 % Please edit documentation in R/features_util.R
 \name{phi.features.explicit}
 \alias{phi.features.explicit}
-\title{Utility function to compute labeled explicit features phi_i(config)}
+\title{Utility function to compute labeled explicit unconditional features phi_i(config)}
 \usage{
 phi.features.explicit(config, edges.mat, node.par, edge.par, ff)
 }

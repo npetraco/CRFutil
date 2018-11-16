@@ -2,7 +2,7 @@
 % Please edit documentation in R/features_util.R
 \name{phi.component}
 \alias{phi.component}
-\title{Utility function to compute phi component for specific node or edge}
+\title{Utility function to compute phi component CONDITIONED for specific node or edge}
 \usage{
 phi.component(config, i = NULL, j = NULL, node.par = NULL,
   edge.par = NULL, edge.mat = NULL, ff)
@@ -17,6 +17,6 @@ The function will XX
 Assumes features are 0,1 valued and parameters are numbered.
 }
 \details{
-The function will XXXX
+The function can be used to compute the CONDITINAL phi feature vector used for pseudolikelihood calculations.
 }
 

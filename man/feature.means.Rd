@@ -2,7 +2,7 @@
 % Please edit documentation in R/features_util.R
 \name{feature.means}
 \alias{feature.means}
-\title{Utility function to compute mean vector of features with supplied theta in a CRF network object.}
+\title{Utility function to compute mean vector of unconditional features with supplied theta in a CRF network object.}
 \usage{
 feature.means(crf, inference.func = infer.exact)
 }

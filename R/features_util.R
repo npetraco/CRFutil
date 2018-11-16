@@ -1,4 +1,4 @@
-#' Utility function to compute features phi_i(config)
+#' Utility function to compute unconditional features phi_i(config)
 #'
 #' Assumes features are 0,1 valued and parameters are numbered.
 #'
@@ -50,7 +50,7 @@ phi.features <- function(config, edges.mat, node.par, edge.par, ff) {
 }
 
 
-#' Utility function to compute labeled explicit features phi_i(config)
+#' Utility function to compute labeled explicit unconditional features phi_i(config)
 #'
 #' Assumes features are 0,1 valued and parameters are numbered.
 #'
@@ -209,11 +209,11 @@ get.node.idxs <- function(par.idx, node.par=NULL, edge.par=NULL, edge.mat=NULL) 
 }
 
 
-#' Utility function to compute phi component for specific node or edge
+#' Utility function to compute phi component CONDITIONED for specific node or edge
 #'
 #' Assumes features are 0,1 valued and parameters are numbered.
 #'
-#' The function will XXXX
+#' The function can be used to compute the CONDITINAL phi feature vector used for pseudolikelihood calculations.
 #'
 #' @param XX The XX
 #' @return The function will XX
@@ -232,7 +232,7 @@ phi.component <- function(config, i=NULL, j=NULL, node.par=NULL, edge.par=NULL, 
 
 #' Utility function to compute model matrix
 #'
-#' Model matrix is the matrix of phi "features". Column
+#' Model matrix is the matrix of unconditional phi "features". Column
 #' sums of the model matrix should be the sufficient statistics.
 #'
 #' The function will XXXX
@@ -253,7 +253,7 @@ compute.model.matrix <- function(configs, edges.mat, node.par, edge.par, ff) {
 }
 
 
-#' Utility function to compute mean vector of features with supplied theta in a CRF network object.
+#' Utility function to compute mean vector of unconditional features with supplied theta in a CRF network object.
 #'
 #' Assumes features are 0,1 valued and parameters are numbered.
 #'

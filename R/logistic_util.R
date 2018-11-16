@@ -59,3 +59,50 @@ delta.alpha <- function(crf, samples, printQ=FALSE) {
   return(da.info)
 
 }
+
+#' Process Stan output for logistic fit
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+process.logistic.fit.stan <- function(stan.obj, param.vec.name, hpdi.unc=0.95) {
+
+  par.mat  <- extract(stan.obj, param.vec.name)[[1]] # In package: rstan
+  #num.pars <- ncol(par.mat)
+
+  par.means <- colMeans(par.mat)
+  par.meds  <- apply(par.mat, MARGIN = 2,FUN = median)
+  par.intervals <- HPDinterval(as.mcmc(par.mat), prob = hpdi.unc) # In package: coda
+  #print(par.intervals)
+
+  par.info <- list(
+    par.means,
+    par.meds,
+    par.intervals
+  )
+  names(par.info) <- c("par.post.means", "par.post.medians", "par.HPDIs")
+  return(par.info)
+
+}
+
+
+#' Process JAGS output for logistic fit
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+process.logistic.fit.JAGS <- function(jags.obj) {
+
+}

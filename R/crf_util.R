@@ -149,3 +149,65 @@ make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=
 
 }
 
+#' Copy and return a new independent crf object
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+copy.crf <- function(crf, plotQ=FALSE){
+
+  adj.mat <- array(0, c(crf$n.nodes, crf$n.nodes))
+  for(i in 1:length(crf$adj.nodes)) {
+    idx <- crf$adj.nodes[[i]]
+    adj.mat[idx[1], idx[2]] <- 1
+  }
+  adj.mat <- t(adj.mat) + adj.mat # symmetrize assuming start is only upper/lower triangle
+
+  if(max(adj.mat) > 1) {
+    print(adj.mat)
+    stop("Something went wrong with reconstructing the adjacency matrix!")
+  }
+
+  new.crf <- make.crf(adj.mat, crf$n.states)
+  new.crf <- make.features(new.crf)
+  new.crf <- make.par(new.crf, crf$n.par)
+  crf.attrib.nms <- names(crf)
+  for(i in 1:length(crf.attrib.nms)){
+    new.crf[[crf.attrib.nms[i]]] <- crf[[crf.attrib.nms[i]]]
+  }
+
+  # PUT IN PLOT OPTION
+
+  return(new.crf)
+
+}
+
+
+#' Print out all contents of a crf object
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+crf.dumpout <- function(crf){
+
+  crf.attrib.nms <- names(crf)
+
+  for(i in 1:length(crf.attrib.nms)){
+    print("----------------")
+    print(crf.attrib.nms[i])
+    print(crf[[crf.attrib.nms[i]]])
+  }
+
+}

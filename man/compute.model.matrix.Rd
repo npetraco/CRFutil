@@ -13,7 +13,7 @@ compute.model.matrix(configs, edges.mat, node.par, edge.par, ff)
 The function will XX
 }
 \description{
-Model matrix is the matrix of phi "features". Column
+Model matrix is the matrix of unconditional phi "features". Column
 sums of the model matrix should be the sufficient statistics.
 }
 \details{

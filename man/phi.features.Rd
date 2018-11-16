@@ -2,7 +2,7 @@
 % Please edit documentation in R/features_util.R
 \name{phi.features}
 \alias{phi.features}
-\title{Utility function to compute features phi_i(config)}
+\title{Utility function to compute unconditional features phi_i(config)}
 \usage{
 phi.features(config, edges.mat, node.par, edge.par, ff)
 }
