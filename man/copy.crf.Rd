@@ -2,7 +2,7 @@
 % Please edit documentation in R/crf_util.R
 \name{copy.crf}
 \alias{copy.crf}
-\title{Copy and return a new independent crf object}
+\title{(Deep) Copy and return a new independent crf object}
 \usage{
 copy.crf(crf, plotQ = FALSE)
 }

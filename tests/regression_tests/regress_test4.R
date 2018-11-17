@@ -234,7 +234,7 @@ alt.config.energies                   # Check: All config energies with features
 
 #   ?????? did we re-normalize at some point?????
 
-psl2a <- copy.crf(psl2)
+psl2a <- copy.crf(psl2, plotQ = F)
 
 out.pot3 <- make.pots(parms = psl2a$par,  crf = psl2a,  rescaleQ = F, replaceQ = T)
 lz.unsc <- infer.exact(crf = psl2a)$logZ
@@ -249,3 +249,4 @@ config.energies - alt.config.energies # Check: Differences
 # So be careful when computing config probs that you are using the correct normalization constant!
 # IE did you re-scale the potentials?????
 
+conditional.config.energy()

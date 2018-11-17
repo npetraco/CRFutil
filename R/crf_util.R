@@ -149,7 +149,140 @@ make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=
 
 }
 
-#' Copy and return a new independent crf object
+#' Instantiate an empty field
+#'
+#' XXXX
+#'
+#' XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="standard", node.par=NULL, edge.par=NULL, plotQ=FALSE) {
+
+  if(is.null(graph.eq) & is.null(adj.mat)){
+    stop("Specify a model!")
+  }
+
+  if(!is.null(graph.eq) & !is.null(adj.mat)){
+    stop("Specify model as either a graph eq OR an adjacency matrix.")
+  }
+
+  # if(num.states != 2) {
+  #   warning("Caution! Number of node states not equal to 2. Most functionality in CRFutil assumes there are only 2 states!")
+  # }
+  num.states <- 2 # Just assume two states per node for now. Parameterization code would have to be much more elaborate otherwise.
+
+  if(!is.null(graph.eq)){
+    adjm <- ug(graph.eq, result="matrix")
+    # Check the graph:
+    #gph <- ug(grphf, result = "graph")
+
+  } else {
+    adjm <- adj.mat
+  }
+  new.crf <- make.crf(adjm, num.states)
+  new.crf <- make.features(new.crf)
+
+  if(parameterization.typ == "standard") {
+
+    # One parameter per node, one parameter per edge
+    num.pars <- new.crf$n.nodes + new.crf$n.edges
+    new.crf <- make.par(new.crf, num.pars)
+
+    par.count <- 1
+    for(i in 1:new.crf$n.nodes) {
+      new.crf$node.par[par.count,1,] <- par.count
+      par.count <- par.count + 1
+    }
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- par.count
+      new.crf$edge.par[[i]][2,2,1] <- par.count
+      par.count <- par.count + 1
+    }
+
+  } else if(parameterization.typ == "flexible") {
+
+    # One parameter per node, two parameters per edge
+    num.pars <- new.crf$n.nodes + 2*new.crf$n.edges
+    new.crf <- make.par(new.crf, num.pars)
+
+    par.count <- 1
+    for(i in 1:new.crf$n.nodes) {
+      new.crf$node.par[par.count,1,] <- par.count
+      par.count <- par.count + 1
+    }
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- par.count
+      par.count <- par.count + 1
+      new.crf$edge.par[[i]][2,2,1] <- par.count
+      par.count <- par.count + 1
+    }
+
+
+  } else if(parameterization.typ == "ising1") {
+
+    # No node parameters and one parameter for all the edges
+    num.pars <- 1
+    new.crf <- make.par(new.crf, num.pars)
+
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- 1
+      new.crf$edge.par[[i]][2,2,1] <- 1
+    }
+
+
+  } else if(parameterization.typ == "ising2") {
+
+    # One parameter for all the nodes, one parameter for all the edges
+    num.pars <- 2
+    new.crf <- make.par(new.crf, num.pars)
+
+    for(i in 1:new.crf$n.nodes) {
+      new.crf$node.par[i,1,] <- 1
+    }
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- 2
+      new.crf$edge.par[[i]][2,2,1] <- 2
+    }
+
+
+  } else if(parameterization.typ == "custom") {
+
+    if(is.null(node.par) & is.null(edge.par)){
+      stop("Custom parameterization specified but no node or edge pars given!")
+    }
+
+    num.pars <- max(c(as.numeric(node.par), unlist(edge.par)))
+    new.crf <- make.par(new.crf, num.pars)
+
+    if(!is.null(node.par)){
+      new.crf$node.par <- node.par
+    }
+    if(!is.null(edge.par)){
+      new.crf$edge.par <- edge.par
+    }
+
+  } else {
+    stop("Specify parameterization choice: standard, flexible, ising1, ising2 or custom!")
+  }
+
+  #dump.crf(new.crf)
+  if(plotQ==TRUE){
+    new.crf.gp <- as(adjm,"graphNEL")
+    if(!is.null(dev.list())){
+      dev.off()
+    }
+    iplot(new.crf.gp)
+  }
+
+  return(new.crf)
+
+}
+
+#' (Deep) Copy and return a new independent crf object
 #'
 #' XXXX
 #'
@@ -168,6 +301,8 @@ copy.crf <- function(crf, plotQ=FALSE){
     adj.mat[idx[1], idx[2]] <- 1
   }
   adj.mat <- t(adj.mat) + adj.mat # symmetrize assuming start is only upper/lower triangle
+  colnames(adj.mat) <- 1:crf$n.nodes
+  rownames(adj.mat) <- 1:crf$n.nodes
 
   if(max(adj.mat) > 1) {
     print(adj.mat)
@@ -182,7 +317,13 @@ copy.crf <- function(crf, plotQ=FALSE){
     new.crf[[crf.attrib.nms[i]]] <- crf[[crf.attrib.nms[i]]]
   }
 
-  # PUT IN PLOT OPTION
+  if(plotQ==TRUE){
+    new.crf.gp <- as(adj.mat,"graphNEL")
+    if(!is.null(dev.list())){
+      dev.off()
+    }
+    iplot(new.crf.gp)
+  }
 
   return(new.crf)
 
@@ -200,7 +341,7 @@ copy.crf <- function(crf, plotQ=FALSE){
 #'
 #'
 #' @export
-crf.dumpout <- function(crf){
+dump.crf <- function(crf){
 
   crf.attrib.nms <- names(crf)
 

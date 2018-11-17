@@ -29,8 +29,8 @@ set.seed(6)
 knm$par <- runif(6,-1.5,1.1)
 out.pot <- make.pots(parms = knm$par,  crf = knm,  rescaleQ = T, replaceQ = T)
 
-
-a.cpy.md <- copy.crf(knm)
+#----- Deep copy an existing model:
+a.cpy.md <- copy.crf(knm, plotQ = T)
 a.cpy.md$adj.edges
 knm$adj.edges
 
@@ -85,5 +85,27 @@ knm$node.pot
 a.cpy.md$par
 knm$par
 
-crf.dumpout(knm)
+dump.crf(knm)
 
+#----------- Instantiate an empty model:
+# Adamantane field:
+grphf <- ~1:2 + 2:3 + 3:4 + 4:5 + 5:6 + 6:1 + 1:7 + 7:8 + 8:9 + 9:6 + 10:8 + 10:3
+adj <- ug(grphf, result="matrix")
+# Check the graph:
+gp <- ug(grphf, result = "graph")
+dev.off()
+iplot(gp)
+
+grphf
+adj
+
+empty.modl <- make.empty.field(
+  graph.eq             = NULL,
+  adj.mat              = adj,
+  parameterization.typ = "ising2",
+  node.par             = NULL,
+  edge.par             = NULL,
+  plotQ                = FALSE)
+
+
+dump.crf(empty.modl)

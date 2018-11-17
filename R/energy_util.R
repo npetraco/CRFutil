@@ -28,7 +28,7 @@ Etwo  <- function(yA, yB, wAB, ff){ ff(yA) %*% wAB %*% ff(yB) }
 
 #' Energy function for a configuration of states
 #'
-#' Compute total energy of a configuration. Assumes node/edge energies are in gRbase format
+#' Compute total energy of a configuration. Assumes node/edge energies are in gRbase format   *****GENERALIZE
 #'
 #' The function will XXXX
 #'
@@ -289,6 +289,8 @@ conditional.config.energy2 <- function(theta.par=NULL, config, condition.element
 
 
 #' Spit out latex expression for E(Xi|X/Xi) given i, X and a crf. Basically used feature formulation for conditional energy.
+#'
+#' Can also spit out a condtional phi vector  (i.e. and alpha vector) if format="conditional.phi" is specified
 #'
 #' @param XXXX XXXX
 #'

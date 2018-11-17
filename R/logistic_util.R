@@ -9,7 +9,7 @@
 #'
 #'
 #' @export
-delta.alpha <- function(crf, samples, printQ=FALSE) {
+delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {
 
   Da.mat        <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
   cond.alp.mat  <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
@@ -21,8 +21,8 @@ delta.alpha <- function(crf, samples, printQ=FALSE) {
 
       X.cfg     <- samples[n,]
       Xc.cfg    <- X.cfg
-      X.cfg[i]  <- 1          # **** CAUTION: assumes states are labeled 1 or 2. GENERALIZE!!!!
-      Xc.cfg[i] <- 2
+      X.cfg[i]  <- state.nmes[1]  # Default state names are our usual choice.
+      Xc.cfg[i] <- state.nmes[2]
 
       cond.alp  <- symbolic.conditional.energy(config = X.cfg,  condition.element.number = i, crf = crf, ff = f0, printQ = F, format = "conditional.phi")
       cond.alpc <- symbolic.conditional.energy(config = Xc.cfg, condition.element.number = i, crf = crf, ff = f0, printQ = F, format = "conditional.phi")

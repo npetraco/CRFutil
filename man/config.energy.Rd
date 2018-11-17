@@ -21,7 +21,7 @@ config.energy(config, edges.mat, one.lgp, two.lgp, ff)
 The function will XX
 }
 \description{
-Compute total energy of a configuration. Assumes node/edge energies are in gRbase format
+Compute total energy of a configuration. Assumes node/edge energies are in gRbase format   *****GENERALIZE
 }
 \details{
 The function will XXXX

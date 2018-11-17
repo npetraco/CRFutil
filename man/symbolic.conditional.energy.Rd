@@ -14,6 +14,6 @@ symbolic.conditional.energy(config, condition.element.number, crf, ff,
 The function will XX
 }
 \description{
-Spit out latex expression for E(Xi|X/Xi) given i, X and a crf. Basically used feature formulation for conditional energy.
+Can also spit out a condtional phi vector  (i.e. and alpha vector) if format="conditional.phi" is specified
 }
 

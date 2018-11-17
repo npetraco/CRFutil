@@ -4,7 +4,7 @@
 \alias{delta.alpha}
 \title{Compute the delta-alpha matrix {\boldsymbol \Delta}_{X_i=1}}
 \usage{
-delta.alpha(crf, samples, printQ = FALSE)
+delta.alpha(crf, samples, state.nmes = c(1, 2), printQ = FALSE)
 }
 \arguments{
 \item{XX}{The XX}
