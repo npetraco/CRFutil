@@ -109,3 +109,39 @@ empty.modl <- make.empty.field(
 
 
 dump.crf(empty.modl)
+
+
+#-----------------
+# Model:
+grphf <- ~1:2+1:3+1:4+1:6+2:3+2:4+3:4+3:5+5:6+5:7
+
+gamt <-  rbind(
+  c(1,2),
+  c(1,3),
+  c(1,4),
+  c(1,6),
+  c(2,3),
+  c(2,4),
+  c(3,4),
+  c(3,5),
+  c(5,6),
+  c(5,7))
+
+adj <- edges2adj(gamt, plotQ = T)
+
+knm <- make.empty.field(
+  graph.eq             = NULL,
+  adj.mat              = adj,
+  parameterization.typ = "ising2",
+  node.par             = NULL,
+  edge.par             = NULL,
+  plotQ                = T)
+dump.crf(knm)
+knm$edges
+
+library(Rgraphviz)
+plot(ug(grphf, result = "graph"))
+dev.off()
+
+ug(grphf, result = "matrix") # Watch out, ug may switch names pf nodes on you.
+adj

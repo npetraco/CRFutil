@@ -268,3 +268,40 @@ params2nodes.list <- function(crf, storeQ = FALSE){
   return(par.node.assoc)
 
 }
+
+
+#' Form adjacency matrix from edge matrix.
+#' XXXX
+#'
+#' Assumes edges/nodes are numeric.
+#'
+#' The function will XXXX
+#'
+#' @param edge.mat The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+edges2adj <- function(edge.mat, plotQ=FALSE){
+
+  num.nods <- max(edge.mat)
+  adj.mat <- array(0, c(num.nods,num.nods))
+
+  for(i in 1:nrow(edge.mat)){
+    adj.mat[edge.mat[i,1], edge.mat[i,2]] <- 1
+    adj.mat[edge.mat[i,2], edge.mat[i,1]] <- 1
+  }
+  colnames(adj.mat) <- 1:num.nods # **** Assumes edges/nodes are numeric and in order.
+  rownames(adj.mat) <- 1:num.nods
+
+  if(plotQ==TRUE){
+    new.gph <- as(adj.mat,"graphNEL")
+    if(!is.null(dev.list())){
+      dev.off()
+    }
+    iplot(new.gph)
+  }
+
+  return(adj.mat)
+
+}
