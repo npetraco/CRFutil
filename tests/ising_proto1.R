@@ -50,7 +50,7 @@ knm$n.par
 knm$node.par
 knm$node.pot
 
-knm$par <- 0.0145
+knm$par <- -1.145
 out.pot <- make.pots(parms = knm$par,  crf = knm,  rescaleQ = T, replaceQ = T)
 knm$edge.par
 knm$edge.pot
@@ -58,7 +58,7 @@ knm$edge.pot
 
 # So now sample from the model as if we obtained an experimental sample:
 num.samps <- 1000
-set.seed(1)
+#set.seed(1)
 samps <- sample.exact(knm, num.samps)
 mrf.sample.plot(samps)
 
@@ -129,4 +129,35 @@ head(cbind(knm.cp, psl.cp), 10)
 sum(psl.cp)
 sum(knm.cp)
 
+
+samps
+library(reshape2)
+library(ggplot2)
+
+#snum <- sample(1:nrow(samps),1)
+snum <- which(joint.dist.info.knm[,17]>0.1)[1] # High bars in the joint show congigs that should come up alot, and hence have a high chance of being seen multiple times on random host objects
+#x=t(matrix(samps[snum,], ncol=4))
+
+x=t(matrix(as.numeric(joint.dist.info.knm[snum,1:16]), ncol=4))
+x
+x1=melt(x)
+names(x1)=c("x","y","color")
+x1$color=factor(x1$color>1)
+levels(x1$color)=c("1","2")
+qplot(x, y, fill=color, data=x1,geom='tile')
+snum
+
+x
+which(joint.dist.info.knm[,17]>0.1)[2]
+dim(samps)
+
+16^2
+2^256
+# Demo for increasing size but still small fields
+# 16x16 Can't get Prs for all these configurations, but could be get Z ??
+2^64
+
+# loop ove nodes (last node??)
+# determine node type
+# input edges for type along with their designation (horr, vert, diag)
 

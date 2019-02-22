@@ -4,7 +4,7 @@ Title: Handy Utility Functions for Use with CRF and gRbase packages
 Version: 0.1.0
 Author: Nick Petraco
 Maintainer: <npetraco@gmail.com>
-Description: Extra stuff you'd may be want to do with MRFs and CRFs
+Description: Extra stuff you'd maybe want to do with MRFs and CRFs
 License: ISC License
     Copyright <YEAR: 2018> <OWNER: Nicholas D. Petraco>
     Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby 
@@ -16,5 +16,5 @@ License: ISC License
     OR PERFORMANCE OF THIS SOFTWARE.
 Encoding: UTF-8
 LazyData: true
-Depends: CRF (>= 0.3-16), gRbase (>= 1.8-3)
+Depends: CRF (>= 0.3-16), gRbase (>= 1.8-3), RBGL (>= 1.46.0)
 RoxygenNote: 5.0.1
