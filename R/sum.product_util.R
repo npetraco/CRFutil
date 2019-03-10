@@ -51,3 +51,22 @@ get.root.paths <- function(graph.eq, root.node) {
   return(all.root.pths)
 
 }
+
+
+#' Process a list of paths into serial schedules (forward and backward)
+#'
+#' Process a list of paths into serial schedules (forward and backward)
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+paths.to.serial.scheds <- function(paths.list) {
+
+  num.paths  <- length(paths.list)
+  path.lengs <- sapply(1:num.paths, function(xx){length(paths.list[[xx]])})
+
+}
