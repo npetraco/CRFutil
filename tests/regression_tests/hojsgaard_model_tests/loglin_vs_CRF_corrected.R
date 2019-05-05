@@ -31,22 +31,33 @@ head(X.RAW)
 colnames(X.RAW) <- c("1","2","3")
 head(X.RAW)
 
+# Fold the observed configurations into a 2^3 (#states^dim(configs) for Ising and Potts-like models) -way contingency table
 X <- xtabs(~., data=X.RAW)
+X
 dim(X)
 ftable(X)
 
+# Hojsgaard: One estimate of the config probabilities is by the relative frquencies:
+X.Prob <- X/sum(X)
+ftable(X.Prob)
+as.data.frame(as.table(X.Prob))
+
 # First fit the Hojgaard model with loglm and gRim
-ll2 <- loglm(~1:2 + 1:3, data=X);
+ll2 <- loglm(~1:2 + 1:3, data=X); # loglm from MASS which uses loglin in base
 ll2
 X.loglm.coefs <- coef(ll2)
 X.loglm.coefs
+
+ll3 <- dmod(~1:2 + 1:3, data=X) # dmod in gRim which uses loglin in base
+ll3
 
 # Look at emp relative freqs vs the fitted relative freqs:
 X.fitted <- fitted(ll2)
 X.Prob.fitted <- X.fitted/sum(X.fitted)
 ftable(X.Prob.fitted)
+data.frame(as.data.frame(as.table(X.Prob)), as.data.frame(as.table(X.Prob.fitted)))
 
-# Lizard graph
+# Lizard graph in Hojsgaard:
 grphf <- ~1:2 + 1:3
 adj <- ug(grphf, result="matrix")
 adj
