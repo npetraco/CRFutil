@@ -16,7 +16,7 @@ delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {
   cond.alpc.mat <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
 
   count <- 1
-  for(i in 1:psl$n.nodes) {
+  for(i in 1:crf$n.nodes) {
     for(n in 1:nrow(samps)) {
 
       X.cfg     <- samples[n,]

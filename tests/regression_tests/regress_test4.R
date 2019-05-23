@@ -91,7 +91,7 @@ dat <- list(
   y = y
 )
 
-model.c <- stanc(file = "/Users/npetraco/latex/papers/dust/steph_diss/CRFutil/tests/regression_tests/logistic_model1.stan", model_name = 'model')
+model.c <- stanc(file = "/home/npetraco/codes/R/CRFutil/tests/regression_tests/logistic_model1.stan", model_name = 'model')
 sm <- stan_model(stanc_ret = model.c, verbose = T)
 bfit <- sampling(sm, data = dat, iter=10000, thin = 1, chains = 4)
 
