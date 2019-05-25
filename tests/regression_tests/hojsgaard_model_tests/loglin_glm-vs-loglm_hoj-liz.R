@@ -9,6 +9,14 @@ data("lizardAGG")
 X  <- lizardRAW   # Observed states
 Xf <- lizardAGG   # Freq table of observed states
 
+# Raw case list to Aggregated Frequency Table
+as.data.frame(ftable(lizardRAW))
+lizardAGG
+
+## Raw case-list to contingency table (Observed states)
+xtabs(~., data=lizardRAW)
+
+
 # contingency table
 lizard <- xtabs(~., data=lizardRAW)
 dim(lizard)
@@ -18,7 +26,7 @@ Xc <- lizard     # Fold into a contingency table
 grphf <- ~species:diam + species:height
 plot(ug(grphf))
 
-ll3  <- dmod(grphf, data = X) 
+ll3  <- dmod(grphf, data = X)
 class(ll3)
 ll3
 
@@ -47,8 +55,8 @@ contrasts(spc.dc)
 contrasts(spc.dc) <- contr.sum(2)
 contrasts(spc.dc)
 
-Xm <- model.matrix(~spc.dc + dia.dc + hgt.dc + spc.dc:dia.dc + spc.dc:hgt.dc, 
-             contrasts = list(spc.dc = "contr.sum", 
+Xm <- model.matrix(~spc.dc + dia.dc + hgt.dc + spc.dc:dia.dc + spc.dc:hgt.dc,
+             contrasts = list(spc.dc = "contr.sum",
                               dia.dc = "contr.sum",
                               hgt.dc = "contr.sum"))
 
@@ -96,7 +104,7 @@ names(lmcoefs) <- names(c1)
 lmcoefs     # compare
 coef(glm.f)
 
-# Default contrast coding: treatment coding 
+# Default contrast coding: treatment coding
 glm.reg <- glm(Freq ~ species + diam + height + species:diam + species:height, data = Xf, family = poisson(link="log"))
 summary(glm.reg)
 coef(glm.reg) - coef(glm.reg)[1] # Nope...
@@ -117,4 +125,4 @@ Xm
 
 # This works. craft model around X also????
 # Would it be equivalent to a logistic for the whole state?
-model.matrix(~species + diam + height + species:diam + species:height, data = X) 
+model.matrix(~species + diam + height + species:diam + species:height, data = X)
