@@ -1,5 +1,3 @@
-# loglin gRim, model matrix loglin, bayes logistic, mle logistic, CRF fit
-
 # loglin gRim
 library(gRim)
 library(MASS)
@@ -22,7 +20,6 @@ dev.off()
 iplot(gp)
 
 
-#         FIX
 # Fit the Hojgaard model with loglm and gRim
 fact.grphf <- ~X.1 + X.2 + X.3 + X.1:X.2 + X.1:X.3 + X.2:X.3
 loglin.mle <- loglm(fact.grphf, data=X.cont); # loglm from MASS which uses loglin in base
@@ -37,12 +34,12 @@ X.cont.fitted <- fitted(loglin.mle)
 # Flatten fit contingency table into matrix-table form
 X.counts.fitted <- data.frame(ftable(X.cont.fitted))
 X.counts.fitted
-sum(X.counts.fitted[,4])
+sum(X.counts.fitted[,4]) # Equal to the sample size?
 
-# Estimate state probabilities is by the EMPIRICAL relative frquencies:
+# Estimate state probabilities is by the loglin fitted relative frquencies:
 X.freq.fitted <- X.counts.fitted
 X.freq.fitted[,4] <- X.freq.fitted[,4]/sum(X.counts.fitted[,4])
 X.freq.fitted <- cbind(X.freq.fitted, X.counts.fitted[,4]) # Carry along the fit counts the computation is based on
 colnames(X.freq.fitted)[c(4,5)] <- c("LogLin.Freq","LogLin.Counts")
-X.freq.fitted
-save(X.freq.fitted, file = paste0(fpth,"triangle_loglin_dist.RData"))
+loglin.dist.info <- X.freq.fitted
+save(loglin.dist.info, file = paste0(fpth,"triangle_loglin_dist.RData"))

@@ -67,7 +67,7 @@ joint.dist.info.true.model
 exact.dist.info <- joint.dist.info.true.model[,c(2,3,1,4)]
 colnames(exact.dist.info)[4] <- "Exact.Freq"
 exact.dist.info
-save(samps, file = paste0(fpth,"triangle_exact_dist.RData"))
+save(exact.dist.info, file = paste0(fpth,"triangle_exact_dist.RData"))
 
 # Fold samples into contingency table for a look
 X.cont <- xtabs(~., data=data.frame(samps))
@@ -83,5 +83,5 @@ X.freq <- X.counts
 X.freq[,4] <- X.freq[,4]/sum(X.counts[,4])
 X.freq <- cbind(X.freq, X.counts[,4]) # Carry along the counts the computation is based on
 colnames(X.freq)[c(4,5)] <- c("Emp.Freq","Counts")
-X.freq
-save(X.freq, file = paste0(fpth,"triangle_empirical_dist.RData"))
+empirical.dist.info <- X.freq
+save(empirical.dist.info, file = paste0(fpth,"triangle_empirical_dist.RData"))
