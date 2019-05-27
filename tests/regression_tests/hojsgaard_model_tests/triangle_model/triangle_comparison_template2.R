@@ -8,7 +8,7 @@
 # bayes logistic,            DONE
 # mle logistic,              DONE
 # CRF fit                    DONE
-# PSL fit
+# PSL fit                    DONE
 
 
 library(CRFutil)
@@ -30,12 +30,16 @@ loglin.MM.dist.info
 load(paste0(fpth,"triangle_bayes-lr_dist.RData"))
 bayes.lr.dist.info
 bayes.lr.dist.info <- bayes.lr.dist.info[,c(2,3,1,4)] # Forgot to rearrange columns
+bayes.lr.dist.info
 
 load(paste0(fpth,"triangle_mle-lr_dist.RData"))
 mle.lr.dist.info
 
 load(paste0(fpth,"triangle_mrf_dist.RData"))
 mrf.dist.info
+
+load(paste0(fpth,"triangle_psl_dist.RData"))
+psl.dist.info
 
 
 ref.states <- exact.dist.info[,1:3]
@@ -45,6 +49,7 @@ loglin.MM.rearr.idxs <- sapply(1:nrow(ref.states), function(xx){row.match(ref.st
 bayes.lr.rearr.idxs  <- sapply(1:nrow(ref.states), function(xx){row.match(ref.states[xx,], table = bayes.lr.dist.info[,1:3])})
 mle.lr.rearr.idxs    <- sapply(1:nrow(ref.states), function(xx){row.match(ref.states[xx,], table = mle.lr.dist.info[,1:3])})
 mrf.rearr.idxs       <- sapply(1:nrow(ref.states), function(xx){row.match(ref.states[xx,], table = mrf.dist.info[,1:3])})
+psl.rearr.idxs       <- sapply(1:nrow(ref.states), function(xx){row.match(ref.states[xx,], table = psl.dist.info[,1:3])})
 
 
 loglin.rearr.idxs
@@ -53,6 +58,7 @@ emp.rearr.idxs
 bayes.lr.rearr.idxs
 mle.lr.rearr.idxs
 mrf.rearr.idxs
+psl.rearr.idxs
 
 
 spcr <- rep(NA, nrow(ref.states))
@@ -62,6 +68,7 @@ cbind(exact.dist.info[,1:3], spcr,
       bayes.lr.dist.info[bayes.lr.rearr.idxs,1:3], spcr,
       mle.lr.dist.info[mle.lr.rearr.idxs,1:3], spcr,
       mrf.dist.info[mle.lr.rearr.idxs,1:3], spcr,
+      psl.dist.info[mle.lr.rearr.idxs,1:3], spcr,
       empirical.dist.info[emp.rearr.idxs,1:3])
 
 loglin.dist.info    <- loglin.dist.info[loglin.rearr.idxs,]
@@ -70,6 +77,7 @@ empirical.dist.info <- empirical.dist.info[emp.rearr.idxs,]
 bayes.lr.dist.info  <- bayes.lr.dist.info[bayes.lr.rearr.idxs,]
 mle.lr.dist.info    <- mle.lr.dist.info[mle.lr.rearr.idxs,]
 mrf.dist.info       <- mrf.dist.info[mrf.rearr.idxs,]
+psl.dist.info       <- psl.dist.info[psl.rearr.idxs,]
 
 
 cbind(exact.dist.info[,1:3], spcr,
@@ -78,6 +86,7 @@ cbind(exact.dist.info[,1:3], spcr,
       bayes.lr.dist.info[,1:3], spcr,
       mle.lr.dist.info[,1:3], spcr,
       mrf.dist.info[,1:3], spcr,
+      psl.dist.info[,1:3], spcr,
       empirical.dist.info[,1:3])
 
 cbind(ref.states,
@@ -87,4 +96,6 @@ cbind(ref.states,
       bayes.lr.dist.info[,4],
       mle.lr.dist.info[,4],
       mrf.dist.info[,4],
+      psl.dist.info[,c(4,5)],
       empirical.dist.info[,4])
+
