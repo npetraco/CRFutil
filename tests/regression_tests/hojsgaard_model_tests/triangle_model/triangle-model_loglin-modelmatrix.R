@@ -11,7 +11,6 @@ head(samps)
 X.freq <- data.frame(ftable(data.frame(samps)))
 X.freq
 
-# IS THERE A BETTER WAY TO DO THIS?????????
 # Get contrasts to build model matrix:
 X1.dc <- X.freq[,1]
 contrasts(X1.dc)
@@ -34,6 +33,14 @@ Xm <- model.matrix(~X1.dc + X2.dc + X3.dc + X1.dc:X2.dc + X1.dc:X3.dc + X2.dc:X3
                                     X2.dc = "contr.sum",
                                     X3.dc = "contr.sum"))
 Xm
+
+# IS THERE A BETTER WAY TO BUILS THE MODEL MATRIX?????????
+# YES! It's this:
+# Xm <- model.matrix(~X.1 + X.2 + X.3 + X.1:X.2 + X.1:X.3 + X.2:X.3,
+#                    contrasts = list(X.1 = "contr.sum",
+#                                     X.2 = "contr.sum",
+#                                     X.3 = "contr.sum"), data = X.freq)
+# Xm
 
 # Fit the loglinear model with contrasts used to build the explicit model matrix
 freqs <- X.freq[,4]
