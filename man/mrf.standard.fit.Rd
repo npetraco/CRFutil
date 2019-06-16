@@ -19,4 +19,3 @@ Fit a MRF paramiterized in the standard way
 \details{
 The function will XXXX
 }
-

@@ -18,4 +18,3 @@ Pretty much a direct port of Schmidt's UGM_MRF_makePotentials.m
 \details{
 The function will XXXX
 }
-

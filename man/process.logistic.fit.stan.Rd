@@ -18,4 +18,3 @@ XXXX
 \details{
 The function will XXXX
 }
-

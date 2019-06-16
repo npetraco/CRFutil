@@ -19,4 +19,3 @@ Make factor to variable (node) message
 \details{
 The function will XXXX
 }
-

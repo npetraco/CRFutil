@@ -16,4 +16,3 @@ The function will XX
 \description{
 Can also spit out a condtional phi vector  (i.e. and alpha vector) if format="conditional.phi" is specified
 }
-

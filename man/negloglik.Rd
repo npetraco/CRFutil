@@ -4,7 +4,8 @@
 \alias{negloglik}
 \title{Experiment: Modified Port of Schmidt UGM_MRF_NLL.m}
 \usage{
-negloglik(par, crf, samples, infer.method = infer.exact, update.crfQ = TRUE)
+negloglik(par, crf, samples, infer.method = infer.exact,
+  update.crfQ = TRUE)
 }
 \arguments{
 \item{XX}{The XX}
@@ -18,4 +19,3 @@ Experiment
 \details{
 The function will XXXX
 }
-

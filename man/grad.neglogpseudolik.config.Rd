@@ -19,4 +19,3 @@ Assumes features are 0,1 valued and parameters are numbered.
 \details{
 neglogpseudolik.config() computes the gradient as as well. This is just a pull out for testing and pedegogy.
 }
-

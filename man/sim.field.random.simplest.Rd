@@ -19,4 +19,3 @@ Simulate an MRF with random unary (node) and pair (edge) potentials.
 \details{
 Uses simplest standard parameterization I can tink of: tau1 = tau2 ..., w11=w22, w12=w21, ...
 }
-

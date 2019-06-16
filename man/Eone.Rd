@@ -18,4 +18,3 @@ One-body (node) wnergy function
 \details{
 The function will XXXX
 }
-

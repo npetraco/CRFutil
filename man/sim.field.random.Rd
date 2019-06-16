@@ -18,4 +18,3 @@ Simulate an MRF with random unary (node) and pair (edge) potentials.
 \details{
 Uses standard parameterization w11=w22, w12=w21
 }
-

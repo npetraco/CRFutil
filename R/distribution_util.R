@@ -46,11 +46,14 @@ distribution.from.potentials <- function(gRbase.node.potentials, gRbase.edge.pot
     }
   }
 
-  prod.edge.pots <- tableMult(gRbase.edge.potentials[[2]], gRbase.edge.potentials[[1]])
+  #prod.edge.pots <- tableMult(gRbase.edge.potentials[[2]], gRbase.edge.potentials[[1]])
   if(num.edges > 2){
+    prod.edge.pots <- tableMult(gRbase.edge.potentials[[2]], gRbase.edge.potentials[[1]])
     for(i in 3:num.edges){
       prod.edge.pots <- tableMult(prod.edge.pots, gRbase.edge.potentials[[i]])
     }
+  } else { # For only two nodes there is only one edge
+    prod.edge.pots <- gRbase.edge.potentials[[1]]
   }
 
   # Direct normalization:

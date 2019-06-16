@@ -21,4 +21,3 @@ The list produced maps node indices to the parameters they are asociated with
 \details{
 The function will XXXX
 }
-

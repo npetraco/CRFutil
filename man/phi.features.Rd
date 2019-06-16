@@ -18,4 +18,3 @@ Assumes features are 0,1 valued and parameters are numbered.
 \details{
 The function will XXXX
 }
-

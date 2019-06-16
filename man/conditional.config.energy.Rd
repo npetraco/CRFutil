@@ -5,8 +5,8 @@
 \title{Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
 Uses the feature function formulation. Eliminates dependency on gRbase format for potentials}
 \usage{
-conditional.config.energy(theta.par = NULL, config, condition.element.number,
-  crf, ff, printQ = FALSE)
+conditional.config.energy(theta.par = NULL, config,
+  condition.element.number, crf, ff, printQ = FALSE)
 }
 \arguments{
 \item{config}{A node configuration (state) vector}
@@ -32,4 +32,3 @@ Assumes log-potentials are in gRbase format
 \details{
 The function will XXXX
 }
-

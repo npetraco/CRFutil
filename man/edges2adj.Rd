@@ -19,4 +19,3 @@ Assumes edges/nodes are numeric.
 \details{
 The function will XXXX
 }
-

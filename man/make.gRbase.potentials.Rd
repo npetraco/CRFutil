@@ -18,4 +18,3 @@ Decorate initalized mrf-object to make potentials compatible with gRbase
 \details{
 The function will XXXX
 }
-

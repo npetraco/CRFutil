@@ -18,4 +18,3 @@ Get a (shortest) path between two nodes
 \details{
 The function will XXXX
 }
-

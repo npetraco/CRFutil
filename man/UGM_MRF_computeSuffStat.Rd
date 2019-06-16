@@ -19,4 +19,3 @@ of non-zero energy parameters... See loops in function below
 \details{
 The function will XXXX
 }
-

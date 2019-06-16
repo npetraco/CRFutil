@@ -4,7 +4,8 @@
 \alias{get.node.idxs}
 \title{Utility function to convert a parameter index to the node/edge indices it is associated with.}
 \usage{
-get.node.idxs(par.idx, node.par = NULL, edge.par = NULL, edge.mat = NULL)
+get.node.idxs(par.idx, node.par = NULL, edge.par = NULL,
+  edge.mat = NULL)
 }
 \arguments{
 \item{XX}{The XX}
@@ -19,4 +20,3 @@ Assumes features are 0,1 valued and parameters are numbered.
 \details{
 The function will XXXX
 }
-

@@ -4,8 +4,8 @@
 \alias{distribution.from.energies}
 \title{Compute the joint distribution from the node and edge energies}
 \usage{
-distribution.from.energies(state.space, edges.mat, node.energies, edge.energies,
-  energy.func, ff)
+distribution.from.energies(state.space, edges.mat, node.energies,
+  edge.energies, energy.func, ff)
 }
 \arguments{
 \item{XX}{The XX}
@@ -19,4 +19,3 @@ The function will XXXX
 \details{
 The function will XXXX
 }
-

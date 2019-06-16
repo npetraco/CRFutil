@@ -5,8 +5,8 @@
 \title{Older implementation of Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
 Uses the feature function formulation.}
 \usage{
-conditional.config.energy.old(config, condition.element.number, adj.node.list,
-  edge.mat, one.lgp, two.lgp, ff, printQ = FALSE)
+conditional.config.energy.old(config, condition.element.number,
+  adj.node.list, edge.mat, one.lgp, two.lgp, ff, printQ = FALSE)
 }
 \arguments{
 \item{config}{A node configuration (state) vector}
@@ -32,4 +32,3 @@ Assumes log-potentials are in gRbase format
 \details{
 The function will XXXX
 }
-

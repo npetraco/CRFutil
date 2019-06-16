@@ -19,4 +19,3 @@ Assumes features are 0,1 valued and parameters are numbered.
 \details{
 The function can be used to compute the CONDITINAL phi feature vector used for pseudolikelihood calculations.
 }
-

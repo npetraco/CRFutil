@@ -17,4 +17,4 @@ License: ISC License
 Encoding: UTF-8
 LazyData: true
 Depends: CRF (>= 0.3-16), gRbase (>= 1.8-3), RBGL (>= 1.46.0), igraph (>= 1.0.1)
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1

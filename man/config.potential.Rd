@@ -18,4 +18,3 @@ Product of potentials function. Expects potentials in gRbase format
 \details{
 The function will XXXX
 }
-

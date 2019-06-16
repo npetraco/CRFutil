@@ -26,4 +26,3 @@ Compute total energy of a configuration. Assumes node/edge energies are in gRbas
 \details{
 The function will XXXX
 }
-

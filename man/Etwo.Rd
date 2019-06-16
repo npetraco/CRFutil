@@ -18,4 +18,3 @@ Two-body (edge) energy function
 \details{
 The function will XXXX
 }
-

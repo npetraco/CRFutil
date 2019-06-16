@@ -5,8 +5,8 @@
 \title{Instantiate an empty field}
 \usage{
 make.empty.field(graph.eq = NULL, adj.mat = NULL,
-  parameterization.typ = "standard", node.par = NULL, edge.par = NULL,
-  plotQ = FALSE)
+  parameterization.typ = "standard", node.par = NULL,
+  edge.par = NULL, plotQ = FALSE)
 }
 \arguments{
 \item{XX}{The XX}
@@ -20,4 +20,3 @@ XXXX
 \details{
 XXXX
 }
-

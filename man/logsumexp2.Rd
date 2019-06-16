@@ -19,4 +19,3 @@ A less readable but shorter Log sum exp:
 \details{
 The function will XXXX
 }
-

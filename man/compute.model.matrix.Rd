@@ -19,4 +19,3 @@ sums of the model matrix should be the sufficient statistics.
 \details{
 The function will XXXX
 }
-

@@ -18,4 +18,3 @@ Get all paths from chosen root node to all leaf nodes
 \details{
 The function will XXXX
 }
-

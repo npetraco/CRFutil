@@ -4,7 +4,8 @@
 \alias{make.gRbase.beliefs}
 \title{Decorate fit node and edge marginal beliefs to make compatible with gRbase}
 \usage{
-make.gRbase.beliefs(inference.obj, node.names, edge.mat, state.nmes = NULL)
+make.gRbase.beliefs(inference.obj, node.names, edge.mat,
+  state.nmes = NULL)
 }
 \arguments{
 \item{XX}{The XX}
@@ -18,4 +19,3 @@ Decorate fit node and edge marginal beliefs to make compatible with gRbase
 \details{
 The function will XXXX
 }
-

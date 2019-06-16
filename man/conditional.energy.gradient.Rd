@@ -20,4 +20,3 @@ Gradient of a condtional energy for a node and a configuration
 This function compute the vector: \nabla_{\boldsymbol \theta}E(X_i|{\bf X}\slash X_i). The vector is the same length as the
          number of parameters.
 }
-

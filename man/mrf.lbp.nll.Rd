@@ -18,4 +18,3 @@ Work around for CRF bug evaluating nll for different infer.method's other than o
 \details{
 The function will XXXX
 }
-

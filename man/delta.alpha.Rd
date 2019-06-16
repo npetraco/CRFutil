@@ -18,4 +18,3 @@ Needed for determination of parameters via logistic regression schemes
 \details{
 The function will XXXX
 }
-

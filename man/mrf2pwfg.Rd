@@ -18,4 +18,3 @@ Convert Markov Random Field to pairwise (two-body) factor graph:
 \details{
 The function will XXXX
 }
-

@@ -18,4 +18,3 @@ Handy for calculating Z from a vector of log potentials.
 \details{
 The function will XXXX
 }
-

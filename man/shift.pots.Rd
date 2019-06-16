@@ -18,4 +18,3 @@ For testing purposes
 \details{
 The function will XXXX
 }
-
