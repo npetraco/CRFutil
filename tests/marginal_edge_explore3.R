@@ -13,6 +13,7 @@ samps <- cbind(
 mrf.sample.plot(samps)
 samps
 
+junk <- NULL
 junk <- marginal.edge.info(samps)
 dump.crf(crf = junk)
 class(samps)
@@ -46,3 +47,8 @@ junk.mrf$gradient
 junk.mrf$nll
 
 dump.crf(junk.mrf)
+
+aa <- T
+bb <- T
+aa | bb
+
