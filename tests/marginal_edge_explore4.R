@@ -18,5 +18,11 @@ junk <- NULL
 junk <- marginal.edge.mrf(samps)
 dump.crf(crf = junk)
 
-infer.exact(junk)
+junk.be <- infer.exact(junk)
+junk.be$node.bel
+junk.b1
 
+junk$edges
+make.gRbase.beliefs(junk.be, node.names = c("X1", "X2"), junk$edges, state.nmes=c("1","2"))
+
+marginal.edge.bels(edge.mrf.obj = junk, node.names = c("A","B"), printQ = T)

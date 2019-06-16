@@ -101,14 +101,81 @@ marginal.edge.mrf <- function(edge.samples){
 #'
 #'
 #' @export
-marginal.edge.bels <- function(edge.mrf.obj, printQ=FALSE){
+marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
 
   # if(ncol(edge.samples) != 2) {
   #   stop("Input one edge (two nodes) only!")
   # }
 
+  if(is.null(node.names)) {
+    loc.node.names <- c("X1", "X2")
+  } else {
+    loc.node.names <- node.names
+  }
 
-  infered.edge.bels <- infer.exact(edge.mrf.obj) # Should be able to always get away with exact for only 2 nodes
+  infered.edge.bels <- make.gRbase.beliefs(
+    inference.obj = infer.exact(edge.mrf.obj),
+    node.names    = loc.node.names,
+    edge.mat      = edge.mrf.obj$edges,
+    state.nmes    = c("1","2"))
+
+  bel.x1x2 <- infered.edge.bels$edge.beliefs[[1]]
+  bel.x1   <- infered.edge.bels$node.beliefs[[1]]
+  bel.x2   <- infered.edge.bels$node.beliefs[[2]]
+
+  bel.x1gx2 <- ar_div(bel.x1x2, bel.x2)
+  bel.x2gx1 <- ar_div(bel.x1x2, bel.x1)
+
+  if(printQ==TRUE){
+
+    print("---------")
+    print("Bel(X1,X2)")
+    print("---------")
+    print(bel.x1x2)
+    print("=======================")
+
+    print("---------")
+    print("Bel(X1)")
+    print("---------")
+    print(bel.x1)
+    print("=======================")
+
+    print("---------")
+    print("Bel(X2)")
+    print("---------")
+    print(bel.x2)
+    print("=======================")
+
+    print("---------")
+    print("Bel(X1|X2)")
+    print("---------")
+    print(bel.x1gx2)
+    print("=======================")
+
+    print("---------")
+    print("Bel(X2|X1)")
+    print("---------")
+    print(bel.x2gx1)
+    print("=======================")
+  }
+
+  edg.bel.info <- list(
+    bel.x1x2,
+    bel.x1,
+    bel.x2,
+    bel.x1gx2,
+    bel.x2gx1
+  )
+
+  names(edg.bel.info) <- c(
+    paste0("Bel(",loc.node.names[1],",",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[1],")"),
+    paste0("Bel(",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[1],"|",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[2],"|",loc.node.names[1],")")
+  )
+
+  return(edg.bel.info)
 
 }
 
