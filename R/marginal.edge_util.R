@@ -8,7 +8,7 @@
 #'
 #'
 #' @export
-marginal.edge.mrf <- function(edge.samples){
+marginal.edge.loglin <- function(edge.samples){
 
   if(ncol(edge.samples) != 2) {
     stop("Input one edge (two nodes) only!")
@@ -16,6 +16,101 @@ marginal.edge.mrf <- function(edge.samples){
 
   # Construct contingency table for edge data
   edge.samps.loc           <- edge.samples # Make a copy
+  if(is.null(colnames(edge.samples))){
+    colnames(edge.samps.loc) <- c("X1","X2")
+  } else {
+    colnames(edge.samps.loc) <- colnames(edge.samples)
+  }
+  X.edge.contingency <- xtabs(~., data=edge.samps.loc)
+  print(X.edge.contingency)
+
+  # Fit a two node loglinear (Poisson) model to examine the edge potentials and resulting node/edge beliefs.
+  # nnmes    <- colnames(edge.samps.loc)
+  edge.grphf  <- ~X1:X2                                   # NEEDS GENERALIZING!!!!!!!!
+  edge.loglin <- loglm(edge.grphf, data = X.edge.contingency)
+  #print(coef(edge.loglin))
+  #fitted(edge.loglin)
+  #X.edge.contingency.fitted <- fitted(edge.loglin) # just reproduces emp freqs ???????
+  #print(X.edge.contingency.fitted)
+
+  # pr.x2    <- ar_marg(pr.x1x2, marg = nnmes[2])
+  # pr.x1gx2 <- ar_div(pr.x1x2, pr.x2)
+  # pr.x2gx1 <- ar_div(pr.x1x2, pr.x1)
+  #
+  # if(printQ==TRUE){
+  #
+  #   print("---------")
+  #   print("Pr(X1,X2)")
+  #   print("---------")
+  #   print(pr.x1x2)
+  #   print("=======================")
+  #
+  #   print("---------")
+  #   print("Pr(X1)")
+  #   print("---------")
+  #   print(pr.x1)
+  #   print("=======================")
+  #
+  #   print("---------")
+  #   print("Pr(X2)")
+  #   print("---------")
+  #   print(pr.x2)
+  #   print("=======================")
+  #
+  #   print("---------")
+  #   print("Pr(X1|X2)")
+  #   print("---------")
+  #   print(pr.x1gx2)
+  #   print("=======================")
+  #
+  #   print("---------")
+  #   print("Pr(X2|X1)")
+  #   print("---------")
+  #   print(pr.x2gx1)
+  #   print("=======================")
+  # }
+  #
+  # edg.emp.pr.info <- list(
+  #   X.edge.contingency,
+  #   pr.x1x2,
+  #   pr.x1,
+  #   pr.x2,
+  #   pr.x1gx2,
+  #   pr.x2gx1
+  # )
+  #
+  # names(edg.emp.pr.info) <- c(
+  #   "edge.contingency.tbl",
+  #   paste0("Pr(",nnmes[1],",",nnmes[2],")"),
+  #   paste0("Pr(",nnmes[1],")"),
+  #   paste0("Pr(",nnmes[2],")"),
+  #   paste0("Pr(",nnmes[1],"|",nnmes[2],")"),
+  #   paste0("Pr(",nnmes[2],"|",nnmes[1],")")
+  # )
+  #
+  # return(edg.emp.pr.info)
+
+
+}
+
+
+#' marginal.edge.mrf
+#'
+#' XXXXXXX
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+marginal.edge.mrf <- function(edge.samples){
+
+  if(ncol(edge.samples) != 2) {
+    stop("Input one edge (two nodes) only!")
+  }
+
+  edge.samps.loc <- edge.samples # Make a copy
   if(is.null(colnames(edge.samples))){
     colnames(edge.samps.loc) <- c("X1","X2")
   } else {
@@ -101,7 +196,7 @@ marginal.edge.mrf <- function(edge.samples){
 #'
 #'
 #' @export
-marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
+marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NULL, printQ=FALSE){
 
   # if(ncol(edge.samples) != 2) {
   #   stop("Input one edge (two nodes) only!")
@@ -113,11 +208,17 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
     loc.node.names <- node.names
   }
 
+  if(is.null(state.names)) {
+    loc.state.names <- c("1","2")
+  } else {
+    loc.state.names <- state.names
+  }
+
   infered.edge.bels <- make.gRbase.beliefs(
     inference.obj = infer.exact(edge.mrf.obj),
     node.names    = loc.node.names,
     edge.mat      = edge.mrf.obj$edges,
-    state.nmes    = c("1","2"))
+    state.nmes    = loc.state.names)
 
   bel.x1x2 <- infered.edge.bels$edge.beliefs[[1]]
   bel.x1   <- infered.edge.bels$node.beliefs[[1]]
@@ -128,9 +229,9 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
 
   if(printQ==TRUE){
 
-    print("---------")
+    print("----------")
     print("Bel(X1,X2)")
-    print("---------")
+    print("----------")
     print(bel.x1x2)
     print("=======================")
 
@@ -146,15 +247,15 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
     print(bel.x2)
     print("=======================")
 
-    print("---------")
+    print("----------")
     print("Bel(X1|X2)")
-    print("---------")
+    print("----------")
     print(bel.x1gx2)
     print("=======================")
 
-    print("---------")
+    print("----------")
     print("Bel(X2|X1)")
-    print("---------")
+    print("----------")
     print(bel.x2gx1)
     print("=======================")
   }
@@ -180,7 +281,7 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, printQ=FALSE){
 }
 
 
-#' marginal.edge.emp.pr
+#' marginal edge empirical probs
 #'
 #' Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
 #' The function will XXXX
