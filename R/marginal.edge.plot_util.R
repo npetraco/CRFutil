@@ -12,7 +12,7 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
 
 
   distc.nmes <- names(posterior.edge.belief.info)[c(4,5)] # Edge conditional distributions
-  distm.nmes <- names(posterior.edge.belief.info)[c(2,3)] # Edge marginal node distrinbitions
+  distm.nmes <- names(posterior.edge.belief.info)[c(2,3)] # Edge marginal node distributions
 
   #print(distc.nmes)
   #print(distm.nmes)
@@ -28,12 +28,12 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
     stop("type must = X1|X2 or X2|X1")
   }
 
-  cond.sect.nmes <- colnames(marg.eg.bel.info[[distc.nme]])
-  marg.sect.nmes <- colnames(marg.eg.bel.info[[distm.nme]])
-  #print(distc.nme)
-  #print(cond.sect.nmes)
-  #print(distm.nme)
-  #print(marg.sect.nmes)
+  cond.sect.nmes <- colnames(posterior.edge.belief.info[[distc.nme]])
+  marg.sect.nmes <- colnames(posterior.edge.belief.info[[distm.nme]])
+  print(distc.nme)
+  print(cond.sect.nmes)
+  print(distm.nme)
+  print(marg.sect.nmes)
 
   # Shut off plot window if open
   if(!is.null(dev.list())){
@@ -47,32 +47,32 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   plt.main      <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
-  med.lne       <- median(marg.eg.bel.info[[distm.nme]][,marg.sect.nme])
-  hist(marg.eg.bel.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
   abline(v=med.lne, lwd=4)
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   # sector 1,2
-  cond.sect.nme <- cond.sect.nmes[3]
+  cond.sect.nme <- cond.sect.nmes[2]
   marg.sect.nme <- marg.sect.nmes[1]
   plt.main <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   plt.main      <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
-  med.lne       <- median(marg.eg.bel.info[[distm.nme]][,marg.sect.nme])
-  hist(marg.eg.bel.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
   abline(v=med.lne, lwd=4)
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   # sector 2,1
-  cond.sect.nme <- cond.sect.nmes[2]
+  cond.sect.nme <- cond.sect.nmes[3]
   marg.sect.nme <- marg.sect.nmes[2]
   plt.main <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   plt.main      <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
-  med.lne       <- median(marg.eg.bel.info[[distm.nme]][,marg.sect.nme])
-  hist(marg.eg.bel.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
   abline(v=med.lne, lwd=4)
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
@@ -83,8 +83,8 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   plt.main      <- paste0("Bel(",cond.sect.nme,") vs. Med[Bel(",marg.sect.nme,")]")
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
-  med.lne       <- median(marg.eg.bel.info[[distm.nme]][,marg.sect.nme])
-  hist(marg.eg.bel.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
   abline(v=med.lne, lwd=4)
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
