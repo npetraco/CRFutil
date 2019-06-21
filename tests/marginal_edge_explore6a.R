@@ -46,8 +46,11 @@ megb$model
 megb$ses
 megb$y
 megb$stanfit
+summary(megb)
 pejunk <- as.matrix(megb)
 hist(pejunk[,4], xlab="omega")
+
+megb
 
 pepotj <- exp(pejunk[,4])/exp(-pejunk[,4])
 hist(pepotj)

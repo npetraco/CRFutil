@@ -75,6 +75,7 @@ marginal.edge.loglin <- function(edge.samples, conf.level=0.95, printQ=FALSE){
   glm.edge.pot.rescaled[2,] <- glm.edge.pot.rescaled[2,]/glm.edge.pot.rescaled[2,1]
 
   glm.pot.est.info <- list(
+    edge.glm,               # fit glm object
     modl.coef.info[,1],     # log potential coeffs (energies) from glm fit
     glm.theta.est.vec,      # log potential coeffs (energies) according to p-values
     glm.node.pot,           # potentials info
@@ -84,6 +85,7 @@ marginal.edge.loglin <- function(edge.samples, conf.level=0.95, printQ=FALSE){
   )
 
   names(glm.pot.est.info) <- c(
+    "glm.model",
     "glm.theta.raw",
     "glm.theta.est",
     "glm.poi.node.pot",
@@ -97,7 +99,7 @@ marginal.edge.loglin <- function(edge.samples, conf.level=0.95, printQ=FALSE){
 }
 
 
-#' marginal edge fit using poisson regression glm
+#' marginal edge fit using vanalla baysian poisson regression with rstanarm
 #'
 #' XXXXXXX
 #' The function will XXXX
@@ -107,7 +109,7 @@ marginal.edge.loglin <- function(edge.samples, conf.level=0.95, printQ=FALSE){
 #'
 #'
 #' @export
-marginal.edge.bayes.loglin <- function(edge.samples, printQ=FALSE){
+marginal.edge.bayes.loglin <- function(edge.samples, prior.sd=NULL, prior_intercept.sd=NULL, stan.iter=NULL, prob.level=0.95, printQ=FALSE){
 
   if(ncol(edge.samples) != 2) {
     stop("Input one edge (two nodes) only!")
@@ -130,72 +132,91 @@ marginal.edge.bayes.loglin <- function(edge.samples, printQ=FALSE){
     c(1, -1, -1,  1))
   edge.data <- data.frame(modl.mat, edge.freq)
   colnames(edge.data)        <- c("alp", "X1", "X2", "omeg","Freq") # omeg is the edge param, alp is the intercept
-  #print(edge.data)
-  edge.glm <-  stan_glm(Freq ~ X1 + X2 + omeg,
-                        family = poisson,
-                        data = edge.data,
-                        prior = normal(0,3),
-                        prior_intercept = normal(0,10),
-                        chains = 4,
-                        cores = 4)
-  return(edge.glm)
-  # modl.summary             <- summary(edge.glm)
-  # if(printQ==TRUE){
-  #   print(modl.summary)
-  # }
-  #
-  # modl.coef.info           <- modl.summary$coefficients
-  # modl.coef.info           <- data.frame(modl.coef.info, modl.coef.info[,4] < (1-conf.level))
-  # modl.coef.info           <- modl.coef.info[,-3]
-  # glm.par.est              <- modl.coef.info[,4]*modl.coef.info[,1]
-  # modl.coef.info           <- data.frame(modl.coef.info,glm.par.est)
-  #
-  # colnames(modl.coef.info) <- c("theta.hat","std.err","p.val","Reject.H0:theta=0?","glm.pars")
-  # rownames(modl.coef.info) <- colnames(modl.mat)
-  # print(modl.coef.info)
-  #
-  # # Put theta est into potential matrix format and re-scale:
-  # glm.theta.est.vec <- glm.par.est[-1]
-  #
-  # glm.node.pot <- rbind(
-  #   c( exp(glm.theta.est.vec[1]), exp(-glm.theta.est.vec[1]) ),
-  #   c( exp(glm.theta.est.vec[2]), exp(-glm.theta.est.vec[2]) )
-  # )
-  #
-  # glm.edge.pot <- rbind(
-  #   c(exp(glm.theta.est.vec[3]),  exp(-glm.theta.est.vec[3])),
-  #   c(exp(-glm.theta.est.vec[3]), exp(glm.theta.est.vec[3]))
-  # )
-  #
-  # # Re-scale node pot matrix wrt second column elements
-  # glm.node.pot.rescaled     <- glm.node.pot
-  # glm.node.pot.rescaled[1,] <- glm.node.pot.rescaled[1,]/glm.node.pot.rescaled[1,2]
-  # glm.node.pot.rescaled[2,] <- glm.node.pot.rescaled[2,]/glm.node.pot.rescaled[2,2]
-  #
-  # # Re-scale edge pot matrix wrt off-diagonal elements
-  # glm.edge.pot.rescaled     <- glm.edge.pot
-  # glm.edge.pot.rescaled[1,] <- glm.edge.pot.rescaled[1,]/glm.edge.pot.rescaled[1,2]
-  # glm.edge.pot.rescaled[2,] <- glm.edge.pot.rescaled[2,]/glm.edge.pot.rescaled[2,1]
-  #
-  # glm.pot.est.info <- list(
-  #   modl.coef.info[,1],     # log potential coeffs (energies) from glm fit
-  #   glm.theta.est.vec,      # log potential coeffs (energies) according to p-values
-  #   glm.node.pot,           # potentials info
-  #   glm.node.pot.rescaled,
-  #   glm.edge.pot,
-  #   glm.edge.pot.rescaled
-  # )
-  #
-  # names(glm.pot.est.info) <- c(
-  #   "glm.theta.raw",
-  #   "glm.theta.est",
-  #   "glm.poi.node.pot",
-  #   "glm.poi.rescaled.node.pot",
-  #   "glm.poi.edge.pot",
-  #   "glm.poi.rescaled.edge.pot"
-  # )
-  #
-  # return(glm.pot.est.info)
+
+  # To not go too banannas, asume weakly informative normal priors
+  # Set up width of normal priors
+  if(is.null(prior.sd)) {
+    prior.sd.loc <- 3
+  } else {
+    prior.sd.loc <- prior.sd
+  }
+  if(is.null(prior_intercept.sd)) {
+    prior_intercept.sd.loc <- 3
+  } else {
+    prior_intercept.sd.loc <- prior.sd
+  }
+
+  if(is.null(stan.iter)) {
+    stan.iter.loc <- 4000
+  } else {
+    stan.iter <- stan.iter.loc
+  }
+
+
+  edge.bglm <-  stan_glm(Freq ~ X1 + X2 + omeg, # Don't worry. It will put in the intercept. Works like glm
+                        family          = poisson,
+                        data            = edge.data,
+                        prior           = normal(0,prior.sd.loc),
+                        prior_intercept = normal(0,prior_intercept.sd.loc),
+                        chains          = 4,
+                        iter            = stan.iter.loc,
+                        cores           = 4)
+
+  modl.summary <- summary(edge.bglm)
+  if(printQ==TRUE){
+    print(modl.summary)
+  }
+
+  modl.coef.info  <- edge.bglm$coefficients # parameter medians
+  post.param.samp <- as.matrix(edge.bglm)
+  alp  <- post.param.samp[,1]
+  tau1 <- post.param.samp[,2]
+  tau2 <- post.param.samp[,3]
+  omeg <- post.param.samp[,4]
+
+  alp.int    <- HPDI(samples = alp,  prob = prob.level)
+  tau1.int   <- HPDI(samples = tau1, prob = prob.level)
+  tau2.int   <- HPDI(samples = tau2, prob = prob.level)
+  omeg.int   <- HPDI(samples = omeg, prob = prob.level)
+  param.ints <- rbind(alp.int, tau1.int, tau2.int, omeg.int)
+
+  modl.coef.info           <- data.frame(modl.coef.info,
+                                         param.ints,
+                                         !cbind( param.ints[,1] <= 0 & param.ints[,2] >= 0 ) )
+  bglm.par.est             <- modl.coef.info[,4]*modl.coef.info[,1]
+  modl.coef.info           <- data.frame(modl.coef.info, bglm.par.est)
+
+  colnames(modl.coef.info) <- c("param.median", names(alp.int), "0.NOT.covered?", "bglm.pars")
+  rownames(modl.coef.info) <- c("(Intercept)", "tau1", "tau2", "omega")
+  print(modl.coef.info)
+
+  # Transform and re-scale posterior sample of parameters to sample of potentials
+  pot.tau1 <- exp(tau1)/exp(-tau1)
+  pot.tau2 <- exp(tau2)/exp(-tau2)
+  pot.omeg <- exp(omeg)/exp(-omeg)
+
+  raw.theta                         <- modl.coef.info[,1]
+  names(raw.theta)                  <- c("(Intercept)", "tau1", "tau2", "omega")
+  med.theta                         <- bglm.par.est[-1]
+  names(med.theta)                  <- c("tau1", "tau2", "omega")
+  rescaled.posterior.pots           <- cbind(pot.tau1, pot.tau2, pot.omeg)
+  colnames(rescaled.posterior.pots) <- c("pot.tau1","pot.tau2","pot.omega")
+
+  edge.bglm.info <- list(
+    edge.bglm,              # rstanarm fit object. Contains unscaled original posterior samples
+    raw.theta,              # all log coefs (energies) from stan fit
+    med.theta,              # essential and cleaned up log coefs (energies) according to HPDI
+    rescaled.posterior.pots # potentials info
+  )
+
+  names(edge.bglm.info) <- c(
+    "rstanarm.obj",
+    "raw.theta",
+    "theta.par.meds",
+    "rescaled.posterior.pots"
+  )
+
+  return(edge.bglm.info)
 
 }
 
@@ -383,6 +404,129 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NU
   )
 
   return(edg.bel.info)
+
+}
+
+
+#' marginal edge beliefs from bayes posterior sample
+#'
+#' Get edge beliefs Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) from bayes loglin fit
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+marginal.edge.bels.bayes <- function(post.edge.param.samp, node.names = NULL, state.names = NULL, printQ=FALSE){
+
+  # if(ncol(edge.samples) != 2) {
+  #   stop("Input one edge (two nodes) only!")
+  # }
+
+  if(is.null(node.names)) {
+    loc.node.names <- c("X1", "X2")
+  } else {
+    loc.node.names <- node.names
+  }
+
+  if(is.null(state.names)) {
+    loc.state.names <- c("1","2")
+  } else {
+    loc.state.names <- state.names
+  }
+
+  edge.mrf.obj   <- make.empty.field(graph.eq = grf.eq, parameterization.typ = "standard", plotQ = F)
+  post.bel.x1x2  <- array(0,c(nrow(post.edge.param.samp), 4))
+  post.bel.x1    <- array(0,c(nrow(post.edge.param.samp), 2))
+  post.bel.x2    <- array(0,c(nrow(post.edge.param.samp), 2))
+  post.bel.x1gx2 <- array(0,c(nrow(post.edge.param.samp), 4))
+  post.bel.x2gx1 <- array(0,c(nrow(post.edge.param.samp), 4))
+
+  # For each posterior potential sample compute Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1)
+  for(i in 1:nrow(post.edge.param.samp)) {
+
+    post.pots <- post.edge.param.samp[i,]
+
+    edge.mrf.obj$node.pot <- rbind(
+      c(post.pots[1], 1),
+      c(post.pots[2], 1)
+    )
+    edge.mrf.obj$edge.pot[[1]] <- rbind(
+      c(post.pots[3], 1           ),
+      c(1           , post.pots[3])
+    )
+
+    infered.edge.bels <- make.gRbase.beliefs(
+      inference.obj = infer.exact(edge.mrf.obj),
+      node.names    = loc.node.names,
+      edge.mat      = edge.mrf.obj$edges,
+      state.nmes    = loc.state.names)
+
+    bel.x1x2 <- infered.edge.bels$edge.beliefs[[1]]
+    bel.x1   <- infered.edge.bels$node.beliefs[[1]]
+    bel.x2   <- infered.edge.bels$node.beliefs[[2]]
+
+    bel.x1gx2 <- ar_div(bel.x1x2, bel.x2)
+    bel.x2gx1 <- ar_div(bel.x1x2, bel.x1)
+
+    # format should be 11 21 12 22
+    post.bel.x1x2[i,]  <- as.numeric(bel.x1x2)
+    post.bel.x1[i,]    <- as.numeric(bel.x1)
+    post.bel.x2[i,]    <- as.numeric(bel.x2)
+    post.bel.x1gx2[i,] <- as.numeric(bel.x1gx2)
+    post.bel.x2gx1[i,] <- as.numeric(bel.x2gx1)
+    #print(i)
+  }
+
+  colnames(post.bel.x1x2) <- c(
+    paste0(loc.node.names[1],"=",loc.state.names[1],",",loc.node.names[2],"=",loc.state.names[1]),
+    paste0(loc.node.names[1],"=",loc.state.names[2],",",loc.node.names[2],"=",loc.state.names[1]),
+    paste0(loc.node.names[1],"=",loc.state.names[1],",",loc.node.names[2],"=",loc.state.names[2]),
+    paste0(loc.node.names[1],"=",loc.state.names[2],",",loc.node.names[2],"=",loc.state.names[2])
+  )
+
+  colnames(post.bel.x1) <- c(
+    paste0(loc.node.names[1],"=",loc.state.names[1]),
+    paste0(loc.node.names[1],"=",loc.state.names[2])
+  )
+
+  colnames(post.bel.x2) <- c(
+    paste0(loc.node.names[2],"=",loc.state.names[1]),
+    paste0(loc.node.names[2],"=",loc.state.names[2])
+  )
+
+  colnames(post.bel.x1gx2) <- c(
+    paste0(loc.node.names[1],"=",loc.state.names[1],"|",loc.node.names[2],"=",loc.state.names[1]),
+    paste0(loc.node.names[1],"=",loc.state.names[2],"|",loc.node.names[2],"=",loc.state.names[1]),
+    paste0(loc.node.names[1],"=",loc.state.names[1],"|",loc.node.names[2],"=",loc.state.names[2]),
+    paste0(loc.node.names[1],"=",loc.state.names[2],"|",loc.node.names[2],"=",loc.state.names[2])
+  )
+
+  colnames(post.bel.x2gx1) <- c(
+    paste0(loc.node.names[2],"=",loc.state.names[1],"|",loc.node.names[1],"=",loc.state.names[1]),
+    paste0(loc.node.names[2],"=",loc.state.names[2],"|",loc.node.names[1],"=",loc.state.names[1]),
+    paste0(loc.node.names[2],"=",loc.state.names[1],"|",loc.node.names[1],"=",loc.state.names[2]),
+    paste0(loc.node.names[2],"=",loc.state.names[2],"|",loc.node.names[1],"=",loc.state.names[2])
+  )
+
+  post.edg.bel.info <- list(
+    post.bel.x1x2,
+    post.bel.x1,
+    post.bel.x2,
+    post.bel.x1gx2,
+    post.bel.x2gx1
+  )
+
+  names(post.edg.bel.info) <- c(
+    paste0("Bel(",loc.node.names[1],",",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[1],")"),
+    paste0("Bel(",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[1],"|",loc.node.names[2],")"),
+    paste0("Bel(",loc.node.names[2],"|",loc.node.names[1],")")
+  )
+
+  return(post.edg.bel.info)
 
 }
 

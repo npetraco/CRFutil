@@ -38,4 +38,11 @@ AB$edge.pot[[1]] <- megi$glm.poi.rescaled.edge.pot
 AB$node.pot #
 AB$edge.pot
 
-marginal.edge.bels(AB, node.names = c("A","B"), state.names = c("0","1"))
+junk <- marginal.edge.bels(AB, node.names = c("A","B"), state.names = c("0","1"))
+as.numeric(junk$`Bel(A,B)`)
+tm <- cbind(c(1.1,2.1),c(1.2,2.2))
+tm
+as.numeric(tm)
+tv <- c("1","2")
+tv2 <- c("X1","X2")
+paste0(tv2[1],"=",tv[1],",",tv2[2],"=",tv[1])
