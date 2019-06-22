@@ -2,7 +2,7 @@
 % Please edit documentation in R/marginal.edge_util.R
 \name{marginal.edge.emp.pr}
 \alias{marginal.edge.emp.pr}
-\title{marginal edge empirical probs}
+\title{Marginal edge empirical probs from a sample of data}
 \usage{
 marginal.edge.emp.pr(edge.samples, printQ = FALSE)
 }

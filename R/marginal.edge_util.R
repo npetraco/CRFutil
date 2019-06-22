@@ -16,11 +16,6 @@ marginal.edge.loglin <- function(edge.samples, conf.level=0.95, printQ=FALSE){
 
   # Construct contingency table for edge data. For now just use X1 and X2 as node names
   edge.samps.loc           <- edge.samples # Make a copy
-  # if(is.null(colnames(edge.samples))){
-  #   colnames(edge.samps.loc) <- c("X1","X2")
-  # } else {
-  #   colnames(edge.samps.loc) <- colnames(edge.samples)
-  # }
   colnames(edge.samps.loc) <- c("X1","X2")
   edge.contingency         <- xtabs(~., data=edge.samps.loc)
   edge.freq.table          <- as.data.frame(edge.contingency)
@@ -152,7 +147,7 @@ marginal.edge.bayes.loglin <- function(edge.samples, prior.sd=NULL, prior_interc
     stan.iter <- stan.iter.loc
   }
 
-
+  # Use pre-coded vanalla poison regression in rstanarm:
   edge.bglm <-  stan_glm(Freq ~ X1 + X2 + omeg, # Don't worry. It will put in the intercept. Works like glm
                         family          = poisson,
                         data            = edge.data,
@@ -169,12 +164,12 @@ marginal.edge.bayes.loglin <- function(edge.samples, prior.sd=NULL, prior_interc
 
   modl.coef.info  <- edge.bglm$coefficients # parameter medians
   post.param.samp <- as.matrix(edge.bglm)
-  alp  <- post.param.samp[,1]
+  alp  <- post.param.samp[,1]               # posterior parameter samples
   tau1 <- post.param.samp[,2]
   tau2 <- post.param.samp[,3]
   omeg <- post.param.samp[,4]
 
-  alp.int    <- HPDI(samples = alp,  prob = prob.level)
+  alp.int    <- HPDI(samples = alp,  prob = prob.level) # parameter prob intervals
   tau1.int   <- HPDI(samples = tau1, prob = prob.level)
   tau2.int   <- HPDI(samples = tau2, prob = prob.level)
   omeg.int   <- HPDI(samples = omeg, prob = prob.level)
@@ -221,7 +216,7 @@ marginal.edge.bayes.loglin <- function(edge.samples, prior.sd=NULL, prior_interc
 }
 
 
-#' marginal.edge.mrf
+#' marginal edge fit with MLE within the CRF framework
 #'
 #' XXXXXXX
 #' The function will XXXX
@@ -254,7 +249,6 @@ marginal.edge.mrf <- function(edge.samples){
   edge.n.states      <- 2 # ***** NOTE ASSUMES Two states ONLY
 
   edge.mrf <- make.empty.field(adj.mat = edge.adj, parameterization.typ = "standard", plotQ = F)
-  #edge.mrf <-train.mrf(edge.mrf, edge.samps.loc)
 
   # ***MLE parameters "by hand" instead of usinf train.mrf to get a little more control over the convergence.
   # Sometimes it takes a few runs of optim to get the gradient down to a reasonable size.
@@ -308,12 +302,10 @@ marginal.edge.mrf <- function(edge.samples){
 
   return(edge.mrf)
 
-  # Compare fit beliefs to empirical probs. Is Bel(A|B) ~~ Bel(A) ~~ Pr(A) etc??
-
 }
 
 
-#' marginal edge beliefs
+#' Marginal edge beliefs from parameter point estimates.
 #'
 #' Get edge beliefs Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) from fit MRF
 #' The function will XXXX
@@ -408,7 +400,7 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NU
 }
 
 
-#' marginal edge beliefs from bayes posterior sample
+#' Marginal edge beliefs from bayes posterior sample
 #'
 #' Get edge beliefs Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) from bayes loglin fit
 #' The function will XXXX
@@ -418,11 +410,7 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NU
 #'
 #'
 #' @export
-marginal.edge.bels.bayes <- function(post.edge.param.samp, node.names = NULL, state.names = NULL, printQ=FALSE){
-
-  # if(ncol(edge.samples) != 2) {
-  #   stop("Input one edge (two nodes) only!")
-  # }
+marginal.edge.bels.bayes.BROKEN <- function(post.edge.param.samp, node.names = NULL, state.names = NULL, printQ=FALSE){
 
   if(is.null(node.names)) {
     loc.node.names <- c("X1", "X2")
@@ -457,7 +445,7 @@ marginal.edge.bels.bayes <- function(post.edge.param.samp, node.names = NULL, st
       c(1           , post.pots[3])
     )
 
-    # get the edge beliefs and flatten them into stackable format
+    # Get the edge beliefs and flatten them into stackable format    PROBLEM HERE?????????????
     infered.edge.bels <- marginal.edge.bels(
       edge.mrf.obj = edge.mrf.obj,
       node.names   = loc.node.names,
@@ -508,7 +496,7 @@ marginal.edge.bels.bayes <- function(post.edge.param.samp, node.names = NULL, st
 }
 
 
-#' marginal edge empirical probs
+#' Marginal edge empirical probs from a sample of data
 #'
 #' Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
 #' The function will XXXX
@@ -557,9 +545,21 @@ marginal.edge.emp.pr <- function(edge.samples, printQ=FALSE){
     print("=======================")
 
     print("---------")
+    print("Pr(X1|X2)")
+    print("---------")
+    print(pr.x1gx2)
+
+    print("=======================")
+    print("---------")
     print("Pr(X1)")
     print("---------")
     print(pr.x1)
+    print("=======================")
+
+    print("---------")
+    print("Pr(X2|X1)")
+    print("---------")
+    print(pr.x2gx1)
     print("=======================")
 
     print("---------")
@@ -568,17 +568,6 @@ marginal.edge.emp.pr <- function(edge.samples, printQ=FALSE){
     print(pr.x2)
     print("=======================")
 
-    print("---------")
-    print("Pr(X1|X2)")
-    print("---------")
-    print(pr.x1gx2)
-    print("=======================")
-
-    print("---------")
-    print("Pr(X2|X1)")
-    print("---------")
-    print(pr.x2gx1)
-    print("=======================")
   }
 
   edg.emp.pr.info <- list(
@@ -615,7 +604,7 @@ marginal.edge.emp.pr <- function(edge.samples, printQ=FALSE){
 #'
 #'
 #' @export
-flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
+flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FALSE){
 
   bel.nmes <- names(marginal.edge.beliefs.list)
   #print(bel.nmes)
@@ -635,8 +624,10 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
     }
   }
   colnames(x1x2.vals) <- x1x2.lbls
-  #print(bel.nmes[1])
-  #print(x1x2.vals)
+  if(printQ==TRUE) {
+    print(bel.nmes[1])
+    print(x1x2.vals)
+  }
 
   #  Bel(X1)
   tij <- marginal.edge.beliefs.list[[ bel.nmes[2] ]]              # mij Belief table
@@ -651,8 +642,10 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
     count <- count + 1
   }
   colnames(x1.vals) <- x1.lbls
-  #print(bel.nmes[2])
-  #print(x1.vals)
+  if(printQ==TRUE) {
+    print(bel.nmes[2])
+    print(x1.vals)
+  }
 
   #  Bel(X2)
   tij <- marginal.edge.beliefs.list[[ bel.nmes[3] ]]              # mij Belief table
@@ -667,8 +660,10 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
     count <- count + 1
   }
   colnames(x2.vals) <- x2.lbls
-  #print(bel.nmes[3])
-  #print(x2.vals)
+  if(printQ==TRUE) {
+    print(bel.nmes[3])
+    print(x2.vals)
+  }
 
   # Flatten Bel(X1|X2)
   tij <- marginal.edge.beliefs.list[[ bel.nmes[4] ]]              # mij Belief table
@@ -685,8 +680,10 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
     }
   }
   colnames(x1gx2.vals) <- x1gx2.lbls
-  #print(bel.nmes[4])
-  #print(x1gx2.vals)
+  if(printQ==TRUE) {
+    print(bel.nmes[4])
+    print(x1gx2.vals)
+  }
 
   # Flatten Bel(X2|X1)
   tij <- marginal.edge.beliefs.list[[ bel.nmes[5] ]]              # mij Belief table
@@ -703,8 +700,10 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list){
     }
   }
   colnames(x2gx1.vals) <- x2gx1.lbls
-  #print(bel.nmes[5])
-  #print(x2gx1.vals)
+  if(printQ==TRUE) {
+    print(bel.nmes[5])
+    print(x2gx1.vals)
+  }
 
   flat.bels <- list(
     x1x2.vals,

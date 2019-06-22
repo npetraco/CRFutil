@@ -4,7 +4,7 @@
 \alias{flatten.marginal.edge.beliefs}
 \title{Flatten belief matrices output by marginal.edge.bels to make them stackable}
 \usage{
-flatten.marginal.edge.beliefs(marginal.edge.beliefs.list)
+flatten.marginal.edge.beliefs(marginal.edge.beliefs.list, printQ = FALSE)
 }
 \arguments{
 \item{XX}{The XX}

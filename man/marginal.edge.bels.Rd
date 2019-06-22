@@ -2,7 +2,7 @@
 % Please edit documentation in R/marginal.edge_util.R
 \name{marginal.edge.bels}
 \alias{marginal.edge.bels}
-\title{marginal edge beliefs}
+\title{Marginal edge beliefs from parameter point estimates.}
 \usage{
 marginal.edge.bels(edge.mrf.obj, node.names = NULL, state.names = NULL,
   printQ = FALSE)

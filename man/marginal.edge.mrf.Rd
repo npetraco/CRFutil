@@ -2,7 +2,7 @@
 % Please edit documentation in R/marginal.edge_util.R
 \name{marginal.edge.mrf}
 \alias{marginal.edge.mrf}
-\title{marginal.edge.mrf}
+\title{marginal edge fit with MLE within the CRF framework}
 \usage{
 marginal.edge.mrf(edge.samples)
 }

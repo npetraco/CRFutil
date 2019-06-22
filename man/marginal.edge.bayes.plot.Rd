@@ -5,7 +5,7 @@
 \title{marginal edge empirical probs}
 \usage{
 marginal.edge.bayes.plot(posterior.edge.pot.mat, type = "pot",
-  ymax = 2500)
+  prob.level = 0.95)
 }
 \arguments{
 \item{XX}{The XX}
