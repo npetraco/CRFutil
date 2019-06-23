@@ -8,7 +8,7 @@
 #'
 #'
 #' @export
-marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X2", ymax=2500, edge.empirical.prob.info=NULL){
+marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X2", ymax=2500, prob.level=0.95){
 
 
   distc.nmes <- names(posterior.edge.belief.info)[c(4,5)] # Edge conditional distributions
@@ -48,8 +48,17 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
   med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
-  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  cond.pi       <- HPDI(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], prob.level)
+  marg.pi       <- HPDI(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme], prob.level)
+
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax), col="red")
   abline(v=med.lne, lwd=4)
+  points(cond.pi, c(0,0), pch=8, col="firebrick4")
+  points(marg.pi, c(0,0), pch=16, col="black")
+  med.in.intQ <- (cond.pi[1] <= med.lne & cond.pi[2] >= med.lne)
+  if(med.in.intQ == TRUE) {
+    t.nme <- paste0(t.nme,"**")
+  }
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   # sector 1,2
@@ -60,8 +69,17 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
   med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
-  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  cond.pi       <- HPDI(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], prob.level)
+  marg.pi       <- HPDI(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme], prob.level)
+
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax), col="red")
   abline(v=med.lne, lwd=4)
+  points(cond.pi, c(0,0), pch=8, col="firebrick4")
+  points(marg.pi, c(0,0), pch=16, col="black")
+  med.in.intQ <- (cond.pi[1] <= med.lne & cond.pi[2] >= med.lne)
+  if(med.in.intQ == TRUE) {
+    t.nme <- paste0(t.nme,"**")
+  }
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   # sector 2,1
@@ -72,8 +90,17 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
   med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
-  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  cond.pi       <- HPDI(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], prob.level)
+  marg.pi       <- HPDI(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme], prob.level)
+
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax), col="red")
   abline(v=med.lne, lwd=4)
+  points(cond.pi, c(0,0), pch=8, col="firebrick4")
+  points(marg.pi, c(0,0), pch=16, col="black")
+  med.in.intQ <- (cond.pi[1] <= med.lne & cond.pi[2] >= med.lne)
+  if(med.in.intQ == TRUE) {
+    t.nme <- paste0(t.nme,"**")
+  }
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   # sector 2,2
@@ -84,8 +111,17 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
   x.nme         <- paste0("Bel(",cond.sect.nme,")")
   t.nme         <- paste0("Med[Bel(",marg.sect.nme,")]")
   med.lne       <- median(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme])
-  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax))
+  cond.pi       <- HPDI(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], prob.level)
+  marg.pi       <- HPDI(posterior.edge.belief.info[[distm.nme]][,marg.sect.nme], prob.level)
+
+  hist(posterior.edge.belief.info[[distc.nme]][,cond.sect.nme], xlab=x.nme, main=plt.main, xlim=c(0,1), ylim=c(0,ymax), col="red")
   abline(v=med.lne, lwd=4)
+  points(cond.pi, c(0,0), pch=8, col="firebrick4")
+  points(marg.pi, c(0,0), pch=16, col="black")
+  med.in.intQ <- (cond.pi[1] <= med.lne & cond.pi[2] >= med.lne)
+  if(med.in.intQ == TRUE) {
+    t.nme <- paste0(t.nme,"**")
+  }
   text(label=t.nme, x=med.lne, y=ymax, adj=1.2)
 
   print(paste0("If X1_||_X2 then: ",distc.nmes[1], " = ", distm.nmes[1]))

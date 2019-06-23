@@ -410,7 +410,7 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NU
 #'
 #'
 #' @export
-marginal.edge.bels.bayes.BROKEN <- function(post.edge.param.samp, node.names = NULL, state.names = NULL, printQ=FALSE){
+marginal.edge.bels.bayes <- function(post.edge.param.samp, node.names = NULL, state.names = NULL, printQ=FALSE){
 
   if(is.null(node.names)) {
     loc.node.names <- c("X1", "X2")
@@ -424,7 +424,8 @@ marginal.edge.bels.bayes.BROKEN <- function(post.edge.param.samp, node.names = N
     loc.state.names <- state.names
   }
 
-  edge.mrf.obj   <- make.empty.field(graph.eq = grf.eq, parameterization.typ = "standard", plotQ = F)
+  loc.graph.eq   <- ~X1loc + X2loc + X1loc:X2loc # Marginal edge graph: X1--X2
+  edge.mrf.obj   <- make.empty.field(graph.eq = loc.graph.eq, parameterization.typ = "standard", plotQ = F)
   post.bel.x1x2  <- array(0,c(nrow(post.edge.param.samp), 4))
   post.bel.x1    <- array(0,c(nrow(post.edge.param.samp), 2))
   post.bel.x2    <- array(0,c(nrow(post.edge.param.samp), 2))
@@ -436,6 +437,13 @@ marginal.edge.bels.bayes.BROKEN <- function(post.edge.param.samp, node.names = N
 
     post.pots <- post.edge.param.samp[i,]
 
+    #TMP
+    # print(paste("================== SAMPLE:",i,"======================"))
+    # print("Posterior potential vector:")
+    # print(post.pots)
+    # print("---------")
+
+
     edge.mrf.obj$node.pot <- rbind(
       c(post.pots[1], 1),
       c(post.pots[2], 1)
@@ -445,13 +453,34 @@ marginal.edge.bels.bayes.BROKEN <- function(post.edge.param.samp, node.names = N
       c(1           , post.pots[3])
     )
 
+    #TMP
+    # print("Input node potential matrix:")
+    # print(edge.mrf.obj$node.pot)
+    # print("---------")
+    #
+    # #TMP
+    # print("Input edge potential matrix:")
+    # print(edge.mrf.obj$edge.pot)
+    # print("---------")
+
     # Get the edge beliefs and flatten them into stackable format    PROBLEM HERE?????????????
     infered.edge.bels <- marginal.edge.bels(
       edge.mrf.obj = edge.mrf.obj,
       node.names   = loc.node.names,
       state.names  = loc.state.names)
+
+    #TMP
+    # print("Infered edge beliefs:")
+    # print(infered.edge.bels)
+    # print("---------")
+
     infered.edge.bels <- flatten.marginal.edge.beliefs(
       marginal.edge.beliefs.list = infered.edge.bels)
+
+    #TMP
+    # print("Flattened Infered edge beliefs:")
+    # print(infered.edge.bels)
+    # print("---------")
 
     bel.x1x2  <- infered.edge.bels[[1]]
     bel.x1    <- infered.edge.bels[[2]]
@@ -610,15 +639,16 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FAL
   #print(bel.nmes)
 
   # Flatten Bel(X1,X2)
-  tij <- marginal.edge.beliefs.list[[ bel.nmes[1] ]]              # mij Belief table
-  din <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[1] ]] )  # dnij Node names for table
-  nis <- names(din)                                               # nij Node names collapsed
+  tij       <- marginal.edge.beliefs.list[[ bel.nmes[1] ]]              # mij Belief table
+  stij      <- colnames(tij)                                            # state names
+  din       <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[1] ]] )  # dnij Node names for table
+  nis       <- names(din)                                               # nij Node names collapsed
   x1x2.lbls <- array("",c(1,4))
   x1x2.vals <- array(NA,c(1,4))
   count <- 1
   for(i in 1:2){  # col
     for(j in 1:2){ # row
-      x1x2.lbls[count] <- paste0(nis[2], "=", i, ",",nis[1],"=",j)
+      x1x2.lbls[count] <- paste0(nis[2], "=", stij[i], ",",nis[1],"=",stij[j])
       x1x2.vals[count] <- tij[j,i]
       count <- count + 1
     }
@@ -630,14 +660,15 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FAL
   }
 
   #  Bel(X1)
-  tij <- marginal.edge.beliefs.list[[ bel.nmes[2] ]]              # mij Belief table
-  din <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[2] ]] )  # dnij Node names for table
-  nis <- names(din)                                               # nij Node names collapsed
+  tij     <- marginal.edge.beliefs.list[[ bel.nmes[2] ]]              # mij Belief table
+  stij    <- names(tij)                                               # state names
+  din     <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[2] ]] )  # dnij Node names for table
+  nis     <- names(din)                                               # nij Node names collapsed
   x1.lbls <- array("",c(1,2))
   x1.vals <- array(NA,c(1,2))
   count <- 1
   for(i in 1:2){  # col
-    x1.lbls[count] <- paste0(nis[1], "=", i)
+    x1.lbls[count] <- paste0(nis[1], "=", stij[i])
     x1.vals[count] <- tij[i]
     count <- count + 1
   }
@@ -648,14 +679,15 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FAL
   }
 
   #  Bel(X2)
-  tij <- marginal.edge.beliefs.list[[ bel.nmes[3] ]]              # mij Belief table
-  din <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[3] ]] )  # dnij Node names for table
-  nis <- names(din)                                               # nij Node names collapsed
+  tij     <- marginal.edge.beliefs.list[[ bel.nmes[3] ]]              # mij Belief table
+  stij    <- names(tij)                                               # state names
+  din     <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[3] ]] )  # dnij Node names for table
+  nis     <- names(din)                                               # nij Node names collapsed
   x2.lbls <- array("",c(1,2))
   x2.vals <- array(NA,c(1,2))
   count <- 1
   for(i in 1:2){  # col
-    x2.lbls[count] <- paste0(nis[1], "=", i)
+    x2.lbls[count] <- paste0(nis[1], "=", stij[i])
     x2.vals[count] <- tij[i]
     count <- count + 1
   }
@@ -666,15 +698,16 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FAL
   }
 
   # Flatten Bel(X1|X2)
-  tij <- marginal.edge.beliefs.list[[ bel.nmes[4] ]]              # mij Belief table
-  din <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[4] ]] )  # dnij Node names for table
-  nis <- names(din)                                               # nij Node names collapsed
+  tij        <- marginal.edge.beliefs.list[[ bel.nmes[4] ]]              # mij Belief table
+  stij       <- colnames(tij)                                            # state names
+  din        <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[4] ]] )  # dnij Node names for table
+  nis        <- names(din)                                               # nij Node names collapsed
   x1gx2.lbls <- array("",c(1,4))
   x1gx2.vals <- array(NA,c(1,4))
   count <- 1
   for(i in 1:2){  # col
     for(j in 1:2){ # row
-      x1gx2.lbls[count] <- paste0(nis[2], "=", i, "|",nis[1],"=",j)
+      x1gx2.lbls[count] <- paste0(nis[2], "=", stij[i], "|", nis[1],"=", stij[j])
       x1gx2.vals[count] <- tij[j,i]
       count <- count + 1
     }
@@ -686,15 +719,16 @@ flatten.marginal.edge.beliefs <- function(marginal.edge.beliefs.list, printQ=FAL
   }
 
   # Flatten Bel(X2|X1)
-  tij <- marginal.edge.beliefs.list[[ bel.nmes[5] ]]              # mij Belief table
-  din <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[5] ]] )  # dnij Node names for table
-  nis <- names(din)                                               # nij Node names collapsed
+  tij        <- marginal.edge.beliefs.list[[ bel.nmes[5] ]]              # mij Belief table
+  stij       <- colnames(tij)                                            # state names
+  din        <- dimnames( marginal.edge.beliefs.list[[ bel.nmes[5] ]] )  # dnij Node names for table
+  nis        <- names(din)                                               # nij Node names collapsed
   x2gx1.lbls <- array("",c(1,4))
   x2gx1.vals <- array(NA,c(1,4))
   count <- 1
   for(i in 1:2){  # col
     for(j in 1:2){ # row
-      x2gx1.lbls[count] <- paste0(nis[2], "=", i, "|",nis[1],"=",j)
+      x2gx1.lbls[count] <- paste0(nis[2], "=", stij[i], "|", nis[1], "=", stij[j])
       x2gx1.vals[count] <- tij[j,i]
       count <- count + 1
     }
