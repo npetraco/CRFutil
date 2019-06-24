@@ -1,9 +1,12 @@
-#' marginal edge empirical probs
+#' marginal edge bayes posterior belief plots
 #'
-#' Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
-#' The function will XXXX
+#' Plots Median[Pr(X1)] vs.  Post-dist[Pr(X1|X2)] and  Median[Pr(X2)] vs.  Post-dist[Pr(X2|X1)]
+#' Handy for checking for independencies between X1 and X2
 #'
-#' @param XX The XX
+#' @param posterior.edge.belief.info Output from marginal.edge.bels.bayes()
+#' @param type Either "X1|X2" or "X2|X1"
+#' @param ymax y-axis frequency scale. Depends on how many posterior samples input and width of posteriors. Adjust as necessary.
+#' @param prob.level Desired width of HPDI intervals plotted
 #' @return The function will XX
 #'
 #'
@@ -129,17 +132,23 @@ marginal.edge.bayes.bels.plot <- function(posterior.edge.belief.info, type="X1|X
 
 }
 
-#' marginal edge empirical probs
+#' marginal edge plot for bayes posterior parameter output
 #'
-#' Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
-#' The function will XXXX
+#' Plots posterior dists for tau1, tau2 and omega
+#' Handy to help check for relative abundance of X1 and X1 (tau's) and total marginal independence between X1 and X2 (omega)
 #'
-#' @param XX The XX
+#' If rescaled.posterior.pots are used tau's = 0 (exp(tau's)=1) indicate about state 1 is about as abundant as state 2.
+#' omega = 0 indicates no dependence between X1 and X2
+#'
+#' @param posterior.edge.pot.mat Posterior potentials from marginal.edge.bayes.loglin. Usually rescaled.posterior.pots portion.
+#' @param type "logpot" (energies) or "pot" (potentials = exp(energies))
+#' @param prob.level Desired width of HPDI intervals plotted
+#'
 #' @return The function will XX
 #'
 #'
 #' @export
-marginal.edge.bayes.plot <- function(posterior.edge.pot.mat, type="pot", prob.level=0.95){
+marginal.edge.bayes.plot <- function(posterior.edge.pot.mat, type="logpot", prob.level=0.95){
 
   if(type == "pot") { # for poentials
     tau1.loc    <- posterior.edge.pot.mat[,1]

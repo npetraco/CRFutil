@@ -2,18 +2,26 @@
 % Please edit documentation in R/marginal.edge.plot_util.R
 \name{marginal.edge.bayes.plot}
 \alias{marginal.edge.bayes.plot}
-\title{marginal edge empirical probs}
+\title{marginal edge plot for bayes posterior parameter output}
 \usage{
-marginal.edge.bayes.plot(posterior.edge.pot.mat, type = "pot",
+marginal.edge.bayes.plot(posterior.edge.pot.mat, type = "logpot",
   prob.level = 0.95)
 }
 \arguments{
-\item{XX}{The XX}
+\item{posterior.edge.pot.mat}{Posterior potentials from marginal.edge.bayes.loglin. Usually rescaled.posterior.pots portion.}
+
+\item{type}{"logpot" (energies) or "pot" (potentials = exp(energies))}
+
+\item{prob.level}{Desired width of HPDI intervals plotted}
 }
 \value{
 The function will XX
 }
 \description{
-Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
-The function will XXXX
+Plots posterior dists for tau1, tau2 and omega
+Handy to help check for relative abundance of X1 and X1 (tau's) and total marginal independence between X1 and X2 (omega)
+}
+\details{
+If rescaled.posterior.pots are used tau's = 0 (exp(tau's)=1) indicate about state 1 is about as abundant as state 2.
+omega = 0 indicates no dependence between X1 and X2
 }

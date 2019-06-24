@@ -2,18 +2,24 @@
 % Please edit documentation in R/marginal.edge.plot_util.R
 \name{marginal.edge.bayes.bels.plot}
 \alias{marginal.edge.bayes.bels.plot}
-\title{marginal edge empirical probs}
+\title{marginal edge bayes posterior belief plots}
 \usage{
 marginal.edge.bayes.bels.plot(posterior.edge.belief.info, type = "X1|X2",
-  ymax = 2500, edge.empirical.prob.info = NULL)
+  ymax = 2500, prob.level = 0.95)
 }
 \arguments{
-\item{XX}{The XX}
+\item{posterior.edge.belief.info}{Output from marginal.edge.bels.bayes()}
+
+\item{type}{Either "X1|X2" or "X2|X1"}
+
+\item{ymax}{y-axis frequency scale. Depends on how many posterior samples input and width of posteriors. Adjust as necessary.}
+
+\item{prob.level}{Desired width of HPDI intervals plotted}
 }
 \value{
 The function will XX
 }
 \description{
-Empirical Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1) estimates from edge data
-The function will XXXX
+Plots Median[Pr(X1)] vs.  Post-dist[Pr(X1|X2)] and  Median[Pr(X2)] vs.  Post-dist[Pr(X2|X1)]
+Handy for checking for independencies between X1 and X2
 }
