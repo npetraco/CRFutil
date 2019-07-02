@@ -36,8 +36,8 @@ true.model$edge.par[[3]][2,2,1] <- 6
 set.seed(6)
 true.model$par <- runif(6,-1.5,1.1)
 true.model$par # "true" theta
-out.pot <- make.pots(parms = true.model$par,  crf = true.model,  rescaleQ = T, replaceQ = T)
-
+out.pot <- make.pots(parms = true.model$par,  crf = true.model,  rescaleQ = F, replaceQ = T)
+infer.exact(true.model)
 
 # So now sample from the model as if we obtained an experimental sample:
 num.samps <- 25
@@ -50,7 +50,7 @@ colnames(samps) <- c("X.1","X.2","X.3")
 Xfreq <- as.data.frame(ftable(data.frame(samps)))
 #ftable(data.frame(samps))
 
-## Raw case-list (Observed states) to contingency table 
+## Raw case-list (Observed states) to contingency table
 Xcont <- xtabs(~., data=data.frame(samps))
 
 # Contrasts to build Model matrix ??????
@@ -135,7 +135,7 @@ old <- rbind(
   c(2,  2,  1,          2.0,        2.5,           1.3),
   c(2,  2,  2,         22.0,       21.5,          15.0)
 )
-colnames(old) <- c("1","2","3","bayes.lrm", "mle.lrm", "true.model") 
+colnames(old) <- c("1","2","3","bayes.lrm", "mle.lrm", "true.model")
 
 resul <- cbind(old[,1:3], llm3[sr.idxs,4]*100, llm4[sr.idxs,4]*100, old[,4:6], ext[,4]*100)
 resul # ????????????????????
