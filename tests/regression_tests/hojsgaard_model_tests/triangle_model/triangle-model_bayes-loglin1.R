@@ -55,7 +55,7 @@ beta <- extract(bfit, "beta")[[1]]
 # Partition function from the intercept:
 hist(beta[,1])
 # alpha = beta1 = log(N) - log(Z)
-logZ <- nrow(Xm) - beta[,1]
+logZ <- nrow(Xm) - beta[,1]       # WRONG??? N = #samps, not num all possible configs....????
 hist(logZ)
 mean(logZ)
 
