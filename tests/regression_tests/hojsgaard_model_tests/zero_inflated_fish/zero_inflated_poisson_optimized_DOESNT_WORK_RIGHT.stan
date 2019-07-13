@@ -31,7 +31,7 @@ model {
   alpha_theta  ~ normal(0,1);
   alpha_lambda ~ normal(0,1);
 
-  // Vectorized Likelihood:
+  // Vectorized Likelihood:    DOESNT WORK!!!!!!! Chains come out super correlated...... WHY?????
   target += N_zero * log_sum_exp(bernoulli_lpmf(1 | theta_z),
                                  bernoulli_lpmf(0 | theta_z) + poisson_log_lpmf(y_zero | lambda_log_z));
 

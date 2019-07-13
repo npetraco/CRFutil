@@ -36,11 +36,11 @@ rstan_options(auto_write = TRUE)
 #fpth <- "C:/Users/aliso/codes/CRFutil/tests/regression_tests/hojsgaard_model_tests/zero_inflated_fish/"
 fpth <- "/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/zero_inflated_fish/"
 #model.c <- stanc(file = paste0(fpth,"zero_inflated_poisson.stan"), model_name = 'model')
-model.c <- stanc(file = paste0(fpth,"zero_inflated_poisson_optimized3.stan"), model_name = 'model')
+model.c <- stanc(file = paste0(fpth,"zero_inflated_poisson_optimized3a.stan"), model_name = 'model')
 sm <- stan_model(stanc_ret = model.c, verbose = T)
 
 #fit <- sampling(sm, data = dat)
-fit <- sampling(sm, data = dat, chains = 8, iter = 20000, thin=10)
+fit <- sampling(sm, data = dat, chains = 4, iter = 2000, thin=1)
 options(max.print = 9999999)
 fit
 # ~ 5.7 sec for 4000 samples

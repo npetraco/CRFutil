@@ -28,8 +28,10 @@ sm <- stan_model(stanc_ret = model.c, verbose = T)
 #fit <- sampling(sm, data = dat)
 fit <- sampling(sm, data = dat, chains = 4, iter = 2000, thin=1)
 options(max.print = 9999999)
-fit
-# ~ 10 seconds for 4000 samples
+fit.smy <- summary(fit)$summary
+rhats <- fit.smy[,"Rhat"]
+neffs <- fit.smy[,"n_eff"]
+
 
 all.params <- extract(fit, permuted = TRUE)
 

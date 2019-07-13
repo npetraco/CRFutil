@@ -4,7 +4,7 @@ library(CRFutil)
 
 
 # Tesseract field model:
-grphf <- 
+grphf <-
  ~X.1:X.2   + X.1:X.4   + X.1:X.5  + X.1:X.13 +
   X.2:X.3   + X.2:X.6   + X.2:X.14 +
   X.3:X.4   + X.3:X.7   + X.3:X.15 +
@@ -63,7 +63,7 @@ hist(freqs)
 sum(freqs)
 
 # Can't handle sampling on whole model
-# Just try non-zero freques 
+# Just try non-zero freques
 nz.idxs <- which(freqs>0)
 X.red <- X.all[nz.idxs,]
 freqs.red <- freqs[nz.idxs]
@@ -75,9 +75,9 @@ max(freqs.red)
 X.red[which(freqs.red == max(freqs.red)), ]
 
 # Model Matrix with respect to graph ????
-#M <- compute.model.matrix(configs=X.all, edges.mat=tess$edges, node.par = tess$node.par, edge.par = tess$edge.par, ff = f0)
+M <- compute.model.matrix(configs=X.all, edges.mat=tess$edges, node.par = tess$node.par, edge.par = tess$edge.par, ff = f0)
 #M
-#dim(M)
+dim(M)
 
 M.red <- compute.model.matrix(configs=X.red, edges.mat=tess$edges, node.par = tess$node.par, edge.par = tess$edge.par, ff = f0)
 dim(M.red)
