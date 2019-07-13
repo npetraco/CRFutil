@@ -103,6 +103,15 @@ dat
 
 bfit <- sampling(sm, data = dat, iter=500, thin = 1, chains = 1)
 bfit
+# 500 mb for 250 samples
+
+fit.smy <- summary(bfit)$summary
+rhats <- fit.smy[,"Rhat"]
+neffs <- fit.smy[,"n_eff"]
+min(neffs)
+max(rhats)
+
+launch_shinystan(bfit)
 
 theta <- extract(bfit, "theta")[[1]]
 alpha <- extract(bfit, "alpha")[[1]]
