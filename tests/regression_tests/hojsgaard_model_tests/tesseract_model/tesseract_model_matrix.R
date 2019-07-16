@@ -87,9 +87,9 @@ options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 
 # Fit log(lam) = alp + M theta
-#fpth <- "C:/Users/aliso/codes/CRFutil/tests/regression_tests/hojsgaard_model_tests/triangle_model/"
-fpth <- "/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/triangle_model/"
-model.c <- stanc(file = paste0(fpth,"vanalla.poisson.regression2a.stan"), model_name = 'model')
+fpth <- "C:/Users/aliso/codes/CRFutil/tests/regression_tests/hojsgaard_model_tests/triangle_model/"
+#fpth <- "/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/triangle_model/"
+model.c <- stanc(file = paste0(fpth,"vanalla.poisson.regression2b.stan"), model_name = 'model')
 sm <- stan_model(stanc_ret = model.c, verbose = T)
 
 

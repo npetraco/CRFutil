@@ -14,7 +14,7 @@ dat <- list(
   N = nrow(zinb), # num obs
   K = ncol(x),    # num vars
   x = x,          # vars
-  y = zinb$count) # counts
+  y //= zinb$count) # counts
 
 
 options(mc.cores = parallel::detectCores())

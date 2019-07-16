@@ -1,12 +1,11 @@
 data{
-  int p;              // Number of columns in the model matrix = number of parameters
-  int N;              // Number of configurations
-  int <lower=0> y[N]; // Counts of each configuration
-  real Mmodl[N,p];    // Model matrix for the graph
+  int p;              // Number of columns in the model matrix
+  int N;              // Number of observed configurations
+  int <lower=0> y[N]; // Counts of each observed config
+  real Xmodl[N,p];    // Model matrix for the graph
 }
 parameters{
-  real theta[p];       // Regression coefs.
-  real alpha;          // alpha
+  real beta[p];       // Regression coefs.
 }
 transformed parameters {
 
@@ -15,7 +14,7 @@ transformed parameters {
 
   for (i in 1:N) {
     // Linear predictor
-    lp[i] = alpha + dot_product(theta,Mmodl[i]);
+    lp[i] = dot_product(beta,Xmodl[i]);
 
     // Mean
     lambda[i] = exp(lp[i]);
@@ -23,9 +22,14 @@ transformed parameters {
 }
 model {
   // Prior on regression coefs
-  theta ~ cauchy(0,30);
-  alpha ~ cauchy(0,10);
+  beta ~ cauchy(0,30);
 
   // Likelihood part of Bayesian inference
   y ~ poisson(lambda);
 }
+// generated quantities{
+//   vector[N] logZ;
+//   for(i in 1:N) {
+//   	logZ[i] = log(N) - log(lambda[i]) + lp[i];
+//   }
+// }
