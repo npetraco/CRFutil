@@ -70,7 +70,23 @@ row.match <- function (x, table, nomatch = NA)
   match(cx, ct, nomatch = nomatch)
 }
 
+#' Spits out premutation to re-order congifs in targ with respect to ref
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+reorder_configs <- function (ref,targ){
 
+  reord.idxs <- sapply(1:nrow(ref), function(xx){row.match(x = ref[xx,], table = targ)})
+  return(reord.idxs)
+
+}
 #' Convenience function to complement a node in a configuration.
 #' Assumes CRF 1,2 states
 #'
