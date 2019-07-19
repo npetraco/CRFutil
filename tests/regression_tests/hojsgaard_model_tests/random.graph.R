@@ -55,12 +55,11 @@ reordr.idxs <- reorder_configs(emp.dist[,1:10], mle.dist[,1:10])
 mle.dist    <- mle.dist[reordr.idxs,]
 plot(mle.dist[,11], typ="h", xlab="configuration state#", ylab="MLE. Freq.")
 
-# Assess difference from the true distribution
-hist(mle.dist[,11] - tru.dist[,11])
-hist(emp.dist[,11] - tru.dist[,11])
-
-
 # logistic regression (glm)
+logis.dist    <-fit_logistic(gf, samps)
+reordr.idxs   <- reorder_configs(emp.dist[,1:10], logis.dist[,1:10])
+logis.dist    <- logis.dist[reordr.idxs,]
+plot(logis.dist[,11], typ="h", xlab="configuration state#", ylab="Logistic Freq.")
 
 
 # Bayes logistic regression (Stan, loo, WAIC)
@@ -70,3 +69,7 @@ hist(emp.dist[,11] - tru.dist[,11])
 # Bayes neg-binomial
 # MLE zero-inflated, geg-binomial??
 
+# Assess difference from the true distribution
+hist(mle.dist[,11] - tru.dist[,11])
+hist(emp.dist[,11] - tru.dist[,11])
+hist(logis.dist[,11] - tru.dist[,11])

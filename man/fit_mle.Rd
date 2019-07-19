@@ -14,7 +14,7 @@ fit_mle(graph.eq, samples, inference.method = infer.exact,
 The function will XX
 }
 \description{
-Empirical joint distribution
+XXXXXX
 }
 \details{
 The function will XXXX

@@ -1,6 +1,6 @@
 #' Joint distribution from true parameters for MRF
 #'
-#' Empirical joint distribution
+#' XXXX
 #'
 #' The function will XXXX
 #'
@@ -71,7 +71,7 @@ fit_empirical <- function(samples) {
 
 #' Joint distribution from MLE fit of parameters for full MRF loglikelihood
 #'
-#' Empirical joint distribution
+#' XXXXXX
 #'
 #' The function will XXXX
 #'
@@ -123,6 +123,56 @@ fit_mle <- function(graph.eq, samples, inference.method = infer.exact, num.iter=
   #print(mle.mdl.fit$par)
 
   potentials.info    <- make.gRbase.potentials(mle.mdl.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  return(joint.distribution)
+
+}
+
+
+#' Joint distribution from logistic regression fit of parameters
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_logistic <- function(graph.eq, samples) {
+
+  # Instantiate an empty model
+  logis.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+
+  # Make Delta-alpha matrix **** DELTA_ALPHA IS SLOW. IMPROVE
+  Delta.alpha.info <- delta.alpha(crf = logis.fit, samples = samples, printQ = F)
+  Delta.alpha      <- Delta.alpha.info$Delta.alpha
+  print("Done Delta-alpha. Sorry it's slow...")
+
+  # Response vector
+  y <- stack(data.frame(samples))[,1]
+  y[which(y==2)] <- 0
+
+  logis.glm.info <- glm(y ~ Delta.alpha -1, family=binomial(link="logit"))
+  #print(summary(logis.glm.info))
+
+  # Put coefs into mrf
+  logis.fit$par <- as.numeric(coef(logis.glm.info))
+  out.potsx     <- make.pots(parms = logis.fit$par, crf = logis.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(logis.fit, node.names = colnames(samples), state.nmes = c("1","2"))
   distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
   joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
 
