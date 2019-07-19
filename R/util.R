@@ -305,3 +305,41 @@ edges2adj <- function(edge.mat, plotQ=FALSE){
   return(adj.mat)
 
 }
+
+#' Form pair-wise formula from adjacency matrix.
+#' XXXX
+#'
+#' Assumes edges/nodes are numeric. Uses row and col numbers as node names.
+#'
+#' The function will XXXX
+#'
+#' @param edge.mat The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+adj2formula <- function(adj.mat){
+
+  # To be safe, just use row and col numbers as node names for now.
+
+  num.nodes  <- ncol(adj.mat)
+  node.idxs <- apply(as.matrix(1:num.nodes), 2, paste0, collapse = " + ")
+  #print(node.idxs)
+
+  adj.up.tri <- adj.mat*upper.tri(adj.mat)
+  edgs.idxs  <- which(adj.up.tri==1, arr.ind = T)
+
+  # Order edges by first node
+  edg.ord   <- order(edgs.idxs[,1])
+  edgs.idxs <- edgs.idxs[edg.ord,]
+
+  edgs.idxs <- apply(edgs.idxs, 1, paste0, collapse = ":")
+  edgs.idxs <- apply(as.matrix(edgs.idxs), 2, paste0, collapse = " + ")
+  #print(edgs.idxs)
+
+  graph.fomla <- as.formula(paste0("~", node.idxs," + ", edgs.idxs))
+
+  return(graph.fomla)
+
+}
+

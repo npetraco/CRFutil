@@ -4,9 +4,8 @@
 \alias{marginal.edge.bayes.beleifs.indep.indic}
 \title{marginal edge bayes independence indicators from beliefs}
 \usage{
-marginal.edge.bayes.beleifs.indep.indic(rescaled.posterior.potentials,
-  node.names = NULL, state.names = NULL, prob.level = 0.95,
-  printQ = FALSE)
+marginal.edge.bayes.beleifs.indep.indic(posterior.edge.belief.info,
+  prob.level = 0.95, printQ = FALSE)
 }
 \arguments{
 \item{XX}{XX}
