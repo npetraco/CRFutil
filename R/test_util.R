@@ -188,3 +188,73 @@ fit_logistic <- function(graph.eq, samples) {
   return(joint.distribution)
 
 }
+
+
+#' Joint distribution from logistic regression fit of parameters
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_bayes_logistic <- function(graph.eq, samples, iter=2000, thin=1, chains=4, control=NULL) {
+
+  # Instantiate an empty model
+  logis.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+
+  # Make Delta-alpha matrix **** DELTA_ALPHA IS SLOW. IMPROVE
+  print("Computing Delta-alpha")
+  Delta.alpha.info <- delta.alpha(crf = logis.fit, samples = samples, printQ = F)
+  Delta.alpha      <- Delta.alpha.info$Delta.alpha
+  print("Done Delta-alpha. Sorry it's slow...")
+
+  # Response vector
+  y <- stack(data.frame(samples))[,1]
+  y[which(y==2)] <- 0
+
+  #logis.glm.info <- glm(y ~ Delta.alpha -1, family=binomial(link="logit"))
+  loc.model.c <- stanc(file = "inst/logistic_model.stan", model_name = 'model')
+  print("Compiling model")
+  loc.sm      <- stan_model(stanc_ret = loc.model.c, verbose = T)
+
+  loc.dat <- list(
+    N=nrow(Delta.alpha),
+    K=ncol(Delta.alpha),
+    Delta_alpha=Delta.alpha,
+    y=y
+  )
+
+  print("Sampling")
+  loc.bfit <- sampling(loc.sm,
+                       data    = loc.dat,
+                       control = control,
+                       iter    = iter,
+                       thin    = thin,
+                       chains  = chains)
+  print("Done Sampling")
+
+  # Put coefs into mrf
+  logis.fit$par <- apply(extract(bfit,"theta")[[1]], 2, median)
+  out.potsx     <- make.pots(parms = logis.fit$par, crf = logis.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(logis.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  return(joint.distribution)
+
+
+}

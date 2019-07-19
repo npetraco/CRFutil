@@ -1,6 +1,8 @@
 library(igraph)
 library(gRbase)
 library(CRFutil)
+#library(rstanarm)
+library(rstan)
 
 # Make up a random graph
 g <- erdos.renyi.game(10, 0.4, typ="gnp")
@@ -56,13 +58,21 @@ mle.dist    <- mle.dist[reordr.idxs,]
 plot(mle.dist[,11], typ="h", xlab="configuration state#", ylab="MLE. Freq.")
 
 # logistic regression (glm)
-logis.dist    <-fit_logistic(gf, samps)
+logis.dist    <- fit_logistic(gf, samps)
 reordr.idxs   <- reorder_configs(emp.dist[,1:10], logis.dist[,1:10])
 logis.dist    <- logis.dist[reordr.idxs,]
 plot(logis.dist[,11], typ="h", xlab="configuration state#", ylab="Logistic Freq.")
 
-
 # Bayes logistic regression (Stan, loo, WAIC)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+blogis.dist <- fit_bayes_logistic(gf, samps)
+reordr.idxs <- reorder_configs(emp.dist[,1:10], blogis.dist[,1:10])
+blogis.dist <- blogis.dist[reordr.idxs,]
+plot(blogis.dist[,11], typ="h", xlab="configuration state#", ylab="Logistic Freq.")
+
+
+
 # log linear (loglin, glm)
 # Bayes log linear (Poisson, Stan, loo, WAIC)
 # Bayes zero-inflated (Stan, MODEL MATRIX?????)
@@ -73,3 +83,4 @@ plot(logis.dist[,11], typ="h", xlab="configuration state#", ylab="Logistic Freq.
 hist(mle.dist[,11] - tru.dist[,11])
 hist(emp.dist[,11] - tru.dist[,11])
 hist(logis.dist[,11] - tru.dist[,11])
+hist(blogis.dist[,11] - tru.dist[,11])
