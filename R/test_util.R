@@ -258,3 +258,68 @@ fit_bayes_logistic <- function(graph.eq, samples, iter=2000, thin=1, chains=4, c
 
 
 }
+
+
+#' Joint distribution from Poisson regression fit of parameters
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_loglinear <- function(graph.eq, samples) {
+
+  # Instantiate an empty model
+  loglin.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+
+  contingency.tab <- xtabs(~., data=samples)
+  loglin.info     <- loglm(graph.eq, data=contingency.tab); # loglm from MASS which uses loglin in base
+  loglin.coefs    <- coef(loglin.info)
+
+  # Disentangle the loglin coefs so we can feed them in as potentials to distribution.from.potentials
+  coef.clss <- sapply(1:length(loglin.coefs), function(xx){class(loglin.coefs[[xx]])})
+  node.idxs <- which(coef.clss == "numeric")[-1] # first is the intercept
+  edge.idxs <- which(coef.clss == "matrix")
+
+  # Edges of the coefs. They are probably in a different order than in the crf$edges
+  loglin.edges <- t(sapply(1:length(edge.idxs), function(xx){as.numeric(strsplit(x = names(loglin.coefs)[edge.idxs][xx], split = ".",fixed=T)[[1]])}))
+
+  # Rearrange edges to be in the crf model order
+  edg.rearr.idxs <- sapply(1:nrow(loglin.fit$edges), function(xx){row.match(x = loglin.fit$edges[xx,], loglin.edges)})
+  # print(cbind(
+  #   loglin.fit$edges,
+  #   loglin.edges[edg.rearr.idxs,],
+  #   names(loglin.coefs)[edge.idxs[edg.rearr.idxs] ],
+  #   edge.idxs[edg.rearr.idxs],
+  #   names(loglin.coefs)[edge.idxs]
+  # ))
+
+  # node potentials
+  node.potentials <- lapply(loglin.coefs[node.idxs], FUN=exp)
+  #print(node.potentials)
+
+  # edge potentials
+  edge.idxs[edg.rearr.idxs]
+
+
+  # distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  # joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+  #
+  # # Re-order columns to increasing order
+  # freq.idx    <- ncol(joint.distribution)
+  # node.nums   <- colnames(joint.distribution)[-freq.idx]
+  # node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  # node.nums   <- node.nums[-which(node.nums == "")]
+  # node.nums   <- as.numeric(node.nums)
+  # col.reorder <- order(node.nums)
+  # joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+  #
+  # return(joint.distribution)
+
+
+
+}
