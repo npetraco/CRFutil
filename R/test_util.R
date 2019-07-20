@@ -191,7 +191,7 @@ fit_logistic <- function(graph.eq, samples) {
 }
 
 
-#' Joint distribution from logistic regression fit of parameters
+#' Joint distribution from bayes logistic regression fit of parameters
 #'
 #' XXXX
 #'
@@ -350,5 +350,39 @@ fit_loglinear <- function(graph.eq, samples) {
   joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
 
   return(joint.distribution)
+
+}
+
+
+#' Joint distribution from bayes poisson regression fit of parameters
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_bayes_loglinear <- function(graph.eq, samples, iter=2000, thin=1, chains=4, control=NULL) {
+
+  # First construct model matrix. Try contr.sum version
+
+  # Convert sample config elements into factors. Required for model.matrix
+  loc.factor.mat <- apply(samples,2, as.character)
+  loc.factor.mat <- data.frame(loc.factor.mat)
+
+  # Change contrasts:
+  for(i in 1:ncol(loc.factor.mat)){
+    contrasts(loc.factor.mat[,i]) <- contr.sum(2)
+  }
+
+  #model.matrix requires non numeric terms, so add Xs in formula
+  loc.gfx <- adj2formula(ug(graph.eq, result = "matrix"), Xoption = T)
+  loc.M   <- model.matrix(loc.gfx, data = loc.factor.mat)
+
+  print(colnames(loc.M))
+  print(dim(loc.M))
 
 }

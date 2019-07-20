@@ -78,9 +78,16 @@ loglin.dist <- fit_loglinear(gf, samps)
 reordr.idxs <- reorder_configs(emp.dist[,1:10], loglin.dist[,1:10])
 loglin.dist <- loglin.dist[reordr.idxs,]
 plot(loglin.dist[,11], typ="h", xlab="configuration state#", ylab="Log-Linear Freq.")
-#????????????????????????
 
 # Bayes log linear (Poisson, Stan, loo, WAIC)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+bloglin.dist <- fit_bayes_loglinear(gf, samps)
+
+gf
+
+
+
 # Bayes zero-inflated (Stan, MODEL MATRIX?????)
 # Bayes neg-binomial
 # MLE zero-inflated, geg-binomial??

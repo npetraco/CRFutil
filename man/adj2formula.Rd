@@ -5,7 +5,7 @@
 \title{Form pair-wise formula from adjacency matrix.
 XXXX}
 \usage{
-adj2formula(adj.mat)
+adj2formula(adj.mat, Xoption = FALSE)
 }
 \arguments{
 \item{edge.mat}{The XX}

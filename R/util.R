@@ -334,12 +334,18 @@ edges2adj <- function(edge.mat, plotQ=FALSE){
 #'
 #'
 #' @export
-adj2formula <- function(adj.mat){
+adj2formula <- function(adj.mat, Xoption=FALSE){
 
-  # To be safe, just use row and col numbers as node names for now.
+  # To be safe, just use row and col numbers as node names for now. Add X if required by a
+  # formula interface
 
-  num.nodes  <- ncol(adj.mat)
-  node.idxs <- apply(as.matrix(1:num.nodes), 2, paste0, collapse = " + ")
+  num.nodes <- ncol(adj.mat)
+  if(Xoption == TRUE) {
+    node.idxs <- apply(as.matrix(paste0("X",1:num.nodes)), 2, paste0, collapse = " + ")
+  } else {
+    node.idxs <- apply(as.matrix(1:num.nodes), 2, paste0, collapse = " + ")
+  }
+
   #print(node.idxs)
 
   adj.up.tri <- adj.mat*upper.tri(adj.mat)
@@ -347,7 +353,14 @@ adj2formula <- function(adj.mat){
 
   # Order edges by first node
   edg.ord   <- order(edgs.idxs[,1])
-  edgs.idxs <- edgs.idxs[edg.ord,]
+  #edgs.idxs <- edgs.idxs[edg.ord,]
+
+  if(Xoption == TRUE){
+    edgs.idxs <- cbind(paste0("X",edgs.idxs[edg.ord,1]),paste0("X",edgs.idxs[edg.ord,2]))
+  } else {
+    edgs.idxs <- edgs.idxs[edg.ord,]
+  }
+  #print(edgs.idxs)
 
   edgs.idxs <- apply(edgs.idxs, 1, paste0, collapse = ":")
   edgs.idxs <- apply(as.matrix(edgs.idxs), 2, paste0, collapse = " + ")
