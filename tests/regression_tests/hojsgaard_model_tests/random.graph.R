@@ -74,36 +74,11 @@ plot(blogis.dist[,11], typ="h", xlab="configuration state#", ylab="Logistic Freq
 
 
 # log linear (loglin, glm)
-fit_loglinear(gf, samps)
-
-jct <- xtabs(~., data=samps)
-jloglin.info     <- loglm(gf, data=jct); # loglm from MASS which uses loglin in base
-jloglin.coefs    <- coef(jloglin.info)
-jcoef.clss <- sapply(1:length(jloglin.coefs), function(xx){class(jloglin.coefs[[xx]])})
-jnode.idxs <- which(jcoef.clss == "numeric")[-1]
-jedge.idxs <- which(jcoef.clss == "matrix")
-jedge.idxs
-
-names(jloglin.coefs)
-jloglin.edges <- t(sapply(1:length(jedge.idxs), function(xx){as.numeric(strsplit(x = names(jloglin.coefs)[jedge.idxs][xx], split = ".",fixed=T)[[1]])}))
-
-cbind(
-  names(jloglin.coefs)[jedge.idxs],
-  rmod$edges,
-  jloglin.edges
-  )
-
-jrearr.idxs <- sapply(1:nrow(rmod$edges), function(xx){row.match(x = rmod$edges[xx,], jloglin.edges)})
-cbind(
-  rmod$edges,
-  jloglin.edges[jrearr.idxs,]
-)
-jloglin.coefs[jnode.idxs]
-lapply(jloglin.coefs[jnode.idxs], exp)
-make.gRbase.potentials(crf = rmod,node.names = 1:10, state.nmes = c("1","2"))
-rmod$node.pot
-rmod$edge.pot
-
+loglin.dist <- fit_loglinear(gf, samps)
+reordr.idxs <- reorder_configs(emp.dist[,1:10], loglin.dist[,1:10])
+loglin.dist <- loglin.dist[reordr.idxs,]
+plot(loglin.dist[,11], typ="h", xlab="configuration state#", ylab="Log-Linear Freq.")
+#????????????????????????
 
 # Bayes log linear (Poisson, Stan, loo, WAIC)
 # Bayes zero-inflated (Stan, MODEL MATRIX?????)
@@ -111,7 +86,8 @@ rmod$edge.pot
 # MLE zero-inflated, geg-binomial??
 
 # Assess difference from the true distribution
-hist(mle.dist[,11] - tru.dist[,11])
-hist(emp.dist[,11] - tru.dist[,11])
-hist(logis.dist[,11] - tru.dist[,11])
+hist(mle.dist[,11]    - tru.dist[,11])
+hist(emp.dist[,11]    - tru.dist[,11])
+hist(logis.dist[,11]  - tru.dist[,11])
 hist(blogis.dist[,11] - tru.dist[,11])
+hist(loglin.dist[,11] - tru.dist[,11])

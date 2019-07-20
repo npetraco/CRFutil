@@ -157,6 +157,7 @@ fit_logistic <- function(graph.eq, samples) {
   logis.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
 
   # Make Delta-alpha matrix **** DELTA_ALPHA IS SLOW. IMPROVE
+  print("Computing Delta-alpha")
   Delta.alpha.info <- delta.alpha(crf = logis.fit, samples = samples, printQ = F)
   Delta.alpha      <- Delta.alpha.info$Delta.alpha
   print("Done Delta-alpha. Sorry it's slow...")
@@ -303,23 +304,51 @@ fit_loglinear <- function(graph.eq, samples) {
   #print(node.potentials)
 
   # edge potentials
-  edge.idxs[edg.rearr.idxs]
+  edge.potentials <- lapply(loglin.coefs[edge.idxs[edg.rearr.idxs]], FUN=exp)
 
+  # print(cbind(
+  #   loglin.fit$edges,
+  #   names(edge.potentials)
+  # ))
 
-  # distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
-  # joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
-  #
-  # # Re-order columns to increasing order
-  # freq.idx    <- ncol(joint.distribution)
-  # node.nums   <- colnames(joint.distribution)[-freq.idx]
-  # node.nums   <- unlist(strsplit(node.nums, split = "X"))
-  # node.nums   <- node.nums[-which(node.nums == "")]
-  # node.nums   <- as.numeric(node.nums)
-  # col.reorder <- order(node.nums)
-  # joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
-  #
-  # return(joint.distribution)
+  # put node potentials into mrf
+  count <- 1
+  for(i in 1:length(node.potentials)) {
+    tmp                     <- node.potentials[[i]]
+    tmp                     <- tmp/tmp[2]               # Shift to standard parameterization
+    loglin.fit$node.pot[i,] <- tmp                      # Stick into mrf
+    loglin.fit$par[count]   <- log(loglin.fit$node.pot[i,1]) # Stick into paramater vector
+    count <- count + 1
+  }
 
+  # put edge potentials into mrf
+  for(i in 1:length(edge.potentials)) {
+    tmp                      <- edge.potentials[[i]]
+    dimnames(tmp)            <- NULL                          # Strip dim names
+    tmp                      <- tmp/tmp[1,2]                  # Shift to standard parameterization
+    loglin.fit$edge.pot[[i]] <- tmp                           # Stick into mrf
+    loglin.fit$par[count]    <- log(loglin.fit$edge.pot[[i]][1,1]) # Stick into paramater vector
+    count <- count + 1
+  }
+  #print(loglin.fit$node.pot)
+  #print(loglin.fit$edge.pot)
+  #print(loglin.fit$par)
 
+  out.potsx     <- make.pots(parms = loglin.fit$par, crf = loglin.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(loglin.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  return(joint.distribution)
 
 }
