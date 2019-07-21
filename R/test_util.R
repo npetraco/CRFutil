@@ -239,7 +239,7 @@ fit_bayes_logistic <- function(graph.eq, samples, iter=2000, thin=1, chains=4, c
   print("Done Sampling")
 
   # Put coefs into mrf
-  logis.fit$par <- apply(extract(bfit,"theta")[[1]], 2, median)
+  logis.fit$par <- apply(extract(loc.bfit,"theta")[[1]], 2, median)
   out.potsx     <- make.pots(parms = logis.fit$par, crf = logis.fit, rescaleQ = T, replaceQ = T)
 
   potentials.info    <- make.gRbase.potentials(logis.fit, node.names = colnames(samples), state.nmes = c("1","2"))
@@ -314,19 +314,19 @@ fit_loglinear <- function(graph.eq, samples) {
   # put node potentials into mrf
   count <- 1
   for(i in 1:length(node.potentials)) {
-    tmp                     <- node.potentials[[i]]
-    tmp                     <- tmp/tmp[2]               # Shift to standard parameterization
-    loglin.fit$node.pot[i,] <- tmp                      # Stick into mrf
+    loc.tmp                 <- node.potentials[[i]]
+    loc.tmp                 <- loc.tmp/loc.tmp[2]               # Shift to standard parameterization
+    loglin.fit$node.pot[i,] <- loc.tmp                      # Stick into mrf
     loglin.fit$par[count]   <- log(loglin.fit$node.pot[i,1]) # Stick into paramater vector
     count <- count + 1
   }
 
   # put edge potentials into mrf
   for(i in 1:length(edge.potentials)) {
-    tmp                      <- edge.potentials[[i]]
-    dimnames(tmp)            <- NULL                          # Strip dim names
-    tmp                      <- tmp/tmp[1,2]                  # Shift to standard parameterization
-    loglin.fit$edge.pot[[i]] <- tmp                           # Stick into mrf
+    loc.tmp                  <- edge.potentials[[i]]
+    dimnames(loc.tmp)        <- NULL                          # Strip dim names
+    loc.tmp                  <- loc.tmp/loc.tmp[1,2]                  # Shift to standard parameterization
+    loglin.fit$edge.pot[[i]] <- loc.tmp                           # Stick into mrf
     loglin.fit$par[count]    <- log(loglin.fit$edge.pot[[i]][1,1]) # Stick into paramater vector
     count <- count + 1
   }
@@ -367,10 +367,17 @@ fit_loglinear <- function(graph.eq, samples) {
 #' @export
 fit_bayes_loglinear <- function(graph.eq, samples, iter=2000, thin=1, chains=4, control=NULL) {
 
-  # First construct model matrix. Try contr.sum version
+  # Get frequency-counts of the configuration states:
+  configs.and.counts <- as.data.frame(ftable(data.frame(samples)))
+  freq.idx           <- ncol(configs.and.counts)
+  loc.freqs          <- configs.and.counts[,freq.idx]
+  loc.configs        <- configs.and.counts[,-freq.idx]
 
-  # Convert sample config elements into factors. Required for model.matrix
-  loc.factor.mat <- apply(samples,2, as.character)
+  # Construct model matrix. Try contr.sum version
+
+  # Convert elements of all configs into factors. Required for model.matrix
+  print("Building model matrix")
+  loc.factor.mat <- apply(loc.configs,2, as.character)
   loc.factor.mat <- data.frame(loc.factor.mat)
 
   # Change contrasts:
@@ -382,7 +389,136 @@ fit_bayes_loglinear <- function(graph.eq, samples, iter=2000, thin=1, chains=4, 
   loc.gfx <- adj2formula(ug(graph.eq, result = "matrix"), Xoption = T)
   loc.M   <- model.matrix(loc.gfx, data = loc.factor.mat)
 
-  print(colnames(loc.M))
-  print(dim(loc.M))
+  # Drop the intercept column. We handle it in Stan
+  loc.M <- loc.M[,-1]
+  #print(colnames(loc.M))
+  #print(dim(loc.M))
+
+  # Get frequency-counts of the configuration states:
+  configs.and.counts <- as.data.frame(ftable(data.frame(samples)))
+  freq.idx           <- ncol(configs.and.counts)
+  loc.freqs          <- configs.and.counts[,freq.idx]
+
+  loc.dat <- list(
+    p = ncol(loc.M),
+    N = nrow(loc.M),
+    y = loc.freqs,
+    Mmodl = loc.M
+  )
+
+  print("Compiling model")
+  loc.model.c <- stanc(file = "inst/poisson_model.stan", model_name = 'model')
+  loc.sm      <- stan_model(stanc_ret = loc.model.c, verbose = T)
+
+  print("Sampling")
+  loc.bfit <- sampling(loc.sm,
+                       data    = loc.dat,
+                       control = control,
+                       iter    = iter,
+                       thin    = thin,
+                       chains  = chains)
+  print("Done Sampling")
+
+  # Instantiate an empty model
+  bloglin.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+
+  # Put coefs into mrf
+  bloglin.fit$par <- apply(extract(loc.bfit,"theta")[[1]], 2, median)
+  out.potsx       <- make.pots(parms = bloglin.fit$par, crf = bloglin.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(bloglin.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  return(joint.distribution)
+
+}
+
+
+#' Joint distribution from bayes poisson regression fit of parameters, use phi model matrix
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_bayes_loglinear2 <- function(graph.eq, samples, iter=2000, thin=1, chains=4, control=NULL, stan.model=NULL) {
+
+  # Get frequency-counts of the configuration states:
+  configs.and.counts <- as.data.frame(ftable(data.frame(samples)))
+  freq.idx           <- ncol(configs.and.counts)
+  loc.freqs          <- configs.and.counts[,freq.idx]
+  loc.configs        <- configs.and.counts[,-freq.idx]
+
+  # Instantiate an empty model
+  bloglin.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+  loc.f0      <- function(yy){ as.numeric(c((yy==1),(yy==2)))}
+
+  # Construct MRF model matrix.
+  print("Building model matrix")
+  loc.M  <- compute.model.matrix(
+    configs   = loc.configs,
+    edges.mat = bloglin.fit$edges,
+    node.par  = bloglin.fit$node.par,
+    edge.par  = bloglin.fit$edge.par,
+    ff        = loc.f0)
+  print("Done with model matrix. Sorry it's slow...")
+
+
+  loc.dat <- list(
+    p = ncol(loc.M),
+    N = nrow(loc.M),
+    y = loc.freqs,
+    Mmodl = loc.M
+  )
+
+  if(is.null(stan.model)) {
+    print("Compiling model")
+    loc.model.c <- stanc(file = "inst/poisson_model.stan", model_name = 'model')
+    loc.sm      <- stan_model(stanc_ret = loc.model.c, verbose = T)
+  } else {
+    loc.sm <- stan.model
+  }
+
+  print("Sampling")
+  loc.bfit <- sampling(loc.sm,
+                       data    = loc.dat,
+                       control = control,
+                       iter    = iter,
+                       thin    = thin,
+                       chains  = chains)
+  print("Done Sampling")
+
+  # Put coefs into mrf
+  bloglin.fit$par <- apply(extract(loc.bfit,"theta")[[1]], 2, median)
+  out.potsx       <- make.pots(parms = bloglin.fit$par, crf = bloglin.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(bloglin.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  return(joint.distribution)
 
 }

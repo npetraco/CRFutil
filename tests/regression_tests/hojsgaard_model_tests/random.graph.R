@@ -84,17 +84,31 @@ options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
 bloglin.dist <- fit_bayes_loglinear(gf, samps)
 
-gf
+reordr.idxs <- reorder_configs(emp.dist[,1:10], bloglin.dist[,1:10])
+bloglin.dist <- bloglin.dist[reordr.idxs,]
+plot(bloglin.dist[,11], typ="h", xlab="configuration state#", ylab="Bayes Loglin Freq.")
 
 
+# Bayes log linear2 (Poisson, Stan, loo, WAIC)
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+model.c       <- stanc(file = "inst/poisson_model.stan", model_name = 'model')
+sm            <- stan_model(stanc_ret = model.c, verbose = T)
+bloglin2.dist <- fit_bayes_loglinear2(gf, samps, stan.model = sm)
+
+reordr.idxs <- reorder_configs(emp.dist[,1:10], bloglin2.dist[,1:10])
+bloglin2.dist <- bloglin2.dist[reordr.idxs,]
+plot(bloglin2.dist[,11], typ="h", xlab="configuration state#", ylab="Bayes Loglin2 Freq.")
 
 # Bayes zero-inflated (Stan, MODEL MATRIX?????)
 # Bayes neg-binomial
 # MLE zero-inflated, geg-binomial??
 
 # Assess difference from the true distribution
-hist(mle.dist[,11]    - tru.dist[,11])
-hist(emp.dist[,11]    - tru.dist[,11])
-hist(logis.dist[,11]  - tru.dist[,11])
-hist(blogis.dist[,11] - tru.dist[,11])
-hist(loglin.dist[,11] - tru.dist[,11])
+hist(mle.dist[,11]      - tru.dist[,11])
+hist(emp.dist[,11]      - tru.dist[,11])
+hist(logis.dist[,11]    - tru.dist[,11])
+hist(blogis.dist[,11]   - tru.dist[,11])
+hist(loglin.dist[,11]   - tru.dist[,11])
+hist(bloglin.dist[,11]  - tru.dist[,11])
+hist(bloglin2.dist[,11] - tru.dist[,11])
