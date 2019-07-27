@@ -522,3 +522,99 @@ fit_bayes_loglinear2 <- function(graph.eq, samples, iter=2000, thin=1, chains=4,
   return(joint.distribution)
 
 }
+
+
+#' Joint distribution from bayes poisson regression fit of parameters, use phi model matrix
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_bayes_zip <- function(graph.eq, samples, iter=2000, thin=1, chains=4, control=NULL, stan.model=NULL) {
+
+  # Get frequency-counts of the configuration states:
+  configs.and.counts <- as.data.frame(ftable(data.frame(samples)))
+  freq.idx           <- ncol(configs.and.counts)
+  loc.freqs          <- configs.and.counts[,freq.idx]
+  loc.configs        <- configs.and.counts[,-freq.idx]
+
+  # Instantiate an empty model
+  bzipp.fit   <- make.empty.field(graph.eq = graph.eq, parameterization.typ = "standard")
+  loc.f0      <- function(yy){ as.numeric(c((yy==1),(yy==2)))}
+
+  # Construct MRF model matrix.
+  print("Building model matrix")
+  loc.M  <- compute.model.matrix(
+    configs   = loc.configs,
+    edges.mat = bzipp.fit$edges,
+    node.par  = bzipp.fit$node.par,
+    edge.par  = bzipp.fit$edge.par,
+    ff        = loc.f0)
+  print("Done with model matrix. Sorry it's slow...")
+
+
+  # loc.dat <- list(
+  #   K = ncol(loc.M),
+  #   N = nrow(loc.M),
+  #   y = loc.freqs,
+  #   x = loc.M
+  # )
+  loc.dat <- list(
+    M = ncol(loc.M),
+    N = nrow(loc.M),
+    y = loc.freqs,
+    X = loc.M,
+    s = rep(10,ncol(loc.M)),
+    s_theta = rep(10,ncol(loc.M))
+  )
+  #print(loc.dat)
+
+  if(is.null(stan.model)) {
+    print("Compiling model")
+    loc.model.c <- stanc(file = "inst/zero_inflated_poisson_take2.stan", model_name = 'model')
+    loc.sm      <- stan_model(stanc_ret = loc.model.c, verbose = T)
+  } else {
+    loc.sm <- stan.model
+  }
+
+  print("Sampling")
+  loc.bfit <- sampling(loc.sm,
+                       data    = loc.dat,
+                       control = control,
+                       iter    = iter,
+                       thin    = thin,
+                       chains  = chains)
+  print("Done Sampling")
+
+  # Put coefs into mrf
+  bzipp.fit$par   <- apply(extract(loc.bfit,"beta")[[1]], 2, median)
+  # print("got here")
+
+  out.potsx       <- make.pots(parms = bzipp.fit$par, crf = bzipp.fit, rescaleQ = T, replaceQ = T)
+
+  potentials.info    <- make.gRbase.potentials(bzipp.fit, node.names = colnames(samples), state.nmes = c("1","2"))
+  distribution.info  <- distribution.from.potentials(potentials.info$node.potentials, potentials.info$edge.potentials)
+  joint.distribution <- as.data.frame(as.table(distribution.info$state.probs))
+
+  # Re-order columns to increasing order
+  freq.idx    <- ncol(joint.distribution)
+  node.nums   <- colnames(joint.distribution)[-freq.idx]
+  node.nums   <- unlist(strsplit(node.nums, split = "X"))
+  node.nums   <- node.nums[-which(node.nums == "")]
+  node.nums   <- as.numeric(node.nums)
+  col.reorder <- order(node.nums)
+  joint.distribution <- joint.distribution[,c(col.reorder, freq.idx)]
+
+  outinfo <- list(
+    joint.distribution,
+    loc.bfit
+  )
+
+  return(loc.bfit)
+
+}

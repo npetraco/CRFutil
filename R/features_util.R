@@ -9,7 +9,7 @@
 #'
 #'
 #' @export
-phi.features <- function(config, edges.mat, node.par, edge.par, ff) {
+phi.features <- function(config, edges.mat, node.par, edge.par, ff) {  # **** NEEDS TO BE C
 
   num.nodes  <- length(config)
   num.edges  <- nrow(edges.mat)
@@ -242,7 +242,7 @@ phi.component <- function(config, i=NULL, j=NULL, node.par=NULL, edge.par=NULL, 
 #'
 #'
 #' @export
-compute.model.matrix <- function(configs, edges.mat, node.par, edge.par, ff) {
+compute.model.matrix <- function(configs, edges.mat, node.par, edge.par, ff) { # **** NEEDS TO BE C
 
   model.mat <- t(sapply(1:nrow(configs), function(xx){
     phi.features(config = configs[xx,], edges.mat, node.par, edge.par, ff)

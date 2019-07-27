@@ -9,7 +9,7 @@
 #'
 #'
 #' @export
-delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {
+delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {  # **** NEEDS TO BE C
 
   Da.mat        <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
   cond.alp.mat  <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))

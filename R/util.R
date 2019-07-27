@@ -48,6 +48,7 @@ logsumexp2 <- function(logv)
 
 }
 
+
 #' Code from prodlim library to match a row in a matrix
 #'
 #' XXXX
@@ -59,7 +60,7 @@ logsumexp2 <- function(logv)
 #'
 #'
 #' @export
-row.match <- function (x, table, nomatch = NA)
+row.match <- function (x, table, nomatch = NA)   # **********NEEDS TO BE C
 {
   if (class(table) == "matrix")
     table <- as.data.frame(table)
@@ -81,12 +82,36 @@ row.match <- function (x, table, nomatch = NA)
 #'
 #'
 #' @export
-reorder_configs <- function (ref,targ){
+reorder_configs <- function (ref,targ){  # NEEDS TO BE C
 
+  # FIX: When config is found take it out so next search is shorter.
   reord.idxs <- sapply(1:nrow(ref), function(xx){row.match(x = ref[xx,], table = targ)})
+
+  # reordr.idxs       <- array(NA, nrow(ref))
+  # targ.running      <- targ                 # This will shrink as reference configs are found
+  # targ.running.idxs <- 1:nrow(targ)         # To keep track of which congis found and removed
+  #
+  # for(i in 1:nrow(ref)){
+  #
+  #   print(i)
+  #
+  #   # Where is the ref in the current target table?:
+  #   tr.idx         <- row.match(x = ref[i,], table = targ.running)
+  #
+  #   # Translate this index to what it was in the original target table
+  #   reordr.idxs[i] <- targ.running.idxs[tr.idx]
+  #
+  #   # Take out of the running what was found:
+  #   targ.running      <- targ.running[-tr.idx, ]
+  #   targ.running.idxs <- targ.running.idxs[-tr.idx]
+  #
+  # }
+
   return(reord.idxs)
 
 }
+
+
 #' Convenience function to complement a node in a configuration.
 #' Assumes CRF 1,2 states
 #'

@@ -297,7 +297,7 @@ conditional.config.energy2 <- function(theta.par=NULL, config, condition.element
 #' @return The function will XX
 #'
 #' @export
-symbolic.conditional.energy <- function(config, condition.element.number, crf, ff, format="tex", printQ=FALSE){
+symbolic.conditional.energy <- function(config, condition.element.number, crf, ff, format="tex", printQ=FALSE){    # **** NEEDS TO BE C
 
   param.num.vec <- NULL
   cond.phi.vec  <- NULL
