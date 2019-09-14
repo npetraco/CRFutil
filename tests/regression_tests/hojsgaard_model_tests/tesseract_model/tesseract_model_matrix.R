@@ -27,10 +27,15 @@ node2nme <- data.frame(1:ncol(adj),colnames(adj))
 colnames(node2nme) <- c("node","name")
 node2nme
 
+gp <- ug(grphf, result = "graph")
+dev.off()
+iplot(gp)
+plot(gp)
+
 # Make up random potentials/sample and return a CRF-object
 f0 <- function(y){ as.numeric(c((y==1),(y==2)))}
 tess <- make.empty.field(adj.mat = adj, parameterization.typ = "standard", plotQ = T)
-#set.seed(87)
+set.seed(87)
 tess$par <- runif(tess$n.par,-1.5,1.5)
 tess$par # "true" theta
 out.pot <- make.pots(parms = tess$par,  crf = tess,  rescaleQ = F, replaceQ = T)
@@ -62,19 +67,8 @@ freqs
 hist(freqs)
 sum(freqs)
 
-# Can't handle sampling on whole model
-# Just try non-zero freques
-# nz.idxs <- which(freqs>0)
-# X.red <- X.all[nz.idxs,]
-# freqs.red <- freqs[nz.idxs]
-# dim(X.red)
-# length(freqs.red)
-# hist(freqs.red)
-# freqs.red
-# max(freqs.red)
-# X.red[which(freqs.red == max(freqs.red)), ]
 
-# Model Matrix with respect to graph ????
+# Model Matrix with respect to graph
 M <- compute.model.matrix(configs=X.all, edges.mat=tess$edges, node.par = tess$node.par, edge.par = tess$edge.par, ff = f0)
 #M
 dim(M)
@@ -101,9 +95,83 @@ dat <- list(
 )
 dat
 
-bfit <- sampling(sm, data = dat, iter=500, thin = 1, chains = 1)
-bfit
-# 500 mb for 250 samples
+bfit <- sampling(sm, data = dat, iter=2000, thin = 1, chains = 8)
+save(file = "bfit.RData",bfit)
+save(file = "M.RData",M)
+save(file = "samps.RData",samps)
+
+# Get the parameter estimtes:
+theta <- extract(bfit, "theta")[[1]]
+alpha <- extract(bfit, "alpha")[[1]]
+
+
+# Quick checks:
+th <- apply(theta, MARGIN = 2, FUN = median)
+length(th)
+length(tess$par)
+dim(M)
+Emat <- M%*%th
+dim(Emat)
+alpv <- median(alpha)*rep(1,nrow(M))
+length(alpv)
+logl <- alpv+Emat
+plot(exp(logl),typ="h")
+prs <- exp(logl)/nrow(samps)
+plot(prs,typ="h")
+sum(prs)
+
+# Extract the graph's partition function:
+#N    <- nrow(samps)
+N <- nrow(samps)
+logZ <- log(N) - alpha
+hist(logZ)
+
+
+
+# Now using the (medians) posterior theta, estimate partition
+# function with Belief propegation
+llm2     <- make.empty.field(adj.mat = adj, parameterization.typ = "standard")
+llm2$par <- apply(theta, MARGIN = 2, FUN = median)
+out.pot  <- make.pots(parms = llm2$par,  crf = llm2,  rescaleQ = F, replaceQ = T)
+
+pot.info.llm2.model     <- make.gRbase.potentials(llm2, node.names = c("X.1", "X.2", "X.3","X.4",
+                                                                       "X.5", "X.6", "X.7","X.8",
+                                                                       "X.9", "X.10", "X.11","X.12",
+                                                                       "X.13", "X.14", "X.15","X.16"), state.nmes = c("1","2"))
+gR.dist.info.llm2.model <- distribution.from.potentials(pot.info.llm2.model$node.potentials, pot.info.llm2.model$edge.potentials)
+logZ.llm2.model         <- gR.dist.info.llm2.model$logZ
+
+logZ.llm2.model # log partition function from BP with a theta (from regression)
+mean(logZ)      # log partition function direct from regression
+median(logZ)
+
+joint.dist.info.llm2.model <- as.data.frame(as.table(gR.dist.info.llm2.model$state.probs))
+dim(joint.dist.info.llm2.model)
+prs.bp <- joint.dist.info.llm2.model[,17]
+sum(prs.bp)
+plot(prs.bp,typ="h")
+# Order configs!!!!
+
+
+joint.dist.info.llm2.model <- joint.dist.info.llm2.model[,c(2,3,1,4)]
+joint.dist.info.llm2.model[,4] <- joint.dist.info.llm2.model[,4] * 100
+joint.dist.info.llm2.model
+
+
+# OLD BELOW:
+
+# Can't handle sampling on whole model
+# Just try non-zero freques
+# nz.idxs <- which(freqs>0)
+# X.red <- X.all[nz.idxs,]
+# freqs.red <- freqs[nz.idxs]
+# dim(X.red)
+# length(freqs.red)
+# hist(freqs.red)
+# freqs.red
+# max(freqs.red)
+# X.red[which(freqs.red == max(freqs.red)), ]
+
 
 fit.smy <- summary(bfit)$summary
 rhats <- fit.smy[,"Rhat"]
