@@ -26,7 +26,8 @@ colnames(node2nme) <- c("node","name")
 node2nme
 
 # Load reference sample data
-setwd("/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
+#setwd("/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
+setwd("tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
 load(file = "samps.RData")
 
 # Regenerate the "true" model
@@ -94,7 +95,7 @@ head(data.frame(joint.config.idxs[joint.configs.row.order], joint.configs[joint.
 
 config.prs <- joint.dist.info.fit.model.rearr[,ncol(joint.dist.info.fit.model.rearr)]
 plot(config.prs, typ="h")
-plot(config.prs[joint.configs.row.order], typ="h") # Re-order
+plot(config.prs[joint.configs.row.order], typ="h", ylim=c(0,0.006)) # Re-order
 
 joint.dist.info.ordered <- data.frame(joint.config.idxs[joint.configs.row.order], joint.configs[joint.configs.row.order,], config.prs[joint.configs.row.order])
 colnames(joint.dist.info.ordered) <- c("config.idx", node.names,"config.Pr")

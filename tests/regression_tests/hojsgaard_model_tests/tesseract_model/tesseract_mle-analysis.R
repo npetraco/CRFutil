@@ -26,7 +26,8 @@ node2nme
 
 
 # Load essentials and results from Stan Poisson fit
-setwd("/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
+#setwd("/home/npetraco/codes/R/CRFutil/tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
+setwd("tests/regression_tests/hojsgaard_model_tests/tesseract_model/")
 load(file = "samps.RData")
 
 
