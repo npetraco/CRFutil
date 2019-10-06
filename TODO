@@ -1,0 +1,9 @@
+1. JAGS poisson
+
+2. loo work flow
+    MLE analogue??
+
+3. Simulator
+    study drop out rates for individual categories
+    are dropouts correlated?
+    do drop out rates vary, Think about bout Poisson lambda and Bernoulli p models. Try both Bayes and Freq ests
