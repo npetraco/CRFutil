@@ -7,3 +7,12 @@
     study drop out rates for individual categories
     are dropouts correlated?
     do drop out rates vary, Think about bout Poisson lambda and Bernoulli p models. Try both Bayes and Freq ests
+
+
+
+Hamiltonian matrix for graph? (records energy "parts": node energies (diagonal)
+ and between pair node energies conected by an edge (off diagonal elements))
+Density matrix? -Always diagonal?
+vonNeumann entropy
+correlation functions?
+

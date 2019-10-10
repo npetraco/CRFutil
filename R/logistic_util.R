@@ -17,7 +17,7 @@ delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {  # ****
 
   count <- 1
   for(i in 1:crf$n.nodes) {
-    for(n in 1:nrow(samps)) {
+    for(n in 1:nrow(samples)) {
 
       X.cfg     <- samples[n,]
       Xc.cfg    <- X.cfg
