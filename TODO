@@ -16,3 +16,7 @@ Density matrix? -Always diagonal?
 vonNeumann entropy
 correlation functions?
 
+https://github.com/andrewcparnell/jags_examples/blob/master/R%20Code/jags_logistic_regression.R
+https://darrenjw.wordpress.com/2012/11/20/getting-started-with-bayesian-variable-selection-using-jags-and-rjags/
+
+https://mc-stan.org/users/documentation/case-studies/rstan_workflow.html
