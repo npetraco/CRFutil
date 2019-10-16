@@ -51,13 +51,15 @@ y
 K <- ncol(Da.mat)
 N <- nrow(Da.mat)
 
-#model_data = list(TT = N, y = y, x = Da.mat, K = 1, pp=ncol(Da.mat)) # v1a
-#model_data = list(TT = N, y = y, x = Da.mat, pp=ncol(Da.mat)) # v1b
-model_data = list(N = N, y = y, x = Da.mat, K=ncol(Da.mat)) # v1b
+model_data <- list(
+  N = N,
+  y = y,
+  x = Da.mat,
+  K=ncol(Da.mat))
 model_data
 
-fpth <- "inst/logistic_model_v1c.bug"
-model_parameters =  c("theta")
+fpth <- "inst/logistic_model.bug"
+model_parameters <- c("theta")
 
 # Run the model
 model_run = jags(data = model_data, #inits = init,
@@ -67,7 +69,6 @@ model_run = jags(data = model_data, #inits = init,
                  n.iter = 10000,
                  n.burnin = 1000,
                  n.thin = 10)
-#
 
 # Check the output - are the true values inside the 95% CI?
 # Also look at the R-hat values - they need to be close to 1 if convergence has been achieved
@@ -76,9 +77,7 @@ print(model_run)
 traceplot(model_run)
 
 # Create a plot of the posterior mean regression line
-post = print(model_run)
-#beta_1_mean = post$mean$beta_1
-#beta_2_mean = post$mean$beta_2
+post    <- print(model_run)
 fit$par <- post$mean$theta
 
 out.pot2 <- make.pots(parms = fit$par,  crf = fit,  rescaleQ = T, replaceQ = T)

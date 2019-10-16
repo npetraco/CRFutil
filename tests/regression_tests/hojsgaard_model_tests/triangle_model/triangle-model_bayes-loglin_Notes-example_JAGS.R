@@ -26,48 +26,48 @@ set.seed(1)
 samps <- sample.exact(knm, num.samps)
 mrf.sample.plot(samps)
 
-# Prepare a logistic model to fit. This time we will use JAGS instead of Stan
-fit <- make.empty.field(adj.mat = adj, parameterization.typ = "standard", plotQ = T)
+# Make state count freq table from samples and compute frequencies of all possible state configs.
+# State configs not observed will have 0 freq
+ftab  <- data.frame(ftable(data.frame(samps)))
+X.all <- ftab[,1:ncol(samps)]
+X.all <- sapply(1:ncol(X.all), function(xx){as.numeric(X.all[,xx])}) # Needed for C routines
+freqs <- ftab[,ncol(ftab)]
 
-# Here we remove the extra index put in by CRF using the C function. We need to do this for the the RcppComponent functions
-theta.pars   <- fix_node_and_edge_par(node_par = fit$node.par, edge_par = fit$edge.par)
-fit$edge.par # Should we replace with what's in theta.pars??
+# Model Matrix with respect to graph
+theta.pars     <- fix_node_and_edge_par(node_par = knm$node.par, edge_par = knm$edge.par) # Needed for C routines
+knm$node.par.c <- theta.pars$node_par
+knm$edge.par.c <- theta.pars$edge_par
+M              <- compute_model_matrix(
+  configs       = X.all,
+  edge_mat      = knm$edges,
+  node_par      = knm$node.par.c,
+  edge_par      = knm$edge.par.c,
+  num_params_in = knm$n.par)
 
-Da.mat <- delta_alpha(
-  samples       = as.matrix(samps),
-  node_par      = theta.pars$node_par,
-  edge_par      = theta.pars$edge_par,
-  edge_mat      = fit$edges,
-  adj_nodes     = fit$adj.nodes,
-  num_params_in = 0)
+# Check C vs R model matrix routines:
+X.all2 <- ftab[,1:ncol(samps)]
+M2     <- compute.model.matrix(configs=X.all2, edges.mat=knm$edges, node.par = knm$node.par, edge.par = knm$edge.par, ff = f0)
+M-M2
 
-Da.mat
+dat <- list(
+  p = ncol(M),
+  N = nrow(M),
+  y = freqs,
+  Mmodl = M
+)
+dat
 
-# Stack the node responses into one long binary vector:
-y <-c(samps[,1], samps[,2], samps[,3])
-y[which(y==2)] <- 0
-y
-
-K <- ncol(Da.mat)
-N <- nrow(Da.mat)
-
-#model_data = list(TT = N, y = y, x = Da.mat, K = 1, pp=ncol(Da.mat)) # v1a
-#model_data = list(TT = N, y = y, x = Da.mat, pp=ncol(Da.mat)) # v1b
-model_data = list(N = N, y = y, x = Da.mat, K=ncol(Da.mat)) # v1b
-model_data
-
-fpth <- "inst/logistic_model_v1c.bug"
-model_parameters =  c("theta")
+fpth <- "inst/poisson_model.bug"
+model_parameters <- c("alpha","theta")
 
 # Run the model
-model_run = jags(data = model_data, #inits = init,
+model_run = jags(data = dat, #inits = init,
                  parameters.to.save = model_parameters,
                  model.file = fpth,
                  n.chains = 4,
-                 n.iter = 10000,
-                 n.burnin = 1000,
-                 n.thin = 10)
-#
+                 n.iter = 50000,
+                 n.burnin = 5000,
+                 n.thin = 50)
 
 # Check the output - are the true values inside the 95% CI?
 # Also look at the R-hat values - they need to be close to 1 if convergence has been achieved
@@ -75,10 +75,14 @@ plot(model_run)
 print(model_run)
 traceplot(model_run)
 
-# Create a plot of the posterior mean regression line
-post = print(model_run)
-#beta_1_mean = post$mean$beta_1
-#beta_2_mean = post$mean$beta_2
+# Prepare a fit to obtain joint dist. This time we will use JAGS instead of Stan
+fit <- make.empty.field(adj.mat = adj, parameterization.typ = "standard", plotQ = T)
+
+# Here we remove the extra index put in by CRF using the C function. We need to do this for the the RcppComponent functions
+#theta.pars   <- fix_node_and_edge_par(node_par = fit$node.par, edge_par = fit$edge.par)
+#fit$edge.par # Should we replace with what's in theta.pars??
+
+post    <- print(model_run)
 fit$par <- post$mean$theta
 
 out.pot2 <- make.pots(parms = fit$par,  crf = fit,  rescaleQ = T, replaceQ = T)
@@ -121,3 +125,4 @@ cbind(
   joint.dist.info.true.model,
   joint.dist.info
 )
+
