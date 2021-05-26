@@ -20,4 +20,4 @@ library(Rgraphviz)
 plot(pwfg2, nodeAttrs=makeNodeAttrs(pwfg2, fontsize=50))
 
 tv<-c("A","B","C")
-tv[c(3,2,1,3,1,1,3,2)]
+tv[c(3,2,1,3,1,1,3,1)]
