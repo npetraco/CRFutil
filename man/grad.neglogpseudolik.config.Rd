@@ -4,8 +4,13 @@
 \alias{grad.neglogpseudolik.config}
 \title{Utility function to SEPARATELY compute gradient negative log pseudo-likelihood.}
 \usage{
-grad.neglogpseudolik.config(param = NULL, config, crf, ff,
-  cond.en.form = "feature.function")
+grad.neglogpseudolik.config(
+  param = NULL,
+  config,
+  crf,
+  ff,
+  cond.en.form = "feature.function"
+)
 }
 \arguments{
 \item{XX}{The XX}

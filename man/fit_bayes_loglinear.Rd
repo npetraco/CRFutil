@@ -4,8 +4,14 @@
 \alias{fit_bayes_loglinear}
 \title{Joint distribution from bayes poisson regression fit of parameters}
 \usage{
-fit_bayes_loglinear(graph.eq, samples, iter = 2000, thin = 1,
-  chains = 4, control = NULL)
+fit_bayes_loglinear(
+  graph.eq,
+  samples,
+  iter = 2000,
+  thin = 1,
+  chains = 4,
+  control = NULL
+)
 }
 \arguments{
 \item{XX}{The XX}

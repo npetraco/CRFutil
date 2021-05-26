@@ -4,8 +4,12 @@
 \alias{marginal.edge.bels.bayes}
 \title{Marginal edge beliefs from bayes posterior sample}
 \usage{
-marginal.edge.bels.bayes(post.edge.param.samp, node.names = NULL,
-  state.names = NULL, printQ = FALSE)
+marginal.edge.bels.bayes(
+  post.edge.param.samp,
+  node.names = NULL,
+  state.names = NULL,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

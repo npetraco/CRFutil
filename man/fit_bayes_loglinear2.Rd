@@ -4,8 +4,15 @@
 \alias{fit_bayes_loglinear2}
 \title{Joint distribution from bayes poisson regression fit of parameters, use phi model matrix}
 \usage{
-fit_bayes_loglinear2(graph.eq, samples, iter = 2000, thin = 1,
-  chains = 4, control = NULL, stan.model = NULL)
+fit_bayes_loglinear2(
+  graph.eq,
+  samples,
+  iter = 2000,
+  thin = 1,
+  chains = 4,
+  control = NULL,
+  stan.model = NULL
+)
 }
 \arguments{
 \item{XX}{The XX}

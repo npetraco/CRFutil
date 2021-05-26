@@ -4,8 +4,7 @@
 \alias{sim.field.random.simplest}
 \title{Simulate an MRF with random unary (node) and pair (edge) potentials.}
 \usage{
-sim.field.random.simplest(adjacentcy.matrix, num.states, num.sims,
-  seed = NULL)
+sim.field.random.simplest(adjacentcy.matrix, num.states, num.sims, seed = NULL)
 }
 \arguments{
 \item{XX}{The XX}

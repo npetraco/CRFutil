@@ -4,9 +4,13 @@
 \alias{marginal.edge.bayes.potentials.indep.indic}
 \title{marginal edge bayes independence indicators}
 \usage{
-marginal.edge.bayes.potentials.indep.indic(rescaled.posterior.potentials,
-  node.names = NULL, state.names = NULL, prob.level = 0.95,
-  printQ = FALSE)
+marginal.edge.bayes.potentials.indep.indic(
+  rescaled.posterior.potentials,
+  node.names = NULL,
+  state.names = NULL,
+  prob.level = 0.95,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{rescaled.posterior.potentials}{Rescaled posterior potentials from marginal.edge.bayes.loglin.}

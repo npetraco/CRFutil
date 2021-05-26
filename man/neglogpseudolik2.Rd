@@ -4,9 +4,15 @@
 \alias{neglogpseudolik2}
 \title{Sample negative log pseudo-likelihood}
 \usage{
-neglogpseudolik2(param, crf, samples,
-  conditional.energy.function.type = "feature.function", ff,
-  gradQ = FALSE, update.crfQ = TRUE)
+neglogpseudolik2(
+  param,
+  crf,
+  samples,
+  conditional.energy.function.type = "feature.function",
+  ff,
+  gradQ = FALSE,
+  update.crfQ = TRUE
+)
 }
 \arguments{
 \item{XX}{The XX}

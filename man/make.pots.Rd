@@ -4,8 +4,14 @@
 \alias{make.pots}
 \title{Make potentials from input parameter vector.}
 \usage{
-make.pots(parms, crf, rescaleQ = FALSE, replaceQ = FALSE,
-  format = "regular", printQ = FALSE)
+make.pots(
+  parms,
+  crf,
+  rescaleQ = FALSE,
+  replaceQ = FALSE,
+  format = "regular",
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

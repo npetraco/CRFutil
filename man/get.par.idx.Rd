@@ -5,8 +5,16 @@
 \title{Utility function to convert node and edge indices to the
 parameter index they are associated with.}
 \usage{
-get.par.idx(config, i = NULL, j = NULL, node.par = NULL,
-  edge.par = NULL, edge.mat = NULL, ff, printQ = FALSE)
+get.par.idx(
+  config,
+  i = NULL,
+  j = NULL,
+  node.par = NULL,
+  edge.par = NULL,
+  edge.mat = NULL,
+  ff,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

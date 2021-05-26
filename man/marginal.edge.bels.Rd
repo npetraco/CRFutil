@@ -4,8 +4,12 @@
 \alias{marginal.edge.bels}
 \title{Marginal edge beliefs from parameter point estimates.}
 \usage{
-marginal.edge.bels(edge.mrf.obj, node.names = NULL, state.names = NULL,
-  printQ = FALSE)
+marginal.edge.bels(
+  edge.mrf.obj,
+  node.names = NULL,
+  state.names = NULL,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

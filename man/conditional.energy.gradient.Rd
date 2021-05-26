@@ -4,8 +4,13 @@
 \alias{conditional.energy.gradient}
 \title{Gradient of a condtional energy for a node and a configuration}
 \usage{
-conditional.energy.gradient(config, condition.element.number, crf, ff,
-  printQ = FALSE)
+conditional.energy.gradient(
+  config,
+  condition.element.number,
+  crf,
+  ff,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XXXX}{XXXX}

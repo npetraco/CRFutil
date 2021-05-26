@@ -4,8 +4,12 @@
 \alias{marginal.edge.bayes.bels.plot}
 \title{marginal edge bayes posterior belief plots}
 \usage{
-marginal.edge.bayes.bels.plot(posterior.edge.belief.info, type = "X1|X2",
-  ymax = 2500, prob.level = 0.95)
+marginal.edge.bayes.bels.plot(
+  posterior.edge.belief.info,
+  type = "X1|X2",
+  ymax = 2500,
+  prob.level = 0.95
+)
 }
 \arguments{
 \item{posterior.edge.belief.info}{Output from marginal.edge.bels.bayes()}

@@ -4,8 +4,14 @@
 \alias{symbolic.conditional.energy}
 \title{Spit out latex expression for E(Xi|X/Xi) given i, X and a crf. Basically used feature formulation for conditional energy.}
 \usage{
-symbolic.conditional.energy(config, condition.element.number, crf, ff,
-  format = "tex", printQ = FALSE)
+symbolic.conditional.energy(
+  config,
+  condition.element.number,
+  crf,
+  ff,
+  format = "tex",
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XXXX}{XXXX}

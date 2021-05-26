@@ -4,8 +4,12 @@
 \alias{sim.ising.field.random}
 \title{Simulate an MRF with random unary (node) and pair (edge) potentials.}
 \usage{
-sim.ising.field.random(adjacentcy.matrix, parameterization.type = "a",
-  num.sims, seed = NULL)
+sim.ising.field.random(
+  adjacentcy.matrix,
+  parameterization.type = "a",
+  num.sims,
+  seed = NULL
+)
 }
 \arguments{
 \item{XX}{The XX}

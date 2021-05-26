@@ -4,8 +4,15 @@
 \alias{phi.component}
 \title{Utility function to compute phi component CONDITIONED for specific node or edge}
 \usage{
-phi.component(config, i = NULL, j = NULL, node.par = NULL,
-  edge.par = NULL, edge.mat = NULL, ff)
+phi.component(
+  config,
+  i = NULL,
+  j = NULL,
+  node.par = NULL,
+  edge.par = NULL,
+  edge.mat = NULL,
+  ff
+)
 }
 \arguments{
 \item{XX}{The XX}

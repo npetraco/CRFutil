@@ -11,11 +11,9 @@ config.energy(config, edges.mat, one.lgp, two.lgp, ff)
 
 \item{edges.mat}{Matrix of connected node edges}
 
-\item{two.lgp}{Log node potentials (one-body energies)}
+\item{two.lgp}{Log edge potentials (two-body energies)}
 
 \item{ff}{The feature function}
-
-\item{two.lgp}{Log edge potentials (two-body energies)}
 }
 \value{
 The function will XX

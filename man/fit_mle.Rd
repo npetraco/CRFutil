@@ -4,8 +4,13 @@
 \alias{fit_mle}
 \title{Joint distribution from MLE fit of parameters for full MRF loglikelihood}
 \usage{
-fit_mle(graph.eq, samples, inference.method = infer.exact,
-  num.iter = 10, mag.grad.tol = 0.001)
+fit_mle(
+  graph.eq,
+  samples,
+  inference.method = infer.exact,
+  num.iter = 10,
+  mag.grad.tol = 0.001
+)
 }
 \arguments{
 \item{XX}{The XX}

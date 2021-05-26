@@ -6,8 +6,12 @@
 Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
 The function will XXXX}
 \usage{
-pseudolikelihoods.from.energies2(state.space, crf,
-  cond.en.form = "feature", ff)
+pseudolikelihoods.from.energies2(
+  state.space,
+  crf,
+  cond.en.form = "feature",
+  ff
+)
 }
 \arguments{
 \item{XX}{The XX}

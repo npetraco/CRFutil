@@ -5,8 +5,14 @@
 \title{Energy function for energy of a conditional configuration of states E(Xi | X/Xi).
 Uses the feature formulation.}
 \usage{
-conditional.config.energy2(theta.par = NULL, config,
-  condition.element.number, crf, ff, printQ = FALSE)
+conditional.config.energy2(
+  theta.par = NULL,
+  config,
+  condition.element.number,
+  crf,
+  ff,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{config}{A node configuration (state) vector}
@@ -18,8 +24,6 @@ conditional.config.energy2(theta.par = NULL, config,
 \item{adj.node.list}{XXXX}
 
 \item{edges.mat}{Matrix of connected node edges}
-
-\item{two.lgp}{Log node potentials (one-body energies)}
 
 \item{two.lgp}{Log edge potentials (two-body energies)}
 }

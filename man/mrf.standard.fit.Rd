@@ -4,8 +4,13 @@
 \alias{mrf.standard.fit}
 \title{Fit a MRF paramiterized in the standard way}
 \usage{
-mrf.standard.fit(samples, net.graph.formula, num.states, mrf.nll.func,
-  infer.func)
+mrf.standard.fit(
+  samples,
+  net.graph.formula,
+  num.states,
+  mrf.nll.func,
+  infer.func
+)
 }
 \arguments{
 \item{XX}{The XX}

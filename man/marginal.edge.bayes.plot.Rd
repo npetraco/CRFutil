@@ -4,8 +4,11 @@
 \alias{marginal.edge.bayes.plot}
 \title{marginal edge plot for bayes posterior parameter output}
 \usage{
-marginal.edge.bayes.plot(posterior.edge.pot.mat, type = "logpot",
-  prob.level = 0.95)
+marginal.edge.bayes.plot(
+  posterior.edge.pot.mat,
+  type = "logpot",
+  prob.level = 0.95
+)
 }
 \arguments{
 \item{posterior.edge.pot.mat}{Posterior potentials from marginal.edge.bayes.loglin. Usually rescaled.posterior.pots portion.}

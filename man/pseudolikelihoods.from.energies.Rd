@@ -6,8 +6,15 @@
 Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
 The function will XXXX}
 \usage{
-pseudolikelihoods.from.energies(state.space, adjacent.nodes, edges.mat,
-  node.energies, edge.energies, conditional.energy.func, ff)
+pseudolikelihoods.from.energies(
+  state.space,
+  adjacent.nodes,
+  edges.mat,
+  node.energies,
+  edge.energies,
+  conditional.energy.func,
+  ff
+)
 }
 \arguments{
 \item{XX}{The XX}

@@ -4,8 +4,14 @@
 \alias{neglogpseudolik.config}
 \title{Utility function to compute negative log pseudo-likelihood. Can also request the gradient.}
 \usage{
-neglogpseudolik.config(param = NULL, config, crf, ff,
-  cond.en.form = "feature.function", gradQ = FALSE)
+neglogpseudolik.config(
+  param = NULL,
+  config,
+  crf,
+  ff,
+  cond.en.form = "feature.function",
+  gradQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

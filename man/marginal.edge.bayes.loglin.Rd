@@ -4,9 +4,14 @@
 \alias{marginal.edge.bayes.loglin}
 \title{marginal edge fit using vanalla baysian poisson regression with rstanarm}
 \usage{
-marginal.edge.bayes.loglin(edge.samples, prior.sd = NULL,
-  prior_intercept.sd = NULL, stan.iter = NULL, prob.level = 0.95,
-  printQ = FALSE)
+marginal.edge.bayes.loglin(
+  edge.samples,
+  prior.sd = NULL,
+  prior_intercept.sd = NULL,
+  stan.iter = NULL,
+  prob.level = 0.95,
+  printQ = FALSE
+)
 }
 \arguments{
 \item{XX}{The XX}

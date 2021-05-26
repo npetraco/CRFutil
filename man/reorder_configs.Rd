@@ -2,7 +2,7 @@
 % Please edit documentation in R/util.R
 \name{reorder_configs}
 \alias{reorder_configs}
-\title{Spits out premutation to re-order congifs in targ with respect to ref}
+\title{Spits out permutation to re-order configs in targ with respect to ref}
 \usage{
 reorder_configs(ref, targ)
 }
