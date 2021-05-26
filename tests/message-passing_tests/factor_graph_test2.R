@@ -9,6 +9,7 @@ pwfg <- mrf2pwfg(grphf, plotQ=T)
 # Schedules:
 schs <- get.root.paths(pwfg, root.node = 5, serial.schedsQ = T)
 schs$forwrd
+schs$backward
 
 # Make up some potentials for testing:
 adj <- ug(grphf, result="matrix")
