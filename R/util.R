@@ -71,7 +71,7 @@ row.match <- function (x, table, nomatch = NA)   # **********NEEDS TO BE C
   match(cx, ct, nomatch = nomatch)
 }
 
-#' Spits out premutation to re-order congifs in targ with respect to ref
+#' Spits out permutation to re-order configs in targ with respect to ref
 #'
 #' XXXX
 #'

@@ -343,8 +343,8 @@ marginal.edge.bels <- function(edge.mrf.obj, node.names = NULL, state.names = NU
   bel.x1   <- infered.edge.bels$node.beliefs[[1]]
   bel.x2   <- infered.edge.bels$node.beliefs[[2]]
 
-  bel.x1gx2 <- ar_div(bel.x1x2, bel.x2)
-  bel.x2gx1 <- ar_div(bel.x1x2, bel.x1)
+  bel.x1gx2 <- tabDiv(bel.x1x2, bel.x2)
+  bel.x2gx1 <- tabDiv(bel.x1x2, bel.x1)
 
   if(printQ==TRUE){
 
@@ -560,10 +560,10 @@ marginal.edge.emp.pr <- function(edge.samples, printQ=FALSE){
   # Compute empirical marginal edge probabilities: Pr(X1), Pr(X2), Pr(X1,X2), Pr(X1|X2), Pr(X2|X1)
   nnmes    <- colnames(edge.samps.loc)
   pr.x1x2  <- X.edge.contingency/sum(X.edge.contingency)
-  pr.x1    <- ar_marg(pr.x1x2, marg = nnmes[1])
-  pr.x2    <- ar_marg(pr.x1x2, marg = nnmes[2])
-  pr.x1gx2 <- ar_div(pr.x1x2, pr.x2)
-  pr.x2gx1 <- ar_div(pr.x1x2, pr.x1)
+  pr.x1    <- tabMarg(pr.x1x2, marg = nnmes[1])
+  pr.x2    <- tabMarg(pr.x1x2, marg = nnmes[2])
+  pr.x1gx2 <- tabDiv(pr.x1x2, pr.x2)
+  pr.x2gx1 <- tabDiv(pr.x1x2, pr.x1)
 
   if(printQ==TRUE){
 
