@@ -171,7 +171,7 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
   # Node names may not be numbers. For this function, we really need the order-ability of numbers.
   # So if node names are not numbers, assign each name a number
   node.names          <- und.gph@nodes
-  node.names.numericQ <- !(NA %in% as.numeric(node.names))
+  node.names.numericQ <- !(NA %in% as.numeric(node.names)) # This will throw a warning is names are not numeric. Just ignore it.
   orig.node.names     <- node.names
   if(node.names.numericQ == FALSE){
 
@@ -236,11 +236,10 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
     edgmat2C
   )
 
-
   fg <- graph_from_data_frame(data.frame(edgmat2), directed = FALSE)
   # In case orig node names were characters
   fgC <- graph_from_data_frame(data.frame(edgmat2C), directed = FALSE)
-  print(cbind(edgmat2, edgmat2C))
+  #print(cbind(edgmat2, edgmat2C)) # Compare node number names to input node character names. Look ok?
 
   nde.nms     <- V(fg)$name
   V(fg)$type  <- sapply(1:length(nde.nms), function(xx){length(strsplit(nde.nms[xx], split = "f")[[1]])})

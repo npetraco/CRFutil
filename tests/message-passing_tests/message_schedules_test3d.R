@@ -1,4 +1,5 @@
 library(CRFutil)
+library(Rgraphviz)
 
 # Model:
 #grf <- ~1:2 # Node names must be numbers for now.... FIX
@@ -7,10 +8,10 @@ library(CRFutil)
 #grf <- ~1:2 + 1:4 + 2:5 + 2:6 + 3:7 + 4:7 + 4:8 + 6:9 + 7:10 + 11:10 + 10:14 + 10:13 + 10:12 + 12:17 + 12:16 + 12:15
 grf <-  ~A:B + A:D + B:E + B:FF + C:G + D:G + D:H + FF:II + G:J + K:J + J:N + J:M + J:L + L:Q + L:P + L:O
 plot(ug(grf))
+dev.off()
 
 # Convert to pw factor graph
 pwfg <- mrf2pwfg2(grf, plotQ=T)
-library(Rgraphviz)
 dev.off()
 plot(pwfg, nodeAttrs=makeNodeAttrs(pwfg, fontsize=30))
 
@@ -70,7 +71,20 @@ lapply(1:length(ep), function(xx){ep[[xx]] - knm$edge.pot[[xx]]})
 
 # Potential names. Node name order within the edge potential name should be the same as in msg.sch output by init.message.storage
 # and (more fundamentally) mrf2pwfg2. In mrf2pwfg2 we use node.names <- und.gph@nodes which sets the order downstream
-paste0("f", nd.nms[knm$edges[,1]], "-", nd.nms[knm$edges[,2]])
+# Put all node and edge potentials into one list so we dont have to search though two lists for them
+all.pots <- union(np, ep)
+length(np)
+length(ep)
+length(all.pots)
+
+# Put the same names on the potentials as will appear in the schedule:
+nd.nms  <- nodes(ug(grf))                                      # node names
+edg.nms <- cbind(nd.nms[knm$edges[,1]], nd.nms[knm$edges[,2]])   # edge names
+names(all.pots) <- c(paste0("f", nd.nms), paste0("f", nd.nms[knm$edges[,1]], ".", nd.nms[knm$edges[,2]]))
+all.pots
+
+
+
 
 msg.sch
 msg.num <- 1
