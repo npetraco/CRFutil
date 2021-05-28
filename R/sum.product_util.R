@@ -276,19 +276,32 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
 #'
 #'
 #' @export
-make.f2v.msg <- function(in.v.msgs.list = NULL, f.msg, out.v.nme){
+make.f2v.msg <- function(in.v.msgs.list, f.msg, out.v.nme){
 
-  if(is.null(in.v.msgs.list)) {
-    # v.nme check for initalization??
+  if(is.null(names(in.v.msgs.list))) { # There will be no incoming message names for leaf nodes
     msg.out <- f.msg # For initialization case
   } else {
-    msg.prod <- f.msg %a*% ar_prod_list(in.v.msgs.list)
+    msg.prod <- f.msg %a*% ar_prod_list(in.v.msgs.list)  #CHANGE BACK TO tabProd??????
     msg.out <- ar_marg(msg.prod, out.v.nme)
   }
 
   return(msg.out) # Guarantee sending this out as a list?????
 
 }
+#f2v rule, v1
+#make.f2v.msg <- function(in.v.msgs.list = NULL, f.msg, out.v.nme){
+#
+#  if(is.null(in.v.msgs.list)) {
+#    # v.nme check for initalization??
+#    msg.out <- f.msg # For initialization case
+#  } else {
+#    msg.prod <- f.msg %a*% ar_prod_list(in.v.msgs.list)
+#    msg.out <- ar_marg(msg.prod, out.v.nme)
+#  }
+#
+#  return(msg.out) # Guarantee sending this out as a list?????
+#
+#}
 
 
 #' Make factor to variable (node) message
@@ -303,10 +316,10 @@ make.f2v.msg <- function(in.v.msgs.list = NULL, f.msg, out.v.nme){
 #'
 #'
 #' @export
-make.v2f.msg <- function(in.f.msgs.list = NULL){
+make.v2f.msg <- function(in.f.msgs.list){
 
-  if(is.null(in.f.msgs.list)) {
-    msg.out <- NULL # For initialization case. Was "id".
+  if(is.null(names(in.f.msgs.list))) { # v with no incoming f occur in Bayes nets.
+    msg.out <- NULL # For initialization case. Was "id". Is there a better option????
   } else {
     msg.out <- ar_prod_list(in.f.msgs.list)
   }
@@ -314,6 +327,18 @@ make.v2f.msg <- function(in.f.msgs.list = NULL){
   return(msg.out)  # Guarantee sending this out as a list?????
 
 }
+# v2f rulw v1
+#make.v2f.msg <- function(in.f.msgs.list = NULL){
+#
+#  if(is.null(in.f.msgs.list)) {
+#    msg.out <- NULL # For initialization case. Was "id".
+#  } else {
+#    msg.out <- ar_prod_list(in.f.msgs.list)
+#  }
+#
+#  return(msg.out)  # Guarantee sending this out as a list?????
+#
+#}
 
 
 #' Initialize an empty set of list containers to hold messages

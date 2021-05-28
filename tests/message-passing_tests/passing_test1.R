@@ -46,7 +46,7 @@ all.pots <- union(np, ep)
 # Put the same names on the potentials as will appear in the schedule:
 nd.nms  <- nodes(ug(grf))                                      # node names
 edg.nms <- cbind(nd.nms[km$edges[,1]], nd.nms[km$edges[,2]])   # edge names
-names(all.pots) <- c(paste0("f", nd.nms), paste0("f", nd.nms[km$edges[,1]], ".", nd.nms[km$edges[,2]]))
+names(all.pots) <- c(paste0("f", nd.nms), paste0("f", nd.nms[km$edges[,1]], "-", nd.nms[km$edges[,2]]))
 all.pots
 
 #XXXXXXXXXXXXXXXXXXXXXX
@@ -70,18 +70,171 @@ msg.sch # schedule
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXX
 # Pass messages according to schedule:
-msg.num <- 1
-msg.sch[msg.num,]
-msg.typ <- message.type(msg.sch[msg.num,4])
+msg.num <- 8
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Get incoming messages:
 msg.sp  <- as.character(msg.sch[msg.num,c(2,3)]) # start-end nodes of message
 msgs.in <- get.incoming.messages(start.node = msg.sp[1], end.node = msg.sp[2], factorgraph = pwfg, message.list = msg.bxs)
 msgs.in
 
+# Determine is f2v of v2f type message
+msg.typ <- message.type(msg.sch[msg.num,4])
+msg.typ
+
 msg.sp
 msg.typ
+msg.nme
+msg.idx
+
 if(msg.typ == "f2v"){
   fpot <- all.pots[[which(names(all.pots) == msg.sp[1])]]
+  msg.bxs[[msg.idx]] <- make.f2v.msg(in.v.msgs.list = msgs.in, f.msg = fpot, out.v.nme = msg.sp[2])
+} else if(msg.typ == "v2f"){
+  msg.bxs[[msg.idx]] <- make.v2f.msg(in.f.msgs.list = msgs.in)
+} else {
+  stop("Invalid message pass requested!")
 }
-make.f2v.msg(in.v.msgs.list = NULL, f.msg = fpot)
-make.f2v.msg(in.v.msgs.list = msgs.in, f.msg = fpot)
+msg.bxs
+
+# Checks:
+msg.num <- 1      # message pass 1
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \Psi_A
+names(all.pots)
+
+msg.bxs[[msg.idx]]
+all.pots[[1]]
+
+
+#-----------------------------------------
+msg.num <- 2      # message pass 1
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \Psi_B
+names(all.pots)
+
+msg.bxs[[msg.idx]]
+all.pots[[2]]
+
+#-----------------------------------------
+msg.num <- 3      # message pass 2
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \Psi_B
+names(all.pots)
+
+msg.bxs[[msg.idx]]
+all.pots[[2]]
+
+
+#-----------------------------------------
+msg.num <- 4      # message pass 3
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \sum_{\sim A} \Big( \Psi_{\text{AB}} \times \Psi_{B} \Big)
+names(all.pots)
+tabMarg(tabProd(all.pots[[3]], all.pots[[2]]), marg = "A")
+
+msg.bxs[[msg.idx]]
+
+
+#-----------------------------------------
+msg.num <- 5      # message pass 4
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \sum_{\sim A} \Big( \Psi_{\text{AB}} \times \Psi_{B} \Big)
+names(all.pots)
+tabMarg(tabProd(all.pots[[3]], all.pots[[2]]), marg = "A")
+
+msg.bxs[[msg.idx]]
+
+
+#-----------------------------------------
+msg.num <- 6      # message pass 4
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \Psi_{A}
+names(all.pots)
+all.pots[[1]]
+msg.bxs[[msg.idx]]
+
+
+
+#-----------------------------------------
+msg.num <- 7      # message pass 5
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \sum_{\sim B} \Big( \Psi_{\text{AB}} \times \Psi_A \Big)
+names(all.pots)
+tabMarg(tabProd(all.pots[[3]], all.pots[[1]]), marg = "B")
+
+msg.bxs[[msg.idx]]
+
+
+#-----------------------------------------
+msg.num <- 8      # message pass 6
+msg.sch[msg.num,] # message info
+
+# Get message name and the mailbox number it goes in:
+msg.nme <- msg.sch[msg.num,4]
+msg.idx <- which(names(msg.bxs) == msg.nme)
+msg.nme
+msg.idx
+
+# Should be \sum_{\sim B} \Big( \Psi_{\text{AB}} \times \Psi_A \Big)
+names(all.pots)
+tabMarg(tabProd(all.pots[[3]], all.pots[[1]]), marg = "B")
+
+msg.bxs[[msg.idx]]
+
 
