@@ -16,5 +16,5 @@ The function will XX
 Convert Markov Random Field to pairwise (two-body) factor graph:
 }
 \details{
-The function will XXXX
+This version allows for nodes names to be characters. It just spits out a warning if they are.
 }

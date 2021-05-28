@@ -4,7 +4,7 @@
 \alias{make.f2v.msg}
 \title{Make factor to variable (node) message}
 \usage{
-make.f2v.msg(in.v.msgs.list = NULL, f.msg, out.v.nme)
+make.f2v.msg(in.v.msgs.list, f.msg, out.v.nme, normalizeQ = F)
 }
 \arguments{
 \item{XX}{The XX}

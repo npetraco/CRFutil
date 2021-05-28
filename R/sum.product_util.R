@@ -9,7 +9,7 @@
 #'
 #'
 #' @export
-get.path <- function(a.graphnel.obj, start.node, end.node){ # **** BROKEN?? SOME SEGMENTS MISSED IN SOME POLYTREES ******
+get.path <- function(a.graphnel.obj, start.node, end.node){
 
   path.info <- sp.between(a.graphnel.obj, as.character(start.node), as.character(end.node))[[1]]
   if(is.na(path.info[1])) {
@@ -325,7 +325,7 @@ make.v2f.msg <- function(in.f.msgs.list, normalizeQ=F){
   if(is.null(names(in.f.msgs.list))) { # v with no incoming f occur in Bayes nets.
     msg.out <- NULL # For initialization case. Was "id". Is there a better option????
   } else {
-    msg.out <- ar_prod_list(in.f.msgs.list)
+    msg.out <- tabProd(in.f.msgs.list)
   }
 
   if(normalizeQ == T){
@@ -539,5 +539,135 @@ get.incoming.messages <- function(start.node, end.node, factorgraph, message.lis
   }
 
   return(incoming.message.list)
+
+}
+
+
+#' Pass a message over an edge on a factor graph
+#'
+#' Pass a message over an edge on a factor graph
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+pass.message <- function(start.node, end.node, factor.graph, pots.list, mailboxes.list, printQ=F){
+
+  # Determine is f2v of v2f type message
+  message.name <- paste0(start.node,".",end.node)
+  message.typ  <- message.type(message.name)
+  if(printQ == T){
+    print(paste("Message name:", message.name))
+    print(paste("Message type:", message.typ))
+  }
+
+  # Get messages coming into the start.node:
+  incoming.messages <- get.incoming.messages(start.node   = start.node,
+                                             end.node     = end.node,
+                                             factorgraph  = factor.graph,
+                                             message.list = mailboxes.list)
+  if(printQ == T){
+    print(paste("Incoming messages:"))
+    incoming.message.names <- names(incoming.messages)
+    if(is.null(incoming.message.names)){
+      print("     No incoming messages. Must be a leaf node")
+    } else {
+      print(paste0("     ", incoming.message.names, collapse = ""))
+    }
+  }
+
+  # Mailbox address where to deliver message
+  message.idx <- which(names(mailboxes.list) == message.name)
+
+  # Pass:
+  if(message.typ == "f2v"){
+    f.pot           <- pots.list[[which(names(pots.list) == start.node)]]
+    passed.message  <- make.f2v.msg(in.v.msgs.list = incoming.messages, f.msg = f.pot, out.v.nme = end.node, normalizeQ = T)
+  } else if(message.typ == "v2f"){
+    passed.message <- make.v2f.msg(in.f.msgs.list = incoming.messages, normalizeQ = T)
+  } else {
+    stop("Invalid message pass requested!")
+  }
+
+  if(printQ == T){
+    print(paste0("Message: ", start.node,"-->",end.node,":"))
+    print(passed.message)
+  }
+
+  message.info <- list(passed.message, message.idx)
+  names(message.info) <- c("message", "mailbox.idx")
+  return(message.info)
+
+}
+
+
+#' Compute a node marginal
+#'
+#' Compute a node marginal
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+node.marginal <- function(v.node.name, factor.graph, mailbox.list){
+
+  incoming.message.names <- paste0(adj(factor.graph, v.node.name)[[1]], ".", v.node.name)
+  incoming.message.idxs  <- sapply(1:length(incoming.message.names), function(xx){which(names(mailbox.list) == incoming.message.names[xx])})
+  incoming.messages      <- mailbox.list[incoming.message.idxs]
+  the.node.marginal      <- tabNormalize(tabProd(incoming.messages),type = 2)
+
+  return(the.node.marginal)
+
+}
+
+
+#' Compute an edge marginal
+#'
+#' Compute a edge marginal
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+edge.marginal <- function(v.start.node, v.end.node, factor.graph, pots.list, mailbox.list){
+
+  edge.pot.name <- paste0("f",v.start.node,"-",v.end.node)
+  #print(edge.pot.name)
+
+  #Check node order. If edge potential is not found, reverse node order:
+  if(length(which(names(pots.list) == edge.pot.name)) == 0){
+
+    edge.pot.name <- paste0("f",v.end.node,"-",v.start.node)
+
+    if(length(which(names(pots.list) == edge.pot.name)) == 0){
+      stop(paste(v.start.node,"-", v.end.node, "not an edge in the graph!"))
+    }
+  }
+
+
+  incoming.message.names <- paste0(adj(factor.graph, edge.pot.name)[[1]], ".", edge.pot.name)
+  #print(incoming.message.names)
+
+  incoming.message.idxs <- sapply(1:length(incoming.message.names), function(xx){which(names(mailbox.list) == incoming.message.names[xx])})
+  #print(incoming.message.idxs)
+
+  incoming.messages <- mailbox.list[incoming.message.idxs]
+  #print(incoming.messages)
+
+  the.edge.pot <- pots.list[which(names(pots.list) == edge.pot.name)]
+  #print(the.edg.pot)
+
+  the.edge.marginal <- tabNormalize(tabProd(union(the.edge.pot, incoming.messages)), type = 2)
+
+  return(the.edge.marginal)
 
 }
