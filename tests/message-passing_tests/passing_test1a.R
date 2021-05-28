@@ -44,9 +44,11 @@ np <- gr.pots$node.potentials # Node potentials in gRbase format
 all.pots <- union(np, ep)
 
 # Put the same names on the potentials as will appear in the schedule:
-nd.nms  <- nodes(ug(grf))                                      # node names
-edg.nms <- cbind(nd.nms[km$edges[,1]], nd.nms[km$edges[,2]])   # edge names
-names(all.pots) <- c(paste0("f", nd.nms), paste0("f", nd.nms[km$edges[,1]], "-", nd.nms[km$edges[,2]]))
+nd.nms      <- nodes(ug(grf))                                      # node names
+edg.nms     <- cbind(nd.nms[km$edges[,1]], nd.nms[km$edges[,2]])   # edge names
+nd.pot.nms  <- paste0("f", nd.nms)
+edg.pot.nms <- paste0("f", nd.nms[km$edges[,1]], "-", nd.nms[km$edges[,2]])
+names(all.pots) <- c(nd.pot.nms, edg.pot.nms)
 all.pots
 
 #XXXXXXXXXXXXXXXXXXXXXX
@@ -70,36 +72,39 @@ msg.sch # schedule
 
 #XXXXXXXXXXXXXXXXXXXXXXXXXXX
 # Pass messages according to schedule:
-msg.num <- 8
-msg.sch[msg.num,] # message info
+for(i in 1:nrow(msg.sch)){
+  msg.num <- i
+  print(msg.sch[msg.num,]) # message info
 
-# Get message name and the mailbox number it goes in:
-msg.nme <- msg.sch[msg.num,4]
-msg.idx <- which(names(msg.bxs) == msg.nme)
-msg.nme
-msg.idx
+  # Get message name and the mailbox number it goes in:
+  msg.nme <- msg.sch[msg.num,4]
+  msg.idx <- which(names(msg.bxs) == msg.nme)
+  #msg.nme
+  #msg.idx
 
-# Get incoming messages:
-msg.sp  <- as.character(msg.sch[msg.num,c(2,3)]) # start-end nodes of message
-msgs.in <- get.incoming.messages(start.node = msg.sp[1], end.node = msg.sp[2], factorgraph = pwfg, message.list = msg.bxs)
-msgs.in
+  # Get incoming messages:
+  msg.sp  <- as.character(msg.sch[msg.num,c(2,3)]) # start-end nodes of message
+  msgs.in <- get.incoming.messages(start.node = msg.sp[1], end.node = msg.sp[2], factorgraph = pwfg, message.list = msg.bxs)
+  #msgs.in
 
-# Determine is f2v of v2f type message
-msg.typ <- message.type(msg.sch[msg.num,4])
-msg.typ
+  # Determine is f2v of v2f type message
+  msg.typ <- message.type(msg.sch[msg.num,4])
+  #msg.typ
 
-msg.sp
-msg.typ
-msg.nme
-msg.idx
+  # msg.sp
+  # msg.typ
+  # msg.nme
+  # msg.idx
 
-if(msg.typ == "f2v"){
-  fpot <- all.pots[[which(names(all.pots) == msg.sp[1])]]
-  msg.bxs[[msg.idx]] <- make.f2v.msg(in.v.msgs.list = msgs.in, f.msg = fpot, out.v.nme = msg.sp[2])
-} else if(msg.typ == "v2f"){
-  msg.bxs[[msg.idx]] <- make.v2f.msg(in.f.msgs.list = msgs.in)
-} else {
-  stop("Invalid message pass requested!")
+  if(msg.typ == "f2v"){
+    fpot <- all.pots[[which(names(all.pots) == msg.sp[1])]]
+    msg.bxs[[msg.idx]] <- make.f2v.msg(in.v.msgs.list = msgs.in, f.msg = fpot, out.v.nme = msg.sp[2])
+  } else if(msg.typ == "v2f"){
+    msg.bxs[[msg.idx]] <- make.v2f.msg(in.f.msgs.list = msgs.in)
+  } else {
+    stop("Invalid message pass requested!")
+  }
+
 }
 msg.bxs
 
@@ -238,4 +243,42 @@ tabMarg(tabProd(all.pots[[3]], all.pots[[1]]), marg = "B")
 msg.bxs[[msg.idx]]
 
 
+
+#XXXXXXXXXXXXXXXXXXXXXXXXXXX
+# Function to compute the marginals:
+
+# Marginals:
+all.marginals <- infer.exact(km)
+
 # Node marginals:
+nd.nms
+
+adj(pwfg, "A")[[1]]
+msgs.in.nmes <- paste0(adj(pwfg, "A")[[1]], ".","A")
+msgs.in.idxs <- sapply(1:length(msgs.in.nmes), function(xx){which(names(msg.bxs) == msgs.in.nmes[xx])})
+msgs.in <- msg.bxs[msgs.in.idxs]
+tabNormalize(tabProd(msgs.in),type = 2)
+all.marginals$node.bel[1,] #Same??
+
+adj(pwfg, "B")[[1]]
+msgs.in.nmes <- paste0(adj(pwfg, "B")[[1]], ".","B")
+msgs.in.idxs <- sapply(1:length(msgs.in.nmes), function(xx){which(names(msg.bxs) == msgs.in.nmes[xx])})
+msgs.in <- msg.bxs[msgs.in.idxs]
+tabNormalize(tabProd(msgs.in),type = 2)
+all.marginals$node.bel[2,] #Same??
+
+# Edge marginals
+edg.pot.nms
+adj(pwfg, edg.pot.nms[1])[[1]]
+
+msgs.in.nmes <- paste0(adj(pwfg, edg.pot.nms[1])[[1]], ".", edg.pot.nms[1])
+msgs.in.nmes
+msgs.in.idxs <- sapply(1:length(msgs.in.nmes), function(xx){which(names(msg.bxs) == msgs.in.nmes[xx])})
+msgs.in.idxs
+msgs.in <- msg.bxs[msgs.in.idxs]
+msgs.in
+
+edg.pot <- all.pots[which(names(all.pots) == edg.pot.nms[1])]
+
+tabNormalize(tabProd(union(edg.pot, msgs.in)), type = 2)
+all.marginals$edge.bel

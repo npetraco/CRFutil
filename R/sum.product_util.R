@@ -276,13 +276,17 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
 #'
 #'
 #' @export
-make.f2v.msg <- function(in.v.msgs.list, f.msg, out.v.nme){
+make.f2v.msg <- function(in.v.msgs.list, f.msg, out.v.nme, normalizeQ=F){
 
   if(is.null(names(in.v.msgs.list))) { # There will be no incoming message names for leaf nodes
-    msg.out <- f.msg # For initialization case
+    msg.out <- f.msg # For case where f.msg is a leaf node
   } else {
-    msg.prod <- f.msg %a*% ar_prod_list(in.v.msgs.list)  #CHANGE BACK TO tabProd??????
-    msg.out <- ar_marg(msg.prod, out.v.nme)
+    msg.prod <- f.msg %a*% tabProd(in.v.msgs.list)
+    msg.out  <- tabMarg(msg.prod, out.v.nme)
+  }
+
+  if(normalizeQ == T){
+    msg.out <- tabNormalize(msg.out, type = 2)
   }
 
   return(msg.out) # Guarantee sending this out as a list?????
@@ -316,12 +320,16 @@ make.f2v.msg <- function(in.v.msgs.list, f.msg, out.v.nme){
 #'
 #'
 #' @export
-make.v2f.msg <- function(in.f.msgs.list){
+make.v2f.msg <- function(in.f.msgs.list, normalizeQ=F){
 
   if(is.null(names(in.f.msgs.list))) { # v with no incoming f occur in Bayes nets.
     msg.out <- NULL # For initialization case. Was "id". Is there a better option????
   } else {
     msg.out <- ar_prod_list(in.f.msgs.list)
+  }
+
+  if(normalizeQ == T){
+    msg.out <- tabNormalize(msg.out, type = 2)
   }
 
   return(msg.out)  # Guarantee sending this out as a list?????
