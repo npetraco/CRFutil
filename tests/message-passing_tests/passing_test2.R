@@ -115,9 +115,19 @@ node.marginal(nde.nms[nde.idx], pwfg, msg.bxs)
 all.marginals$node.bel[nde.idx,] # Compare: same??
 lapply(1:length(nde.nms), function(xx){node.marginal(nde.nms[xx], pwfg, msg.bxs)})
 
-# edge marginals routine
+# edge marginals ??
 edge.marginal(v.start.node = "E", v.end.node = "C", factor.graph = pwfg, pots.list = all.pots, mailbox.list = msg.bxs)
 all.marginals$edge.bel[[4]]
+
+for(i in 1:nrow(km$edges)){
+  lnd <- nd.nms[km$edges[i,1]]
+  rnd <- nd.nms[km$edges[i,2]]
+  print(paste0("bel(",lnd,",",rnd,"):"))
+  edgm <- edge.marginal(v.start.node = lnd, v.end.node = rnd,
+                        factor.graph = pwfg, pots.list = all.pots, mailbox.list = msg.bxs)
+  print(edgm)
+  print(all.marginals$edge.bel[[i]])
+}
 
 # make identity message for loopy initalization
 # Bethe
