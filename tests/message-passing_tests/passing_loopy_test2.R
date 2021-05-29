@@ -1,30 +1,26 @@
 library(CRFutil)
 library(Rgraphviz)
 
-# Loopy Message pass test
 
 # Model:
-grf <- ~A:B
-adj <- ug(grf, result="matrix")
-f0  <- function(y){ as.numeric(c((y==1),(y==2)))}
+#grf <- ~1:2
+#grf <- ~A:B
+grf <- ~1:2 + 2:3 + 3:1
+#grf <- ~A:B + B:C + C:A
+#grf <- ~A:B + B:C + C:A + B:D
+#grf <- ~A:B + B:C + C:A + B:FF + FF:G + G:B
+#grf <- ~A:B + B:C + C:A + B:D + D:FF + FF:G + G:D
+#grf <- ~A:B + B:C + C:A + B:E + E:D + D:FF + FF:G + G:D
+#grf <- ~A:B + B:C + C:A + B:E + E:D + D:FF + FF:G + G:D + E:H
 
+dev.off()
+plot(ug(grf))
+dev.off()
+
+# First Instantiate a model with some random values for the params in the potentials:
+adj      <- ug(grf, result="matrix")
 n.states <- 2
-km       <- make.crf(adj, n.states)
-
-# Node pots:
-PsiA <- c(3,1)
-PsiB <- c(3,1)
-
-# Edge pots:
-PsiAB <-
-  rbind(
-    c(3, 6.1),
-    c(6.1, 3)
-  )
-
-km$node.pot[1,]  <- PsiA
-km$node.pot[2,]  <- PsiB
-km$edge.pot[[1]] <- PsiAB
+km       <- sim.field.random(adjacentcy.matrix = adj, num.states = n.states, num.sims = 0)[[1]]
 
 # Dress potentials for message passing:
 gr.pots  <- make.gRbase.potentials(crf = km, node.names = rownames(adj), state.nmes = c("up", "dn"))
@@ -39,9 +35,8 @@ edg.pot.nms     <- paste0("f", nd.nms[km$edges[,1]], "-", nd.nms[km$edges[,2]]) 
 names(all.pots) <- c(nd.pot.nms, edg.pot.nms) # Put the same names on the potentials as will appear in the schedule
 all.pots        # Potentials dressed up in gRbase format and ready for message passing
 
-
 # Convert MRF to a pair-wise factor graph
-pwfg <- mrf2pwfg(grf, plotQ=T)
+pwfg <- mrf2pwfg(grf, plotQ=F)
 dev.off()
 plot(pwfg, nodeAttrs=makeNodeAttrs(pwfg, fontsize=30))
 
@@ -55,7 +50,7 @@ msg.sch # schedule
 
 
 # Loopy Pass messages according to schedule:
-max.iter <- 2
+max.iter <- 10
 for(iter in 1:max.iter){
 
   for(i in 1:nrow(msg.sch)){
@@ -85,6 +80,12 @@ msg.bxs
 # Get exact marginals to check against:
 all.marginals <- infer.exact(km)
 all.marginals
+
+all.marginals.loopy <- infer.lbp(km)
+all.marginals.loopy
+
+# XXXXXXXX ADD COMPARISON TO CRF LOOPY BP
+
 
 # Node marginals
 nde.nms <- nodes(ug(grf))
