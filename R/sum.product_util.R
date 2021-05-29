@@ -73,78 +73,6 @@ get.root.paths <- function(graph.obj, root.node, serial.schedsQ=FALSE) {
 
 }
 
-#' Convert Markov Random Field to pairwise (two-body) factor graph:
-#'
-#' Convert Markov Random Field to pairwise (two-body) factor graph:
-#'
-#' The function will XXXX
-#'
-#' @param XX The XX
-#' @return The function will XX
-#'
-#'
-#' @export
-mrf2pwfg <- function(graph.obj, plotQ=FALSE) {  # BROKEN!!!!!! LARGE POLYTREES WITH MANY NODES MISCONNECTING NODES
-
-  if(class(graph.obj) == "formula") {
-    und.gph    <- ug(graph.obj)
-  } else if(class(graph.obj) == "graphNEL") {
-    und.gph    <- graph.obj
-  } else {
-    stop("Must enter a formula or graphNEL object for the graph.obj arguement.")
-  }
-
-  # Use igraph functionality to build pair-wise factor graph from UG model
-  adjmat <- as(und.gph, "matrix")
-  adjmat.uptri <- upper.tri(adjmat) * adjmat
-
-  # edges:
-  edgmat <- which(adjmat.uptri == 1, arr.ind = T)
-  edgmat <- cbind(
-    as.numeric(rownames(adjmat)[edgmat[,1]]),  # This means that input graph nodes must be numbers....
-    as.numeric(colnames(adjmat)[edgmat[,2]])   # Can we remove this restriction or try to get around it?
-  )
-  edgmat <- t(sapply(1:nrow(edgmat), function(xx){sort(edgmat[xx,])}))
-
-  edgmat2 <- NULL
-  # add edge factors between connected nodes:
-  for(i in 1:nrow(edgmat)) {
-    factor.nme <- paste0("f",edgmat[i,1],edgmat[i,2])  # PROBLEM HERE? EG f12 edge name gets confused with f12 node name
-    edgmat2 <- rbind(
-      edgmat2,
-      c(edgmat[i,1], factor.nme),
-      c(factor.nme, edgmat[i,2])
-    )
-  }
-
-  # tack on node factors:
-  edgmat2 <- rbind(
-    cbind(
-      paste0("f",sort(und.gph@nodes)),
-      sort(und.gph@nodes)
-    ),
-    edgmat2
-  )
-
-  fg <- graph_from_data_frame(data.frame(edgmat2), directed = FALSE)
-  nde.nms <- V(fg)$name
-  V(fg)$type <- sapply(1:length(nde.nms), function(xx){length(strsplit(nde.nms[xx], split = "f")[[1]])})
-
-  if(plotQ==TRUE){
-    # Plot factor graph:
-    cols <- c("steelblue", "red")
-    shps <- c("circle", "square")
-    plot(fg,
-         vertex.color = cols[as.numeric(V(fg)$type)],
-         vertex.shape = shps[as.numeric(V(fg)$type)]
-    )
-  }
-
-  # Convert back to graphNEL format:
-  fg <- igraph.to.graphNEL(fg)
-  return(fg)
-}
-
 
 #' Convert Markov Random Field to pairwise (two-body) factor graph:
 #'
@@ -157,7 +85,7 @@ mrf2pwfg <- function(graph.obj, plotQ=FALSE) {  # BROKEN!!!!!! LARGE POLYTREES W
 #'
 #'
 #' @export
-mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-write try
+mrf2pwfg <- function(graph.obj, plotQ=FALSE) {
 
 
   if(class(graph.obj) == "formula") {
@@ -168,6 +96,9 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
     stop("Must enter a formula or graphNEL object for the graph.obj arguement.")
   }
 
+
+  # XXXX BELOW WE REALLY DON'T NEED THE IF, SINCE WE Re-ORDER nodes in either case
+  # XXXX CLEAN UP AT SOME POINT
   # Node names may not be numbers. For this function, we really need the order-ability of numbers.
   # So if node names are not numbers, assign each name a number
   node.names          <- und.gph@nodes
@@ -180,7 +111,18 @@ mrf2pwfg2 <- function(graph.obj, plotQ=FALSE) {  # mrf2pwfg BROKEN!!!!!! Re-writ
     und.gph <- graph_from_graphnel(und.gph)
     V(und.gph)$name <- 1:length(node.names)
     und.gph <- as_graphnel(und.gph)
-  }
+  } else { # XXXXXXXXXX
+
+    # Reorder anyway?? Having problems with numerical nodes out of order..... XXXXXXXXXX
+    # Long and short of it, we dont need this if-else. Clean up at some point
+    warning("Temporarily assigning nodes a cononical order.")
+
+    und.gph <- graph_from_graphnel(und.gph)
+    V(und.gph)$name <- 1:length(node.names)
+    und.gph <- as_graphnel(und.gph)
+
+
+  }       # XXXXXXXXXX
 
   # Use igraph functionality to build pair-wise factor graph from UG model
   adjmat <- as(und.gph, "matrix")
@@ -292,20 +234,6 @@ make.f2v.msg <- function(in.v.msgs.list, f.msg, out.v.nme, normalizeQ=F){
   return(msg.out) # Guarantee sending this out as a list?????
 
 }
-#f2v rule, v1
-#make.f2v.msg <- function(in.v.msgs.list = NULL, f.msg, out.v.nme){
-#
-#  if(is.null(in.v.msgs.list)) {
-#    # v.nme check for initalization??
-#    msg.out <- f.msg # For initialization case
-#  } else {
-#    msg.prod <- f.msg %a*% ar_prod_list(in.v.msgs.list)
-#    msg.out <- ar_marg(msg.prod, out.v.nme)
-#  }
-#
-#  return(msg.out) # Guarantee sending this out as a list?????
-#
-#}
 
 
 #' Make factor to variable (node) message
@@ -332,21 +260,9 @@ make.v2f.msg <- function(in.f.msgs.list, normalizeQ=F){
     msg.out <- tabNormalize(msg.out, type = 2)
   }
 
-  return(msg.out)  # Guarantee sending this out as a list?????
+  return(msg.out)
 
 }
-# v2f rulw v1
-#make.v2f.msg <- function(in.f.msgs.list = NULL){
-#
-#  if(is.null(in.f.msgs.list)) {
-#    msg.out <- NULL # For initialization case. Was "id".
-#  } else {
-#    msg.out <- ar_prod_list(in.f.msgs.list)
-#  }
-#
-#  return(msg.out)  # Guarantee sending this out as a list?????
-#
-#}
 
 
 #' Initialize an empty set of list containers to hold messages
@@ -641,7 +557,6 @@ node.marginal <- function(v.node.name, factor.graph, mailbox.list){
 edge.marginal <- function(v.start.node, v.end.node, factor.graph, pots.list, mailbox.list){
 
   edge.pot.name <- paste0("f",v.start.node,"-",v.end.node)
-  #print(edge.pot.name)
 
   #Check node order. If edge potential is not found, reverse node order:
   if(length(which(names(pots.list) == edge.pot.name)) == 0){
@@ -655,18 +570,10 @@ edge.marginal <- function(v.start.node, v.end.node, factor.graph, pots.list, mai
 
 
   incoming.message.names <- paste0(adj(factor.graph, edge.pot.name)[[1]], ".", edge.pot.name)
-  #print(incoming.message.names)
-
-  incoming.message.idxs <- sapply(1:length(incoming.message.names), function(xx){which(names(mailbox.list) == incoming.message.names[xx])})
-  #print(incoming.message.idxs)
-
-  incoming.messages <- mailbox.list[incoming.message.idxs]
-  #print(incoming.messages)
-
-  the.edge.pot <- pots.list[which(names(pots.list) == edge.pot.name)]
-  #print(the.edg.pot)
-
-  the.edge.marginal <- tabNormalize(tabProd(union(the.edge.pot, incoming.messages)), type = 2)
+  incoming.message.idxs  <- sapply(1:length(incoming.message.names), function(xx){which(names(mailbox.list) == incoming.message.names[xx])})
+  incoming.messages      <- mailbox.list[incoming.message.idxs]
+  the.edge.pot           <- pots.list[which(names(pots.list) == edge.pot.name)]
+  the.edge.marginal      <- tabNormalize(tabProd(union(the.edge.pot, incoming.messages)), type = 2)
 
   return(the.edge.marginal)
 

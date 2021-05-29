@@ -4,7 +4,7 @@
 \alias{edge.marginal}
 \title{Compute an edge marginal}
 \usage{
-edge.marginal(v.start.node, v.end.node, factor.graph, mailbox.list)
+edge.marginal(v.start.node, v.end.node, factor.graph, pots.list, mailbox.list)
 }
 \arguments{
 \item{XX}{The XX}
