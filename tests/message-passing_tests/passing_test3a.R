@@ -5,8 +5,9 @@ library(Rgraphviz)
 
 
 # Model:
-grf <- ~1:2 + 1:4 + 2:5 + 2:6 + 3:7 + 4:7 + 4:8 + 6:9 + 7:10 + 11:10 + 10:14 + 10:13 + 10:12 + 12:17 + 12:16 + 12:15
-#grf <-  ~A:B + A:D + B:E + B:FF + C:G + D:G + D:H + FF:II + G:J + K:J + J:N + J:M + J:L + L:Q + L:P + L:O
+#grf <- ~1:2 + 1:4 + 2:5 + 2:6 + 3:7 + 4:7 + 4:8 + 6:9 + 7:10 + 11:10 + 10:14 + 10:13 + 10:12 + 12:17 + 12:16 + 12:15
+grf <-  ~A:B + A:D + B:E + B:FF + C:G + D:G + D:H + FF:II + G:J + K:J + J:N + J:M + J:L + L:Q + L:P + L:O
+dev.off()
 plot(ug(grf))
 dev.off()
 
@@ -34,7 +35,7 @@ dev.off()
 plot(pwfg, nodeAttrs=makeNodeAttrs(pwfg, fontsize=30))
 
 # Initialize a storage list to hold messages and get message passing schedule:
-root.pths     <- get.root.paths(pwfg, root.node = "1", serial.schedsQ = T)
+root.pths     <- get.root.paths(pwfg, root.node = "H", serial.schedsQ = T)
 msg.cont.info <- init.message.storage(root.pths)
 msg.bxs       <- msg.cont.info$message.container
 msg.sch       <- msg.cont.info$message.schedule.mat

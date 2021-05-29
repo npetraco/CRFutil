@@ -97,10 +97,8 @@ mrf2pwfg <- function(graph.obj, plotQ=FALSE) {
   }
 
 
-  # XXXX BELOW WE REALLY DON'T NEED THE IF, SINCE WE Re-ORDER nodes in either case
+  # XXXX BELOW WE REALLY DON'T NEED THE IF, SINCE WE Re-ORDER nodes in either case (numeric or character node names)
   # XXXX CLEAN UP AT SOME POINT
-  # Node names may not be numbers. For this function, we really need the order-ability of numbers.
-  # So if node names are not numbers, assign each name a number
   node.names          <- und.gph@nodes
   node.names.numericQ <- !(NA %in% as.numeric(node.names)) # This will throw a warning is names are not numeric. Just ignore it.
   orig.node.names     <- node.names
@@ -192,6 +190,12 @@ mrf2pwfg <- function(graph.obj, plotQ=FALSE) {
     # Plot factor graph:
     cols <- c("steelblue", "red")
     shps <- c("circle", "rectangle")
+
+    # Shut off the plot screen if it's on:
+    if(!is.null(dev.list())){
+      dev.off()
+    }
+
     plot(fgC,
          vertex.color = cols[as.numeric(node.types)],
          vertex.shape = shps[as.numeric(node.types)]
@@ -268,7 +272,7 @@ make.v2f.msg <- function(in.f.msgs.list, normalizeQ=F){
 #' Initialize an empty set of list containers to hold messages
 #'
 #' Initialize an empty set of list containers to hold messages
-#' A NULL message can be interpreted as an id message if necessary.
+#' A NULL message can be interpreted as an id message if necessary??
 #'
 #' The function will XXXX
 #'
@@ -329,7 +333,7 @@ init.message.storage <- function(a.schedule){
   # the root. When doing sequential message passing, a node can't send out a message
   # until it has received all its incoming messages. So a messages pass number in the schedule
   # should correspond to the latest time it shows up in all the pass sequences. We can get that by
-  # choosing the max pass number for a message in message.names.mat. Thats what we do now:
+  # choosing the max pass number for a message in message.names.mat. That's what we do now:
   unique.messages          <- unique(message.names.mat[,4])
   message.names.mat.pruned <- NULL
 
@@ -367,6 +371,65 @@ init.message.storage <- function(a.schedule){
   names(a.mailroom) <- message.names.mat[,4]
 
   rownames(message.names.mat)   <- NULL
+  message.container.info        <- list(a.mailroom, message.names.mat)
+  names(message.container.info) <- c("message.container", "message.schedule.mat")
+
+  return(message.container.info)
+
+}
+
+
+#' Initialize an empty set of list containers to hold messages for loopy belief propagation
+#'
+#' Initialize an empty set of list containers to hold messages for loopy belief propagation
+#' No scheduled required to be passed in as all messages are passed at every BP iteration.
+#'
+#' The function will XXXX
+#'
+#' @param factor.graph.obj A factor graph in graphNEL or igraph format.
+#' @return The function will XX
+#'
+#'
+#' @export
+init.loopy.message.storage <- function(factor.graph.obj, node.levels=c("up","dn")){
+
+  if(class(factor.graph.obj) == "graphNEL") {
+    f.igph    <- graph_from_graphnel(factor.graph.obj)
+  } else if(class(graph.obj) == "igraph") {
+    f.igph    <- factor.graph.obj
+  } else {
+    stop("Must enter a igraph or graphNEL (factor graph) object for the graph.obj arguement.")
+  }
+
+  # Since no schedule is required (i.e. we are using a "flooding schedule"), we just need to
+  # generate the message names off the factor graph.
+  edge.mat <- as_edgelist(f.igph)
+
+  forward.message.names  <- paste0(edge.mat[,1], ".", edge.mat[,2])
+  backward.message.names <- paste0(edge.mat[,2], ".", edge.mat[,1])
+  #message.names          <- c(forward.message.names, backward.message.names)
+
+  message.names.mat <- rbind(
+    cbind(rep(1,nrow(edge.mat)), edge.mat[,1], edge.mat[,2], forward.message.names),
+    cbind(rep(1,nrow(edge.mat)), edge.mat[,2], edge.mat[,1], backward.message.names)
+  )
+
+  # A little reformatting for message.names.mat
+  message.names.mat <- data.frame(as.numeric(message.names.mat[,1]), message.names.mat[,c(2:4)])
+  colnames(message.names.mat) <- c("pass.num", "start.node", "end.node", "msg.symb")
+  #print(message.names.mat)
+
+  # Container to hold all the messages passed over the network
+  a.mailroom        <- rep(list(NULL), nrow(message.names.mat))
+  names(a.mailroom) <- message.names.mat[,4]
+
+  # initalize all messages to an identity message
+  id.message <- tabNew(c("id"), levels=list(id=node.levels), values=rep(1,length(node.levels)))
+  #print(id.message)
+  for(i in 1:length(a.mailroom)) {
+    a.mailroom[[i]] <- id.message
+  }
+
   message.container.info        <- list(a.mailroom, message.names.mat)
   names(message.container.info) <- c("message.container", "message.schedule.mat")
 

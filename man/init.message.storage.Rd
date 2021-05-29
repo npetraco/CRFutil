@@ -14,7 +14,7 @@ The function will XX
 }
 \description{
 Initialize an empty set of list containers to hold messages
-A NULL message can be interpreted as an id message if necessary.
+A NULL message can be interpreted as an id message if necessary??
 }
 \details{
 The function will XXXX
