@@ -5,10 +5,10 @@ library(Rgraphviz)
 # Model:
 #grf <- ~1:2
 #grf <- ~A:B
-grf <- ~1:2 + 2:3 + 3:1
+#grf <- ~1:2 + 2:3 + 3:1
 #grf <- ~A:B + B:C + C:A
 #grf <- ~A:B + B:C + C:A + B:D
-#grf <- ~A:B + B:C + C:A + B:FF + FF:G + G:B
+grf <- ~A:B + B:C + C:A + B:FF + FF:G + G:B
 #grf <- ~A:B + B:C + C:A + B:D + D:FF + FF:G + G:D
 #grf <- ~A:B + B:C + C:A + B:E + E:D + D:FF + FF:G + G:D
 #grf <- ~A:B + B:C + C:A + B:E + E:D + D:FF + FF:G + G:D + E:H
@@ -50,7 +50,7 @@ msg.sch # schedule
 
 
 # Loopy Pass messages according to schedule:
-max.iter <- 10
+max.iter <- 50
 for(iter in 1:max.iter){
 
   for(i in 1:nrow(msg.sch)){
@@ -84,7 +84,6 @@ all.marginals
 all.marginals.loopy <- infer.lbp(km)
 all.marginals.loopy
 
-# XXXXXXXX ADD COMPARISON TO CRF LOOPY BP
 
 
 # Node marginals
@@ -93,7 +92,10 @@ for(i in 1:length(nde.nms)){
   ndm <- node.marginal(nde.nms[i], pwfg, msg.bxs)
   print(paste0("bel(",nde.nms[i],"):"))
   print(ndm)
+  print("Compared to exact:")
   print(round(ndm - all.marginals$node.bel[i,], 3)) # Diffs = about 0??
+  print("Compared to CRF-loopy:")
+  print(round(ndm - all.marginals.loopy$node.bel[i,], 3)) # Diffs = about 0??
   print("==================================")
 }
 
@@ -106,6 +108,9 @@ for(i in 1:nrow(km$edges)){
   edgm <- edge.marginal(v.start.node = lnd, v.end.node = rnd,
                         factor.graph = pwfg, pots.list = all.pots, mailbox.list = msg.bxs)
   print(edgm)
+  print("Compared to exact:")
   print(round(edgm - all.marginals$edge.bel[[i]], 3)) # Diffs = about 0??
+  print("Compared to CRF-loopy:")
+  print(round(edgm - all.marginals.loopy$edge.bel[[i]], 3)) # Diffs = about 0??
   print("==================================")
 }
