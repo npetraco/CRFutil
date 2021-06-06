@@ -56,7 +56,7 @@ all.pots
 # passing schedule. Graph should have no loops!
 
 # Convert MRF to a pair-wise factor graph
-pwfg <- mrf2pwfg2(grf, plotQ=T)
+pwfg <- mrf2pwfg(grf, plotQ=T)
 dev.off()
 plot(pwfg, nodeAttrs=makeNodeAttrs(pwfg, fontsize=30))
 
