@@ -1,4 +1,4 @@
-* A handy utility package to go along with R packhage CRF. 
+* A handy utility package to go along with R package CRF (https://cran.r-project.org/web/packages/CRF/index.html). 
 
 * To install:
 
