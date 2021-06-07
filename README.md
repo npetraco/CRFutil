@@ -1,16 +1,16 @@
 * A handy utility package to go along with R packhage CRF. 
 
 * To install:
-# First install devtools
+** First install devtools
 install.packages("devtools")
 
-# Turn on devtools and install CRFutil from github
-# CRFutil should automatically install CRF and gRbase:
+** Turn on devtools and install CRFutil from github
+** CRFutil should automatically install CRF and gRbase:
 library(devtools)
 install_github("npetraco/CRFutil")
 
-# Test and see if the CRFutil library loads. No error messages 
-# is a sign of success. Don't worry about any warning messages.
+** Test and see if the CRFutil library loads. No error messages 
+** is a sign of success. Don't worry about any warning messages.
 library(CRFutil)
 
 * Extensive notes and tutorials at:
