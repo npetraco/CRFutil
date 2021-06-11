@@ -8,14 +8,14 @@
 
 2. Turn on devtools and install CRFutil from github. CRFutil should automatically install CRF and gRbase:
 
-library(devtools)
+	library(devtools)
 
-install_github("npetraco/CRFutil")
+	install_github("npetraco/CRFutil")
 
 3. Test and see if the CRFutil library loads. No error messages is a sign of success. Don't worry about any warning messages.
 
-library(CRFutil)
+	library(CRFutil)
 
 * Extensive notes and tutorials on the use of this code with pair-wise Markov Random Fields at:
 
-https://jjcweb.jjay.cuny.edu/npetraco/tutorials/R/MRF/Notes.pptx
+	https://jjcweb.jjay.cuny.edu/npetraco/tutorials/R/MRF/Notes.pptx
