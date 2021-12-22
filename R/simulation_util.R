@@ -62,7 +62,8 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
 
 
   mrf.model.samples <- sample.junction(mrf.sim.model, num.sims)
-  colnames(mrf.model.samples) <- as.character(1:num.nodes)
+  #colnames(mrf.model.samples) <- as.character(1:num.nodes)
+  colnames(mrf.model.samples) <- as.character(colnames(adjacentcy.matrix)) # How do we know for sure these are the column names??
   mrf.sim.info <- list(
     mrf.sim.model,
     mrf.model.samples

@@ -2,7 +2,7 @@
 
 * To install:
 
-1. First install devtools
+1. First install devtools:
 
 	install.packages("devtools")
 

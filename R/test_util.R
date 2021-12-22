@@ -140,6 +140,76 @@ fit_mle <- function(graph.eq, samples, inference.method = infer.exact, num.iter=
 }
 
 
+#' MLE fit of parameters ONLY for full MRF loglikelihood
+#'
+#' Use this for bigger models where it is not possible to compute the full joint distribution
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard", opt.method="L-BFGS-B", inference.method = infer.exact, state.nmes = c("1","2"), num.iter=10, mag.grad.tol=1e-3) {
+
+  # Instantiate an empty model
+  mle.mdl.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = parameterization.typ)
+
+  # First compute the sufficient stats needed by the likelihood and its’ grad
+  mle.mdl.fit$par.stat <- mrf.stat(mle.mdl.fit, samples)
+
+  # Auxiliary, gradient convenience function. Follows train.mrf in CRF:
+  gradient <- function(par, crf, ...) { crf$gradient }
+
+  infr.meth <- inference.method     # inference method needed for Z and marginals calcs
+
+  # May need to run the optimization a few times to get the gradient down:
+  for(i in 1:num.iter) {
+    opt.info  <- stats::optim(        # optimize parameters
+      par          = mle.mdl.fit$par, # theta
+      fn           = negloglik,       # objective function
+      gr           = gradient,        # grad of obj func
+      crf          = mle.mdl.fit,     # passed to fn/gr
+      samples      = samples,         # passed to fn/gr
+      infer.method = infr.meth,       # passed to fn/gr
+      update.crfQ  = TRUE,            # passed to fn/gr
+      method       = opt.method,
+      control      = list(trace = 1, REPORT=1))
+
+    # Magnitude of the gradient:
+    mag.grad <- sqrt(sum(mle.mdl.fit$gradient^2))
+
+    print("==============================")
+    print(paste("iter:", i))
+    print(opt.info$convergence)
+    print(opt.info$message)
+    print(paste("Mag. Grad.:", mag.grad))
+
+    if(mag.grad <= mag.grad.tol){
+      print("Gradient converged!")
+      break()
+    } else {
+      print("Gradient not yet converged to specified tolerance")
+    }
+    print("==============================")
+  }
+  #print(mle.mdl.fit$par)
+
+  # Dress the potentials with gRbase decorations and include with crf object returned:
+  potentials.info <- make.gRbase.potentials(mle.mdl.fit, node.names = colnames(samples), state.nmes = state.nmes)
+  mle.mdl.fit$node.potentials <- potentials.info$node.potentials
+  mle.mdl.fit$edge.potentials <- potentials.info$edge.potentials
+  mle.mdl.fit$node.energies   <- potentials.info$node.energies
+  mle.mdl.fit$edge.energies   <- potentials.info$edge.energies
+
+  #print(colnames(samples))
+
+  return(mle.mdl.fit)
+
+}
+
+
 #' Joint distribution from logistic regression fit of parameters
 #'
 #' XXXX

@@ -285,3 +285,48 @@ pseudolikelihoods.from.energies2 <- function(state.space, crf, cond.en.form="fea
   return(dist.info)
 
 }
+
+
+#' Compute the Kullback-Leibler distance between two distributions
+#'
+#' Credit: Shamelessly taken from the excellent LaplacesDemon package
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+KLD <- function (px, py, base = exp(1))
+{
+  if (!is.vector(px))
+    px <- as.vector(px)
+  if (!is.vector(py))
+    py <- as.vector(py)
+  n1 <- length(px)
+  n2 <- length(py)
+  if (!identical(n1, n2))
+    stop("px and py must have the same length.")
+  if (any(!is.finite(px)) || any(!is.finite(py)))
+    stop("px and py must have finite values.")
+  if (any(px <= 0))
+    px <- exp(px)
+  if (any(py <= 0))
+    py <- exp(py)
+  px[which(px < .Machine$double.xmin)] <- .Machine$double.xmin
+  py[which(py < .Machine$double.xmin)] <- .Machine$double.xmin
+  px <- px/sum(px)
+  py <- py/sum(py)
+  KLD.px.py <- px * (log(px, base = base) - log(py, base = base))
+  KLD.py.px <- py * (log(py, base = base) - log(px, base = base))
+  sum.KLD.px.py <- sum(KLD.px.py)
+  sum.KLD.py.px <- sum(KLD.py.px)
+  mean.KLD <- (KLD.px.py + KLD.py.px)/2
+  mean.sum.KLD <- (sum.KLD.px.py + sum.KLD.py.px)/2
+  out <- list(KLD.px.py = KLD.px.py, KLD.py.px = KLD.py.px,
+              mean.KLD = mean.KLD, sum.KLD.px.py = sum.KLD.px.py, sum.KLD.py.px = sum.KLD.py.px,
+              mean.sum.KLD = mean.sum.KLD, intrinsic.discrepancy = min(sum.KLD.px.py,
+                                                                       sum.KLD.py.px))
+  return(out)
+}
