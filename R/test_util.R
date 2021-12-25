@@ -151,7 +151,7 @@ fit_mle <- function(graph.eq, samples, inference.method = infer.exact, num.iter=
 #'
 #'
 #' @export
-fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard", opt.method="L-BFGS-B", inference.method = infer.exact, state.nmes = c("1","2"), num.iter=10, mag.grad.tol=1e-3) {
+fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard", opt.method="L-BFGS-B", inference.method = infer.exact, state.nmes = c("1","2"), num.iter=10, mag.grad.tol=1e-3, plotQ=F) {
 
   # Instantiate an empty model
   mle.mdl.fit <- make.empty.field(graph.eq = graph.eq, parameterization.typ = parameterization.typ)
@@ -165,6 +165,7 @@ fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard",
   infr.meth <- inference.method     # inference method needed for Z and marginals calcs
 
   # May need to run the optimization a few times to get the gradient down:
+  mag.grads <- NULL
   for(i in 1:num.iter) {
     opt.info  <- stats::optim(        # optimize parameters
       par          = mle.mdl.fit$par, # theta
@@ -178,7 +179,8 @@ fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard",
       control      = list(trace = 1, REPORT=1))
 
     # Magnitude of the gradient:
-    mag.grad <- sqrt(sum(mle.mdl.fit$gradient^2))
+    mag.grad  <- sqrt(sum(mle.mdl.fit$gradient^2))
+    mag.grads <- c(mag.grads, mag.grad)
 
     print("==============================")
     print(paste("iter:", i))
@@ -193,6 +195,11 @@ fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard",
       print("Gradient not yet converged to specified tolerance")
     }
     print("==============================")
+
+    if(plotQ==TRUE){
+      plot(1:length(mag.grads), mag.grads, xlab="iteration", xlim=c(1,num.iter))
+    }
+
   }
   #print(mle.mdl.fit$par)
 

@@ -12,7 +12,8 @@ fit_mle_params(
   inference.method = infer.exact,
   state.nmes = c("1", "2"),
   num.iter = 10,
-  mag.grad.tol = 0.001
+  mag.grad.tol = 0.001,
+  plotQ = F
 )
 }
 \arguments{

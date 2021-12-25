@@ -72,6 +72,61 @@ distribution.from.potentials <- function(gRbase.node.potentials, gRbase.edge.pot
 
 }
 
+#' Compute the joint distribution, assuming a crf object is passed in with gRbase formatted potentials and/or energies
+#'
+#' The function will XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#' @return The function will state probalities in gRbase table form as well as logZ
+#'
+#'
+#' @export
+distribution.calc <- function(crf, logZ.calc=NULL){
+
+  num.nodes <- crf$n.nodes
+  num.edges <- crf$n.edges
+
+  prod.node.pots <- tableMult(crf$node.potentials[[2]], crf$node.potentials[[1]])
+  if(num.nodes > 2){
+    for(i in 3:num.nodes){
+      prod.node.pots <- tableMult(prod.node.pots, crf$node.potentials[[i]])
+    }
+  }
+
+  #prod.edge.pots <- tableMult(gRbase.edge.potentials[[2]], gRbase.edge.potentials[[1]])
+  if(num.edges > 2){
+    prod.edge.pots <- tableMult(crf$edge.potentials[[2]], crf$edge.potentials[[1]])
+    for(i in 3:num.edges){
+      prod.edge.pots <- tableMult(prod.edge.pots, crf$edge.potentials[[i]])
+    }
+  } else { # For only two nodes there is only one edge
+    prod.edge.pots <- crf$edge.potentials[[1]]
+  }
+
+  # Direct normalization:
+  #state.probs <- tableMult(prod.edge.pots, prod.node.pots)
+  #ZZ <- sum(state.probs)
+  #state.probs <- state.probs/ZZ
+
+  # Assume the prod pots can get a little rowdy. Normalize on log scale instead:
+  log.state.prod.pots <- log(tableMult(prod.edge.pots, prod.node.pots)) # log un-normalized joint dist.
+
+  if(is.null(logZ.calc)){
+    logZZ <- logsumexp2(log.state.prod.pots)
+  } else {
+    logZZ <- logZ.calc(crf)$logZ # Use one of the inference methods implemented in CRF instead
+  }
+
+  log.state.probs     <- log.state.prod.pots - logZZ
+
+  dist.info <- list(exp(log.state.probs), logZZ)
+  names(dist.info) <- c("state.probs", "logZ")
+  return(dist.info)
+
+}
+
 
 #' Compute the pseudolikelihoods from the node and edge energies. Assumes only 2 states/node
 #' Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
