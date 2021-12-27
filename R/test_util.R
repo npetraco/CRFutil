@@ -204,6 +204,7 @@ fit_mle_params <- function(graph.eq, samples, parameterization.typ = "standard",
   #print(mle.mdl.fit$par)
 
   # Dress the potentials with gRbase decorations and include with crf object returned:
+  out.pots        <- make.pots(parms = mle.mdl.fit$par,  crf = mle.mdl.fit,  rescaleQ = F, replaceQ = T)
   potentials.info <- make.gRbase.potentials(mle.mdl.fit, node.names = colnames(samples), state.nmes = state.nmes)
   mle.mdl.fit$node.potentials <- potentials.info$node.potentials
   mle.mdl.fit$edge.potentials <- potentials.info$edge.potentials
