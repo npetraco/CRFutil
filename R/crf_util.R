@@ -252,6 +252,20 @@ make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="
       new.crf$edge.par[[i]][2,2,1] <- 2
     }
 
+  } else if(parameterization.typ == "ising3") {
+
+    # Different parameters for all the nodes, one parameter for all the edges
+    num.pars <- new.crf$n.nodes+1
+    new.crf  <- make.par(new.crf, num.pars)
+
+    for(i in 1:new.crf$n.nodes) {
+      new.crf$node.par[i,1,] <- i
+    }
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- new.crf$n.nodes+1
+      new.crf$edge.par[[i]][2,2,1] <- new.crf$n.nodes+1
+    }
+
 
   } else if(parameterization.typ == "custom") {
 
@@ -270,7 +284,7 @@ make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="
     }
 
   } else {
-    stop("Specify parameterization choice: standard, flexible, ising1, ising2 or custom!")
+    stop("Specify parameterization choice: standard, flexible, ising1, ising2, ising3, or custom!")
   }
 
   #dump.crf(new.crf)

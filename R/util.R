@@ -275,7 +275,7 @@ nodes2params.list2 <- function(crf, storeQ = FALSE){
 #' Function to find which parameters are associated with which nodes.
 #' XXXX
 #'
-#' The list produced maps parameters indices to the nodes they are asociated with
+#' The list produced maps parameters indices to the nodes they are associated with
 #'
 #' The function will XXXX
 #'
