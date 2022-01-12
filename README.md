@@ -2,9 +2,13 @@
 
 * To install:
 
-1. First install devtools:
+1. First install devtools, BiocManager, graph, Rgraphviz and RBGL:
 
 	install.packages("devtools")
+	install.packages("BiocManager")
+	BiocManager::install("graph", force = TRUE)
+	BiocManager::install("Rgraphviz", force = TRUE)
+	BiocManager::install("RBGL", force = TRUE)
 
 2. Turn on devtools and install CRFutil from github. CRFutil should automatically install CRF and gRbase:
 
