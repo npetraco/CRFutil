@@ -226,6 +226,35 @@ make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="
     }
 
 
+  } else if(parameterization.typ == "general") {
+
+    # **NOTE: Don't use this one for fits. It's just meant for testing unsymmetrical potentials
+
+    # Two parameter per node, four parameters per edge
+    num.pars <- 2*new.crf$n.nodes + 4*new.crf$n.edges
+    new.crf <- make.par(new.crf, num.pars)
+
+    par.count <- 1
+    for(i in 1:new.crf$n.nodes) {
+      new.crf$node.par[i,1,] <- par.count
+      par.count <- par.count + 1
+      new.crf$node.par[i,2,] <- par.count
+      par.count <- par.count + 1
+    }
+    for(i in 1:new.crf$n.edges){
+      new.crf$edge.par[[i]][1,1,1] <- par.count
+      par.count <- par.count + 1
+
+      new.crf$edge.par[[i]][2,1,1] <- par.count
+      par.count <- par.count + 1
+
+      new.crf$edge.par[[i]][1,2,1] <- par.count
+      par.count <- par.count + 1
+
+      new.crf$edge.par[[i]][2,2,1] <- par.count
+      par.count <- par.count + 1
+    }
+
   } else if(parameterization.typ == "ising1") {
 
     # No node parameters and one parameter for all the edges

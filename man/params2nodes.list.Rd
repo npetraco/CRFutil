@@ -16,7 +16,7 @@ params2nodes.list(crf, storeQ = FALSE)
 The function will XX
 }
 \description{
-The list produced maps parameters indices to the nodes they are asociated with
+The list produced maps parameters indices to the nodes they are associated with
 }
 \details{
 The function will XXXX

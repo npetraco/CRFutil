@@ -83,7 +83,7 @@ distribution.from.potentials <- function(gRbase.node.potentials, gRbase.edge.pot
 #'
 #'
 #' @export
-distribution.calc <- function(crf, logZ.calc=NULL){
+distribution.calc <- function(crf, logZ.calc=NULL){  # change logZ.calc to inference.meth at some point
 
   num.nodes <- crf$n.nodes
   num.edges <- crf$n.edges
