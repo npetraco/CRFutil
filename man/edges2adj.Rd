@@ -5,7 +5,7 @@
 \title{Form adjacency matrix from edge matrix.
 XXXX}
 \usage{
-edges2adj(edge.mat, plotQ = FALSE)
+edges2adj(edge.mat, n.nodes = NULL, plotQ = FALSE)
 }
 \arguments{
 \item{edge.mat}{The XX}

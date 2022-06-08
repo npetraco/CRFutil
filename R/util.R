@@ -323,9 +323,14 @@ params2nodes.list <- function(crf, storeQ = FALSE){
 #'
 #'
 #' @export
-edges2adj <- function(edge.mat, plotQ=FALSE){
+edges2adj <- function(edge.mat, n.nodes = NULL, plotQ=FALSE){
 
-  num.nods <- max(edge.mat)
+  if(is.null(n.nodes)){
+    num.nods <- max(edge.mat) # Assumes all nodes have at least one edge
+  } else {
+    num.nods <- n.nodes
+  }
+
   adj.mat <- array(0, c(num.nods,num.nods))
 
   for(i in 1:nrow(edge.mat)){
