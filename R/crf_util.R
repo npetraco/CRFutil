@@ -77,7 +77,7 @@ make.gRbase.potentials <- function(crf, node.names, state.nmes=NULL){
     } else {
       vls <- crf$node.pot[i,]
     }
-    gRbase.node.potentials[[i]]     <- ar_new(node.names[i], levels=node.levs, values=c(vls))
+    gRbase.node.potentials[[i]]     <- tabNew(node.names[i], levels=node.levs, values=c(vls))
     gRbase.node.log.potentials[[i]] <- log(gRbase.node.potentials[[i]])
   }
 
@@ -89,7 +89,7 @@ make.gRbase.potentials <- function(crf, node.names, state.nmes=NULL){
     e2                              <- node.names[crf$edges[i,2]]
     node.levs                       <- list(state.nmes.loc,state.nmes.loc)
     names(node.levs)                <- c(e1,e2)
-    gRbase.edge.potentials[[i]]     <- ar_new(c(e1,e2), levels=node.levs, values=as.numeric(crf$edge.pot[[i]]))
+    gRbase.edge.potentials[[i]]     <- tabNew(c(e1,e2), levels=node.levs, values=as.numeric(crf$edge.pot[[i]]))
     gRbase.edge.log.potentials[[i]] <- log(gRbase.edge.potentials[[i]])
   }
 
@@ -132,7 +132,7 @@ make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=
   for(i in 1:num.nodes){
     node.levs                 <- list(state.nmes.loc)
     names(node.levs)          <- node.names[i]
-    gRbase.node.bels[[i]]     <- ar_new(node.names[i], levels=node.levs, values=c(inference.obj$node.bel[i,]))
+    gRbase.node.bels[[i]]     <- tabNew(node.names[i], levels=node.levs, values=c(inference.obj$node.bel[i,]))
   }
 
   # Decorate edge beliefs:
@@ -142,7 +142,7 @@ make.gRbase.beliefs <- function(inference.obj, node.names, edge.mat, state.nmes=
     e2                        <- node.names[edge.mat[i,2]]
     node.levs                 <- list(state.nmes.loc,state.nmes.loc)
     names(node.levs)          <- c(e1,e2)
-    gRbase.edge.bels[[i]]     <- ar_new(c(e1,e2), levels=node.levs, values=as.numeric(inference.obj$edge.bel[[i]]))
+    gRbase.edge.bels[[i]]     <- tabNew(c(e1,e2), levels=node.levs, values=as.numeric(inference.obj$edge.bel[[i]]))
   }
 
   belief.info        <- list(gRbase.node.bels,
