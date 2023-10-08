@@ -1,3 +1,19 @@
+#' Easily update the CRFutil library by installing the current version from the github site
+#'
+#' Easily update the CRFutil library by installing the current version from the github site
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+update_CRFutil <- function() {
+  print("Updating CRFutil")
+  remotes::install_github("npetraco/CRFutil")
+  print("Done!")
+}
+
+
 #' Log sum exp trick. From Brendon Brewer's DNest code:
 #'
 #' Handy for calculating Z from a vector of log potentials.
