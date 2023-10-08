@@ -61,8 +61,10 @@ data.frame(as.data.frame(as.table(X.Prob)), as.data.frame(as.table(X.Prob.fitted
 grphf <- ~1:2 + 1:3
 adj <- ug(grphf, result="matrix")
 adj
+
 # Check the graph:
-gp <- ug(grphf, result = "graph")
+#gp <- ug(grphf, result = "graph") # No longer working 10-8-23
+gp <- ug(grphf, result = "igraph")
 dev.off()
 iplot(gp)
 
@@ -89,7 +91,8 @@ knm$node.pot
 infer.exact(knm)
 
 
-pot.info.knm <- make.gRbase.potentials(knm, node.names = gp@nodes, state.nmes = c("1","2"))
+#pot.info.knm <- make.gRbase.potentials(knm, node.names = gp@nodes, state.nmes = c("1","2")) # gp@nodes not functional 10-8-23
+pot.info.knm <- make.gRbase.potentials(knm, node.names = V(gp), state.nmes = c("1","2"))
 gR.dist.info.knm    <- distribution.from.potentials(pot.info.knm$node.potentials, pot.info.knm$edge.potentials)
 logZ.knm            <- gR.dist.info.knm$logZ
 joint.dist.info.knm <- as.data.frame(as.table(gR.dist.info.knm$state.probs))
@@ -117,6 +120,8 @@ data.frame(X.Prob.fitted.flat[,1:4], joint.dist.info.knm.rearr[rearr.idxs,4])
 # Use hojsgaard loglm coefs to make potentials for CRF. Compare the state probs we get to the
 # direct state probs of the hojsgaard loglm model and the original CRF model
 # Compare logZ obtained to hojsgaard intercept
+
+grphf
 hoj <- make.empty.field(graph.eq=grphf, parameterization.typ="standard", plotQ=T)
 dump.crf(hoj)
 adj
@@ -134,7 +139,8 @@ hoj$edge.pot[[2]] <- exp(t(X.loglm.coefs$`1.3`))  # 1-3
 hoj$edge.pot
 
 
-pot.info.hoj <- make.gRbase.potentials(hoj, node.names = gp@nodes, state.nmes = c("1","2"))
+#pot.info.hoj <- make.gRbase.potentials(hoj, node.names = gp@nodes, state.nmes = c("1","2"))
+pot.info.hoj <- make.gRbase.potentials(hoj, node.names = V(gp), state.nmes = c("1","2"))
 pot.info.hoj
 
 gR.dist.info.hoj    <- distribution.from.potentials(pot.info.hoj$node.potentials, pot.info.hoj$edge.potentials)

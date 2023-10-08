@@ -318,7 +318,8 @@ make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="
 
   #dump.crf(new.crf)
   if(plotQ==TRUE){
-    new.crf.gp <- as(adjm,"graphNEL")
+    #new.crf.gp <- as(adjm,"graphNEL")  # 10-8-23 This works, but iplot will no longer plot a graphNEL object, so do below instead:
+    new.crf.gp <- graph_from_adjacency_matrix(adjm, mode = "undirected")
     if(!is.null(dev.list())){
       dev.off()
     }

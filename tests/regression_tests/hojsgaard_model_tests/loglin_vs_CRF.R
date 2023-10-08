@@ -1,4 +1,4 @@
-library(gRbase)
+#library(gRbase)
 library(MASS)
 library(gRim)
 library(CRFutil)
@@ -19,14 +19,15 @@ head(data.frame(hgt, lizardRAW[,2]))
 levels(lizardRAW[,3])
 spc <- as.numeric(lizardRAW[,3])
 head(data.frame(spc, lizardRAW[,3]))
-# Put the data bach together in the orignina column order and convert to a contingency table
+
+# Put the data back together in the original column order and convert to a contingency table
 X.RAW <- cbind(diam, hgt, spc)
 head(X.RAW)
 X <- xtabs(~., data=X.RAW)
 dim(X)
 ftable(X)
 
-# Hojsgaard: One estimate of the config probabilities is by the relative frquencies:
+# Hojsgaard: One estimate of the config probabilities is by the relative frequencies:
 X.Prob <- X/sum(X)
 ftable(X.Prob)
 
@@ -51,8 +52,11 @@ grphf <- ~spc:diam + spc:hgt
 #~spc:diam + spc:hgt used for loglm above
 adj <- ug(grphf, result="matrix")
 adj
+
 # Check the graph:
-gp <- ug(grphf, result = "graph")
+#gp <- ug(grphf, result = "graph")    # deprecated and no longer functional 10-8-23
+#gp <- ug(grphf, result = "graphNEL") # not working.......
+gp <- ug(grphf)                       # outputs igraph format. Can convert to graphNEL format if required with as_graphnel()
 dev.off()
 iplot(gp)
 
@@ -78,8 +82,8 @@ knm$edge.pot
 knm$node.pot
 infer.exact(knm)
 
-
-pot.info.knm <- make.gRbase.potentials(knm, node.names = gp@nodes, state.nmes = c("1","2"))
+gp <- as_graphnel(gp) # gp now gets output in igraph form. Convert to graphNEL 10-8-23
+pot.info.knm        <- make.gRbase.potentials(knm, node.names = gp@nodes, state.nmes = c("1","2"))
 gR.dist.info.knm    <- distribution.from.potentials(pot.info.knm$node.potentials, pot.info.knm$edge.potentials)
 logZ.knm            <- gR.dist.info.knm$logZ
 joint.dist.info.knm <- as.data.frame(as.table(gR.dist.info.knm$state.probs))
@@ -97,6 +101,11 @@ X.Prob.fitted.rearr
 joint.dist.info.knm
 
 # Rearrange state indices to be in the same order between the two models:
+
+# row.match is BROKEN?????????????????????:
+# row.match(joint.dist.info.knm[1,1:3],  as.(X.Prob.fitted.rearr[,1:3]))
+# as.table(X.Prob.fitted.rearr[,1:3])
+
 rearr.idxs <- sapply(1:8,function(xx){row.match(joint.dist.info.knm[xx,1:3], table = X.Prob.fitted.rearr[,1:3])})
 data.frame(joint.dist.info.knm[,1:3], X.Prob.fitted.rearr[rearr.idxs,1:3])
 
