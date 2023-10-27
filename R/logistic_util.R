@@ -9,7 +9,7 @@
 #'
 #'
 #' @export
-delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {  # **** NEEDS TO BE C
+delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE, ff) {  # **** NEEDS TO BE C
 
   Da.mat        <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
   cond.alp.mat  <- array(NA,c(nrow(samples)*crf$n.nodes, crf$n.par))
@@ -24,8 +24,8 @@ delta.alpha <- function(crf, samples, state.nmes=c(1,2), printQ=FALSE) {  # ****
       X.cfg[i]  <- state.nmes[1]  # Default state names are our usual choice.
       Xc.cfg[i] <- state.nmes[2]
 
-      cond.alp  <- symbolic.conditional.energy(config = X.cfg,  condition.element.number = i, crf = crf, ff = f0, printQ = F, format = "conditional.phi")
-      cond.alpc <- symbolic.conditional.energy(config = Xc.cfg, condition.element.number = i, crf = crf, ff = f0, printQ = F, format = "conditional.phi")
+      cond.alp  <- symbolic.conditional.energy(config = X.cfg,  condition.element.number = i, crf = crf, ff = ff, printQ = F, format = "conditional.phi")
+      cond.alpc <- symbolic.conditional.energy(config = Xc.cfg, condition.element.number = i, crf = crf, ff = ff, printQ = F, format = "conditional.phi")
       cond.alp.mat[count,]  <- cond.alp
       cond.alpc.mat[count,] <- cond.alpc
       Da.mat[count,]      <- cond.alp - cond.alpc

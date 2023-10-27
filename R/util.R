@@ -65,22 +65,6 @@ logsumexp2 <- function(logv)
 }
 
 
-#' testf
-#'
-#' XXXX
-#'
-#' The function will XXXX
-#'
-#' @param XX The XX
-#' @return The function will XX
-#'
-#'
-#' @export
-testf.fix <- function(){
-  print("Come out??")
-}
-
-
 #' Take the log of stuff (vectors, matrices, etc) in a list
 #'
 #' Handy for going from node/edge potentials in list form to node/edge energies (log potentials)
@@ -107,7 +91,7 @@ log_list <- function(a.list.for.logging) {
 
 #' Exp a bunch of stuff (vectors, matrices, etc) in a list
 #'
-#' Handy for going from node/edge energies (log potentials) in list form to node/edge potentials
+#' Handy for going from node/edge energies (log potentials) in list to node/edge potentials
 #'
 #' The function will XXXX
 #'
@@ -118,7 +102,7 @@ log_list <- function(a.list.for.logging) {
 #' @export
 exp_list <- function(a.list.for.eing) {
 
-  an.exp.list <- lapply(1:length(an.exp.list), function(xx){log(an.exp.list[[xx]])})
+  an.exp.list <- lapply(1:length(a.list.for.eing), function(xx){exp(a.list.for.eing[[xx]])})
 
   if(!is.null(names(a.list.for.eing))) {
     names(an.exp.list) <- names(a.list.for.eing)
@@ -142,7 +126,8 @@ exp_list <- function(a.list.for.eing) {
 #' @export
 row.match <- function (x, table, nomatch = NA)   # **********NEEDS TO BE C
 {
-  if (class(table) == "matrix")
+  #if (class(table) == "matrix")
+  if ("matrix" %in% class(table)) # Mod needed because class now returns all classes of object and that causes a bug. 10-15-23
     table <- as.data.frame(table)
   if (is.null(dim(x)))
     x <- as.data.frame(matrix(x, nrow = 1))
@@ -444,7 +429,7 @@ edges2adj <- function(edge.mat, n.nodes = NULL, plotQ=FALSE){
 #'
 #'
 #' @export
-adj2formula <- function(adj.mat, Xoption=FALSE){
+adj2formula <- function(adj.mat, edge.only.formulaQ=FALSE, Xoption=FALSE){
 
   # To be safe, just use row and col numbers as node names for now. Add X if required by a
   # formula interface
@@ -476,7 +461,11 @@ adj2formula <- function(adj.mat, Xoption=FALSE){
   edgs.idxs <- apply(as.matrix(edgs.idxs), 2, paste0, collapse = " + ")
   #print(edgs.idxs)
 
-  graph.fomla <- as.formula(paste0("~", node.idxs," + ", edgs.idxs))
+  if(edge.only.formulaQ == TRUE) {
+    graph.fomla <- as.formula(paste0("~", edgs.idxs)) # Produce formula with edges only. Primarily used for igraph plot
+  } else {
+    graph.fomla <- as.formula(paste0("~", node.idxs," + ", edgs.idxs)) # Produce formula with nodes and edges
+  }
 
   return(graph.fomla)
 

@@ -323,6 +323,10 @@ make.empty.field <- function(graph.eq=NULL, adj.mat=NULL, parameterization.typ="
     if(!is.null(dev.list())){
       dev.off()
     }
+    # if(length(dev.list()) !=0) {
+    #   dev.off()
+    #   print("DEV-OFF!")
+    # }
     iplot(new.crf.gp)
   }
 

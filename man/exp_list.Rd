@@ -13,7 +13,7 @@ exp_list(a.list.for.eing)
 The function will XX
 }
 \description{
-Handy for going from node/edge energies (log potentials) in list form to node/edge potentials
+Handy for going from node/edge energies (log potentials) in list to node/edge potentials
 }
 \details{
 The function will XXXX

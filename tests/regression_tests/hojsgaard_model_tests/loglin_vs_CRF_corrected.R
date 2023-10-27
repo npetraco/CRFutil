@@ -37,7 +37,7 @@ X
 dim(X)
 ftable(X)
 
-# Hojsgaard: One estimate of the config probabilities is by the relative frquencies:
+# Hojsgaard: One estimate of the config probabilities is by the relative frequencies:
 X.Prob <- X/sum(X)
 ftable(X.Prob)
 as.data.frame(as.table(X.Prob))
