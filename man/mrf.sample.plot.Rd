@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_util.R
 \name{mrf.sample.plot}
 \alias{mrf.sample.plot}
-\title{Plot a a sample of states node-wise}
+\title{Plot a sample of states node-wise}
 \usage{
 mrf.sample.plot(samples)
 }

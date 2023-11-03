@@ -24,25 +24,25 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
     mrf.sim.model$edge.par[[i]][2,2,1] <- nrow(mrf.sim.model$node.pot) + i
   }
 
-
-  # Make up random node weights:
   num.nodes <- nrow(adjacentcy.matrix)
+
+  # Make up random node and edge potentials:
   if(!is.null(seed)){
     set.seed(seed)
   }
-  pos <- runif(num.nodes)
-  neg <- 1-pos
+  rand.pots <- runif(num.nodes + mrf.sim.model$n.edges)
 
-  # ADD facility for non random node weights
+  # Node potentials
+  pos <- rand.pots[1:num.nodes]
+  neg <- 1-pos
 
   mrf.sim.model$node.pot <- cbind(pos,neg)
 
+  # Edge potentials
+  edge.pots.vec <- rand.pots[(num.nodes+1):length(rand.pots)]
   for (i in 1:mrf.sim.model$n.edges) {
-    # Make up random symmetric edge weights
-    if(!is.null(seed)){
-      set.seed(seed)
-    }
-    trans.1122 <- runif(1)
+    # Make symmetric edge potentials
+    trans.1122 <- edge.pots.vec[i]
     trans.prob <- rbind(
       c(trans.1122, 1-trans.1122),
       c(1-trans.1122, trans.1122)

@@ -3,7 +3,7 @@
 \name{make.par.from.potentials}
 \alias{make.par.from.potentials}
 \title{This version makes a parameter vector from the potentials according to the node/edge pars contained in the
-crf object. If the potentials are not scalled according to the codeing in node/edge par, they are re-scaled
+crf object. If the potentials are not scaled according to the coding in node/edge par, they are re-scaled
 before being used.}
 \usage{
 make.par.from.potentials(crf)

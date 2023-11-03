@@ -25,7 +25,7 @@ head(data.frame(spc, lizardRAW[,3]))
 #diam is 2
 #hgt  is 3
 
-# Put the data bach together in the orignina column order and convert to a contingency table
+# Put the data bach together in the original column order and convert to a contingency table
 X.RAW <- cbind(spc, diam, hgt)
 head(X.RAW)
 colnames(X.RAW) <- c("1","2","3")

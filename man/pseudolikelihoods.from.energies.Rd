@@ -3,8 +3,7 @@
 \name{pseudolikelihoods.from.energies}
 \alias{pseudolikelihoods.from.energies}
 \title{Compute the pseudolikelihoods from the node and edge energies. Assumes only 2 states/node
-Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
-The function will XXXX}
+Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975}
 \usage{
 pseudolikelihoods.from.energies(
   state.space,
@@ -23,5 +22,8 @@ pseudolikelihoods.from.energies(
 The function will XX
 }
 \description{
+The function will XXXX
+}
+\details{
 The function will XXXX
 }

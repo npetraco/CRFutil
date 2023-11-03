@@ -128,8 +128,110 @@ distribution.calc <- function(crf, logZ.calc=NULL){  # change logZ.calc to infer
 }
 
 
+#' Compute the joint distribution, with just an input crf object
+#'
+#' The function will XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#'
+#' @details A little shorter version and more generic version of distribution.calc above.
+#'
+#' @return The function will compute all configuration probabilities as well as logZ
+#'
+#'
+#' @export
+compute.full.distribution <- function(crf.obj, node.names=NULL, state.names=NULL){
+
+  if(is.null(node.names)) {
+    node.names.loc <- as.character(1:crf.obj$n.nodes)
+  }
+
+  if(is.null(state.names)) {
+    state.names.loc <- c("1", "2")
+  }
+
+  pot.info.loc     <- make.gRbase.potentials(crf.obj, node.names = node.names.loc, state.nmes = state.names.loc)
+  gR.dist.info.loc <- distribution.from.potentials(pot.info.loc$node.potentials, pot.info.loc$edge.potentials)
+
+  logZ.loc             <- gR.dist.info.loc$logZ
+  joint.dist.info.loc  <- as.data.frame(as.table(gR.dist.info.loc$state.probs))
+  joint.dist.info.list <- list(joint.dist.info.loc, logZ.loc)
+  names(joint.dist.info.list) <- c("joint.distribution", "logZ")
+
+  return(joint.dist.info.list)
+
+}
+
+
+#' Align joint distributions in table form, to a reference joint distribution
+#'
+#' The function will XXXX
+#'
+#' The function will XXXX
+#'
+#' @param XX The XX
+#'
+#' @details All joint distributions need to have the same numbers of nodes and configurations
+#'
+#' @return The function will compute all configuration probabilities as well as logZ
+#'
+#'
+#' @export
+align.distributions <- function(ref.dist.frame, dist.frame.list, include.configsQ=T){
+
+  # Assumes last column is the distribution
+  num.nodes.ref  <- ncol(ref.dist.frame) - 1
+  node.names.ref <- colnames(ref.dist.frame)[1:num.nodes.ref]
+
+  # Number of reference confgs:
+  num.configs.ref <- nrow(ref.dist.frame)
+
+  dist.probs <- array(-1.0, c(nrow(ref.dist.frame), length(dist.frame.list)))
+  for(i in 1:length(dist.frame.list)) {
+
+    dist.i             <- dist.frame.list[[i]]
+    num.nodes.dist.i   <- ncol(dist.i) - 1
+    node.names.dist.i  <- colnames(dist.i)[1:num.nodes.dist.i]
+    num.configs.dist.i <- nrow(dist.i)
+
+    # Make sure number of nodes are the same between dists
+    if(num.nodes.dist.i != num.nodes.ref) {
+      stop(paste("Dist ", i, " and Ref do not have the same number of nodes!"))
+    }
+
+    # Make sure number of configurations are the same between dists
+    if(num.configs.dist.i != num.configs.ref) {
+      stop(paste("Dist ", i, " and Ref do not have the same number of configurations!"))
+    }
+
+    # Permute the columns of dist.i to match the reference dist.:
+    col.perm.i <- sapply(1:num.nodes.ref, function(xx){which(colnames(dist.i) == node.names.ref[xx])})
+    dist.i     <- dist.i[, c(col.perm.i, ncol(dist.i))]
+
+    # Rearrange state indices to be in the same order between the two models:
+    rearr.idxs <- sapply(1:nrow(ref.dist.frame),function(xx){row.match(ref.dist.frame[xx,1:num.nodes.ref], table = dist.i[,1:num.nodes.dist.i])})
+    dist.i     <- dist.i[rearr.idxs,]
+    #print(data.frame(ref.dist.frame, dist.i))
+
+    dist.probs[,i] <- dist.i[, ncol(dist.i)]
+
+  }
+
+  # Tack on configurations if requested
+  if(include.configsQ == T) {
+    dist.probs <- data.frame(dist.i[, 1:(ncol(ref.dist.frame)-1) ], dist.probs)
+  }
+
+  return(dist.probs)
+
+}
+
+
 #' Compute the pseudolikelihoods from the node and edge energies. Assumes only 2 states/node
 #' Pr(X) ~= Prod Pr(Xi | X/Xi) Besag 1975
+#'
 #' The function will XXXX
 #'
 #' The function will XXXX

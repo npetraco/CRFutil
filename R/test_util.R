@@ -696,3 +696,754 @@ fit_bayes_zip <- function(graph.eq, samples, iter=2000, thin=1, chains=4, contro
   return(loc.bfit)
 
 }
+
+
+#' Generate a little lizard data model from Brunner course for testing
+#'
+#' XXXX
+#'
+#' The function will
+#'
+#' @param XX The XX
+#'
+#' @details The function will generate a little lizard data model for testing. Originally from: https://www.utstat.toronto.edu/~brunner/oldclass/312f12/lectures/312f12LoglinearWithR2.pdf
+#'          Generating the data this way saves a little space in testing and allows the user
+#'          to change the names of the nodes and states.
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_brunner_lizards <- function(typ=1, node1.name=NULL, node2.name=NULL, node3.name=NULL, node1.states=NULL, node2.states=NULL, node3.states=NULL) {
+
+  lizards      <- numeric(8)
+  dim(lizards) <- c(2,2,2) # Now a 2x2x2 table: Rows, cols, layers
+
+  # 1 = Perch Height, 2 = Perch Diameter, 3 = Species
+  lizards[,,1] <- rbind( c(15,18),
+                         c(48,84) )
+  lizards[,,2] <- rbind( c(21,1),
+                         c(3, 2) )
+
+  if(typ==1) {
+    # Original labels Brunner used
+    lizlabels          <- list()
+    lizlabels$Height   <- c("gt_5.0","le_5.0")
+    lizlabels$Diameter <- c("le_2.5","gt_2.5")
+    lizlabels$Species  <- c("Sagrei","Angusticeps")
+    dimnames(lizards)  <- lizlabels
+  } else if(typ==2) {
+    # More generic labels
+    lizlabels     <- list()
+    lizlabels$`1` <- c("1","2")
+    lizlabels$`2` <- c("1","2")
+    lizlabels$`3` <- c("1","2")
+    dimnames(lizards)  <- lizlabels
+  } else if(typ==3) {
+    # User defined labels
+    lizlabels     <- list(
+      node1.states,
+      node2.states,
+      node3.states
+    )
+    names(lizlabels)  <- c(node1.name, node2.name, node3.name)
+    dimnames(lizards) <- lizlabels
+  } else if(typ==0) {
+    # Do nothing for labels
+    lizlabels     <- list()
+  } else {
+    stop("typ must == 0, 1, 2, or 3")
+  }
+
+  # Table forms
+  lizards.config.freq.frame <- as.data.frame(as.table(lizards)) # Config freq table
+  #print(lizards.config.freq.frame)
+
+  # Configurations. Put in random order
+  num.samp.configs <- sum(lizards)
+  num.nodes.loc    <- (ncol(lizards.config.freq.frame)-1)
+  lizards.configs  <- NULL
+
+  for(i in 1:nrow(lizards.config.freq.frame)) {
+    a.config    <- lizards.config.freq.frame[i, 1:num.nodes.loc]
+    config.freq <- lizards.config.freq.frame[i, num.nodes.loc+1]
+
+    for(j in 1:config.freq) {
+      lizards.configs <- rbind(lizards.configs, a.config)
+    }
+
+  }
+  rownames(lizards.configs) <- NULL
+  #print(configs)
+
+  # Empirical dist
+  lizards.config.probs <- lizards/sum(lizards)
+  lizards.config.probs <- as.data.frame(as.table(lizards.config.probs))
+
+  lizards.info.list <- list(lizards,
+                            lizards.config.freq.frame,
+                            lizards.configs,
+                            lizards.config.probs)
+
+  names(lizards.info.list) <- c("lizards.contingency.table",
+                                "lizards.configuration.frequencies",
+                                "lizards.samples",
+                                "lizards.configuration.probabilities")
+
+  return(lizards.info.list)
+
+}
+
+
+#' Generate a little lizard data model from the gRbase package for testing
+#'
+#' XXXX
+#'
+#' The function will
+#'
+#' @param XX The XX
+#'
+#' @details The function will generate a little lizard data model for testing. Accessed from the gRbase package and
+#' processed/reconfigured for various testing exercises.
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_gRbase_lizards <- function() {
+
+  # gRbase lizard data should already be loaded
+  #data(lizard)
+
+  # Empirical dist
+  lizards.config.probs <- lizard/sum(lizard)
+  lizards.config.probs <- as.data.frame(as.table(lizards.config.probs))
+
+  lizards.info.list <- list(lizard,    # Already in gRbase
+                            lizardAGG, # Already in gRbase
+                            lizardRAW, # Already in gRbase
+                            lizards.config.probs)
+
+  # Use the same names as for the Brunner data set above
+  names(lizards.info.list) <- c("lizards.contingency.table",
+                                "lizards.configuration.frequencies",
+                                "lizards.samples",
+                                "lizards.configuration.probabilities")
+
+  return(lizards.info.list)
+
+}
+
+
+#' Generate the original triangle model used in Notes
+#'
+#' Generate the original triangle model used in Notes
+#'
+#' The function will generate the original triangle model used in Notes. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate the original triangle model used in Notes along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_triangle_model <- function(num.samples = NULL, Temp=1, plot.sampleQ=F, plot.graphQ=F) {
+
+  # A:B + A:C + B:C
+  tri.model.loc <- make.empty.field(graph.eq = ~1:2 + 1:3 + 2:3, parameterization.typ = "general", plot.graphQ)
+  #dump.crf(tri.model.loc)
+
+  # node potentials:
+  tauA <- c( 1,    -1.3)
+  tauB <- c(-0.85, -2.4)
+  tauC <- c(3.82,   1.4)
+
+  # edge potentials:
+  omegaAB <- rbind(
+    c( 3.5, -1.4),
+    c(-1.4,  2.5)
+  )
+  omegaBC <- rbind(
+    c( 2.6, 0.4),
+    c( 0.4, 2.5)
+  )
+  omegaAC <- rbind(
+    c(-0.6,  1.2),
+    c( 1.2, -0.6)
+  )
+
+  tri.model.loc$node.pot <- rbind(
+    exp(tauA/Temp),
+    exp(tauB/Temp),
+    exp(tauC/Temp)
+  )
+  rownames(tri.model.loc$node.pot) <- NULL # Remove the row names
+
+  tri.model.loc$edge.pot[[1]] <- exp(omegaAB/Temp)
+  tri.model.loc$edge.pot[[2]] <- exp(omegaAC/Temp)
+  tri.model.loc$edge.pot[[3]] <- exp(omegaBC/Temp)
+
+  tri.model.loc$par <- c(as.numeric(t(tri.model.loc$node.pot)), unlist(tri.model.loc$edge.pot))
+
+  # Compute exact joint distribution from potentials:
+  tri.model.ext.probs <- compute.full.distribution(tri.model.loc)$joint.distribution
+  #print(tri.model.ext.probs)
+
+  tri.model.samps             <- NULL
+  tri.model.contingency       <- NULL
+  tri.model.config.freq.frame <- NULL
+  tri.model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    tri.model.samps <- sample.exact(tri.model.loc, size = num.samples)
+    #print(tri.model.samps)
+    colnames(tri.model.samps) <- c("X1", "X2", "X3")
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(tri.model.samps)
+    }
+
+    # Samples to contingency table
+    tri.model.contingency <- xtabs(~., data=as.data.frame(tri.model.samps))
+    #print(tri.model.contingency)
+
+    # Sample config freq table
+    tri.model.config.freq.frame <- as.data.frame(as.table(tri.model.contingency))
+
+    # Sample configuration probabilities
+    tri.model.emp.probs <- tri.model.contingency/sum(tri.model.contingency)
+    tri.model.emp.probs <- as.data.frame(as.table(tri.model.emp.probs))
+    tri.model.ext.probs <- align.distributions(tri.model.emp.probs, list(tri.model.ext.probs))
+    #print(data.frame(tri.model.emp.probs, tri.model.ext.probs))
+
+
+  }
+
+  tri.model.info <-   list(
+    tri.model.loc,
+    tri.model.contingency,
+    tri.model.config.freq.frame,
+    tri.model.samps,
+    tri.model.emp.probs,
+    tri.model.ext.probs
+  )
+
+  names(tri.model.info) <- c("triangle.model",
+                             "tri.contingency.table",
+                             "tri.configuration.frequencies",
+                             "tri.samples",
+                             "tri.empirical.joint.distribution",
+                             "tri.exact.joint.distribution")
+
+  return(tri.model.info)
+
+}
+
+
+#' Generate the original Schmidt small chain model used in Notes
+#'
+#' Generate the original Schmidt small chain model used in Notes
+#'
+#' The function will generate the original Schmidt small chain model used in Notes. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate the original Schmidt small chain model used in Notes along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_schmidt_small_model <- function(num.samples = NULL, Temp = 1, plot.sampleQ=F, plot.graphQ=F) {
+
+  # Cathy-Heather-Mark-Allison: 1-2-3-4
+  model.loc <- make.empty.field(graph.eq = ~1:2 + 2:3 + 3:4, parameterization.typ = "general", plot.graphQ)
+  #dump.crf(model.loc)
+
+  Psi1 <- exp(log(c(0.25, 0.75)*4)/Temp)
+  Psi2 <- exp(log(c(0.9,  0.1) *10)/Temp)
+  Psi3 <- exp(log(c(0.25, 0.75)*4)/Temp)
+  Psi4 <- exp(log(c(0.9,  0.1) *10)/Temp)
+
+  Psi12 <- exp(log(6*rbind(c(2/6, 1/6),
+                           c(1/6, 2/6)) )/Temp)
+  Psi23 <- exp(log(6*rbind(c(2/6, 1/6),
+                           c(1/6, 2/6)) )/Temp)
+  Psi34 <- exp(log(6*rbind(c(2/6, 1/6),
+                           c(1/6, 2/6)) )/Temp)
+
+  model.loc$node.pot <- rbind(
+    Psi1,
+    Psi2,
+    Psi3,
+    Psi4
+  )
+  rownames(model.loc$node.pot) <- NULL # Remove the row names
+
+  model.loc$edge.pot[[1]] <- Psi12
+  model.loc$edge.pot[[2]] <- Psi23
+  model.loc$edge.pot[[3]] <- Psi34
+
+  model.loc$par <- c(as.numeric(t(model.loc$node.pot)), unlist(model.loc$edge.pot))
+  #dump.crf(model.loc)
+
+  # Compute exact joint distribution from potentials:
+  model.ext.probs <- compute.full.distribution(model.loc)$joint.distribution
+  #print(model.ext.probs)
+
+  model.samps             <- NULL
+  model.contingency       <- NULL
+  model.config.freq.frame <- NULL
+  model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    model.samps <- sample.exact(model.loc, size = num.samples)
+    colnames(model.samps) <- paste0("X", 1:model.loc$n.nodes)
+    #print(head(model.samps))
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(model.samps)
+    }
+
+    # Samples to contingency table
+    model.contingency <- xtabs(~., data=as.data.frame(model.samps))
+    #print(model.contingency)
+
+    # Sample config freq table
+    model.config.freq.frame <- as.data.frame(as.table(model.contingency))
+    #print(model.config.freq.frame)
+
+    # Sample configuration probabilities
+    model.emp.probs <- model.contingency/sum(model.contingency)
+    model.emp.probs <- as.data.frame(as.table(model.emp.probs))
+    model.ext.probs <- align.distributions(model.emp.probs, list(model.ext.probs))
+    #print(data.frame(model.emp.probs, model.ext.probs))
+
+  }
+
+  model.info <- list(
+    model.loc,
+    model.contingency,
+    model.config.freq.frame,
+    model.samps,
+    model.emp.probs,
+    model.ext.probs
+  )
+
+  names(model.info) <- c("schmidt.small.model",
+                             "schmidt.small.contingency.table",
+                             "schmidt.small.configuration.frequencies",
+                             "schmidt.small.samples",
+                             "schmidt.small.empirical.joint.distribution",
+                             "schmidt.small.exact.joint.distribution")
+
+  return(model.info)
+
+}
+
+
+#' Generate the original Koller-Friedman Misconception model used in their book and the Notes
+#'
+#' Generate the original Koller-Friedman Misconception model used in their book and the Notes
+#'
+#' The function will generate the original Koller-Friedman Misconception model used in Notes. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate the original Schmidt small chain model used in Notes along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_koller_misconception_model <- function(num.samples = NULL, Temp = 1, plot.sampleQ=F, plot.graphQ=F) {
+
+  # Alice---Bob
+  #    |     |
+  # Charles-Debbie
+  model.loc <- make.empty.field(graph.eq = ~1:2 + 2:3 + 3:4 + 4:1, parameterization.typ = "general", plotQ = plot.graphQ)
+  #dump.crf(model.loc)
+
+  # Node pots in original Misconception example are all 1 so no need to initialize them.
+  # Edge pots in the Misconception example:
+  PsiAB <- exp(log( rbind(
+    c(30, 5),
+    c(1, 10)) )/Temp)
+
+  PsiBC <- exp(log( rbind(
+    c(100, 1),
+    c(1, 100)) )/Temp)
+
+  PsiCD <- exp(log( rbind(
+    c(1, 100),
+    c(100, 1)) )/Temp)
+
+  PsiDA <- exp(log( rbind(
+    c(100, 1),
+    c(1, 100)) )/Temp)
+
+  model.loc$edge.pot[[1]] <- PsiAB
+  model.loc$edge.pot[[2]] <- PsiBC
+  model.loc$edge.pot[[3]] <- PsiCD
+  model.loc$edge.pot[[4]] <- PsiDA
+
+  model.loc$par <- c(as.numeric(t(model.loc$node.pot)), unlist(model.loc$edge.pot))
+  #dump.crf(model.loc)
+
+  # Compute exact joint distribution from potentials:
+  model.ext.probs <- compute.full.distribution(model.loc)$joint.distribution
+  #print(model.ext.probs)
+
+  model.samps             <- NULL
+  model.contingency       <- NULL
+  model.config.freq.frame <- NULL
+  model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    model.samps <- sample.exact(model.loc, size = num.samples)
+    colnames(model.samps) <- paste0("X", 1:model.loc$n.nodes)
+    #print(head(model.samps))
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(model.samps)
+    }
+
+    # Samples to contingency table
+    model.contingency <- xtabs(~., data=as.data.frame(model.samps))
+    #print(model.contingency)
+
+    # Sample config freq table
+    model.config.freq.frame <- as.data.frame(as.table(model.contingency))
+    #print(model.config.freq.frame)
+
+    # Sample configuration probabilities
+    model.emp.probs <- model.contingency/sum(model.contingency)
+    model.emp.probs <- as.data.frame(as.table(model.emp.probs))
+    model.ext.probs <- align.distributions(model.emp.probs, list(model.ext.probs))
+    #print(data.frame(model.emp.probs, model.ext.probs))
+
+  }
+
+  model.info <- list(
+    model.loc,
+    model.contingency,
+    model.config.freq.frame,
+    model.samps,
+    model.emp.probs,
+    model.ext.probs
+  )
+
+  names(model.info) <- c("koller.misconception.model",
+                         "koller.misconception.contingency.table",
+                         "koller.misconception.configuration.frequencies",
+                         "koller.misconception.samples",
+                         "koller.misconception.empirical.joint.distribution",
+                         "koller.misconception.exact.joint.distribution")
+
+  return(model.info)
+
+}
+
+
+#' Generate the star model used in their book and the Notes
+#'
+#' Generate the star model used in their book and the Notes
+#'
+#' The function will generate the star model used in Notes. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate the original Schmidt small chain model used in Notes along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_star_model <- function(num.samples = NULL, Temp=1, seed=NULL, plot.sampleQ=F, plot.graphQ=F) {
+
+
+  # Graph formula for Star field:
+  adj.loc   <- ug(~1:2+1:3+1:4+1:5+2:3+2:4+2:5+3:4+3:5, result="matrix")
+
+  # Permute the rows and columns so that the node names are in ascending order. This makes it easier to check the edge potentials in the crf object
+  n.nms   <- as.numeric(colnames(adj.loc))
+  adj.loc <- adj.loc[order(n.nms), order(n.nms)]
+  #print(adj.loc)
+
+  model.loc <- make.empty.field(adj.mat = adj.loc, parameterization.typ = "standard", plotQ = plot.graphQ)
+
+  if(!is.null(seed)) {
+    set.seed(seed)
+  }
+  model.loc$par <- runif(model.loc$n.par,-1.5,1.5)/Temp
+  out.pot.loc   <- make.pots(parms = model.loc$par,  crf = model.loc,  rescaleQ = F, replaceQ = T)
+  #dump.crf(model.loc)
+
+  # Compute exact joint distribution from potentials:
+  model.ext.probs <- compute.full.distribution(model.loc)$joint.distribution
+  #print(model.ext.probs)
+
+  model.samps             <- NULL
+  model.contingency       <- NULL
+  model.config.freq.frame <- NULL
+  model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    model.samps <- sample.junction(model.loc, size = num.samples)
+    colnames(model.samps) <- paste0("X", 1:model.loc$n.nodes)
+    #print(head(model.samps))
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(model.samps)
+    }
+
+    # Samples to contingency table
+    model.contingency <- xtabs(~., data=as.data.frame(model.samps))
+    #print(model.contingency)
+
+    # Sample config freq table
+    model.config.freq.frame <- as.data.frame(as.table(model.contingency))
+    #print(model.config.freq.frame)
+
+    # Sample configuration probabilities
+    model.emp.probs <- model.contingency/sum(model.contingency)
+    model.emp.probs <- as.data.frame(as.table(model.emp.probs))
+    model.ext.probs <- align.distributions(model.emp.probs, list(model.ext.probs))
+    #print(data.frame(model.emp.probs, model.ext.probs))
+
+  }
+
+  model.info <- list(
+    model.loc,
+    model.contingency,
+    model.config.freq.frame,
+    model.samps,
+    model.emp.probs,
+    model.ext.probs
+  )
+
+  names(model.info) <- c("star.model",
+                         "star.contingency.table",
+                         "star.configuration.frequencies",
+                         "star.samples",
+                         "star.empirical.joint.distribution",
+                         "star.exact.joint.distribution")
+
+  return(model.info)
+
+}
+
+
+#' Generate the tesseract model used in their book and the Notes
+#'
+#' Generate the tesseract model used in their book and the Notes
+#'
+#' The function will generate the tesseract model used in Notes. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate the tesseract model used in Notes along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_tesseract_model <- function(num.samples = NULL, Temp=1, seed=NULL, plot.sampleQ=F, plot.graphQ=F) {
+
+  # Tesseract field model:
+  adj.loc <- ug(~1:2  + 1:4   + 1:5  + 1:13 +
+                2:3   + 2:6   + 2:14 +
+                3:4   + 3:7   + 3:15 +
+                4:8   + 4:16  +
+                5:6   + 5:8   + 5:9 +
+                6:7   + 6:10  +
+                7:8   + 7:11  +
+                8:12  +
+                9:10  + 9:12  + 9:13 +
+                10:11 + 10:14 +
+                11:12 + 11:15 +
+                12:16 +
+                13:14 + 13:16 +
+                14:15 +
+                15:16, result="matrix")
+
+  # Permute the rows and columns so that the node names are in ascending order. This makes it easier to check the edge potentials in the crf object
+  n.nms   <- as.numeric(colnames(adj.loc))
+  adj.loc <- adj.loc[order(n.nms), order(n.nms)]
+  #print(adj.loc)
+
+  model.loc <- make.empty.field(adj.mat = adj.loc, parameterization.typ = "standard", plotQ = plot.graphQ)
+
+  if(!is.null(seed)) {
+    set.seed(seed)
+  }
+  model.loc$par <- runif(model.loc$n.par,-1.5,1.5)/Temp
+  out.pot.loc   <- make.pots(parms = model.loc$par,  crf = model.loc,  rescaleQ = F, replaceQ = T)
+  #dump.crf(model.loc)
+
+  # Compute exact joint distribution from potentials:
+  model.ext.probs <- compute.full.distribution(model.loc)$joint.distribution
+  #print(model.ext.probs)
+
+  model.samps             <- NULL
+  model.contingency       <- NULL
+  model.config.freq.frame <- NULL
+  model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    model.samps <- sample.exact(model.loc, size = num.samples)
+    colnames(model.samps) <- paste0("X", 1:model.loc$n.nodes)
+    #print(head(model.samps))
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(model.samps)
+    }
+
+    # Samples to contingency table
+    model.contingency <- xtabs(~., data=as.data.frame(model.samps))
+    #print(model.contingency)
+
+    # Sample config freq table
+    model.config.freq.frame <- as.data.frame(as.table(model.contingency))
+    #print(model.config.freq.frame)
+
+    # Sample configuration probabilities
+    model.emp.probs <- model.contingency/sum(model.contingency)
+    model.emp.probs <- as.data.frame(as.table(model.emp.probs))
+    model.ext.probs <- align.distributions(model.emp.probs, list(model.ext.probs))
+    #print(data.frame(model.emp.probs, model.ext.probs))
+
+  }
+
+  model.info <- list(
+    model.loc,
+    model.contingency,
+    model.config.freq.frame,
+    model.samps,
+    model.emp.probs,
+    model.ext.probs
+  )
+
+  names(model.info) <- c("tesseract.model",
+                         "tesseract.contingency.table",
+                         "tesseract.configuration.frequencies",
+                         "tesseract.samples",
+                         "tesseract.empirical.joint.distribution",
+                         "tesseract.exact.joint.distribution")
+
+  return(model.info)
+
+}
+
+
+#' Generate a random model using Erdos Renyi game
+#'
+#' Generate a random model using Erdos Renyi game
+#'
+#' The function will generate a random model using the Erdos Renyi game. Added a "Temp" parameter for user
+#' to adjust the potentials in bulk. Also added sampling from the model.
+#'
+#' @param num.samples  Optional number of samples specification
+#' @param Temp         Adjustment parameter to bulk adjust the potentials
+#' @param plot.sampleQ Optional plot marginal node samples
+#'
+#' @details The function will generate a random model along with a random sample
+#'
+#' @return A little data set
+#'
+#'
+#' @export
+generate_random_model <- function(num.samples = NULL, Temp=1, num.nodes=10, p.or.numedges=0.6, type="gnp", seed=NULL, plot.sampleQ=F, plot.graphQ=T) {
+
+  # A random graph:
+  if(!is.null(seed)) {
+    set.seed(seed)
+  }
+  gp.loc <- erdos.renyi.game(n = num.nodes, p.or.m = p.or.numedges, type = type)
+
+  adj.loc <- as_adjacency_matrix(gp.loc, type = "both", sparse = F, names = T)
+  # Name/rename the nodes to guarantee that they are in ascending order. This makes it easier to check the edge potentials in the crf object
+  n.nms             <- 1:num.nodes
+  colnames(adj.loc) <- n.nms
+  rownames(adj.loc) <- n.nms
+  #print(adj.loc)
+
+  # Regenerate graph from adjacency matrix to get the node names right:
+  # gp.loc  <- graph_from_adjacency_matrix(adj.loc, mode = "undirected")
+  # if(plot.graphQ == T) {
+  #   plot(gp.loc)
+  # }
+
+  model.loc <- make.empty.field(adj.mat = adj.loc, parameterization.typ = "standard", plotQ = plot.graphQ)
+
+  if(is.null(seed)) {
+    set.seed(seed)
+  }
+  model.loc$par <- runif(model.loc$n.par,-1.5,1.5)/Temp
+  out.pot.loc   <- make.pots(parms = model.loc$par,  crf = model.loc,  rescaleQ = F, replaceQ = T)
+  #dump.crf(model.loc)
+
+  # Compute exact joint distribution from potentials:
+  model.ext.probs <- compute.full.distribution(model.loc)$joint.distribution
+  #print(model.ext.probs)
+
+  model.samps             <- NULL
+  model.contingency       <- NULL
+  model.config.freq.frame <- NULL
+  model.probs             <- NULL
+  if(!is.null(num.samples)) {
+    model.samps <- sample.exact(model.loc, size = num.samples)
+    colnames(model.samps) <- paste0("X", 1:model.loc$n.nodes)
+    #print(head(model.samps))
+
+    if(plot.sampleQ == T) {
+      mrf.sample.plot(model.samps)
+    }
+
+    # Samples to contingency table
+    model.contingency <- xtabs(~., data=as.data.frame(model.samps))
+    #print(model.contingency)
+
+    # Sample config freq table
+    model.config.freq.frame <- as.data.frame(as.table(model.contingency))
+    #print(model.config.freq.frame)
+
+    # Sample configuration probabilities
+    model.emp.probs <- model.contingency/sum(model.contingency)
+    model.emp.probs <- as.data.frame(as.table(model.emp.probs))
+    model.ext.probs <- align.distributions(model.emp.probs, list(model.ext.probs))
+    #print(data.frame(model.emp.probs, model.ext.probs))
+
+  }
+
+  model.info <- list(
+    model.loc,
+    model.contingency,
+    model.config.freq.frame,
+    model.samps,
+    model.emp.probs,
+    model.ext.probs
+  )
+
+  names(model.info) <- c("random.model",
+                         "random.contingency.table",
+                         "random.configuration.frequencies",
+                         "random.samples",
+                         "random.empirical.joint.distribution",
+                         "random.exact.joint.distribution")
+
+  return(model.info)
+
+}
