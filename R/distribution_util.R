@@ -450,7 +450,9 @@ pseudolikelihoods.from.energies2 <- function(state.space, crf, cond.en.form="fea
 #'
 #' The function will XXXX
 #'
-#' @param XX The XX
+#' @param px vector of probability densities p(x)
+#' @param py vector of probability densities p(y)
+#'
 #' @return The function will XX
 #'
 #'

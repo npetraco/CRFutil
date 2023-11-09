@@ -52,3 +52,5 @@ tes <- generate_tesseract_model(num.samples = 1000, Temp=1, plot.sampleQ = T)
 # Random graph
 randm <- generate_random_model(num.samples = 1000, p.or.numedges = 12, type = "gnm", Temp=1, plot.sampleQ = T)
 randm$random.contingency.table
+
+

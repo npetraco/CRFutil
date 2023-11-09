@@ -136,6 +136,168 @@ row.match <- function (x, table, nomatch = NA)   # **********NEEDS TO BE C
   match(cx, ct, nomatch = nomatch)
 }
 
+#' A quick and dirty function to find the frequency of a configuration within a sample of configurations
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param tab.dat The query configuration(s)
+#' @param tab.ref The reference configurations to search through
+#'
+#' @return The function will XX
+#'
+#'
+#' @export
+count.row.matches_SAFE <- function(tab.dat, tab.ref) {
+
+  if(class(tab.ref)[1] == "character") {
+    # Assume reference configurations are already glued together into strings
+    # This should save time when using the function recursively.
+    rvec <- tab.ref
+  } else {
+    # If not, glue the states of the configurations together into strings
+    rvec <- sapply(1:nrow(tab.ref), function(xx){paste(tab.ref[xx,], collapse="")})
+  }
+
+  if(class(tab.dat)[1] == "numeric"){             # If just one input search configuration
+    qvec        <- paste(tab.dat,collapse="")  # Glue the states of the query configuration together
+    row.matches <- which(rvec == qvec)         # See where the query string appears in the reference strings
+    freq        <- length(row.matches)
+    freqs       <- freq
+
+  } else {
+    num.rows <- nrow(tab.dat)
+    freqs    <- numeric(num.rows)
+    qvec     <- sapply(1:num.rows, function(xx){paste(tab.dat[xx,],collapse="")})
+
+    for(i in 1:num.rows) {
+      row.matches <- which(rvec == qvec[i])
+      freq        <- length(row.matches)
+      freqs[i]    <- freq
+    }
+
+  }
+
+  return(freqs)
+}
+
+
+#' A quick and dirty function to find the frequency of a configuration within a sample of configurations
+#'
+#' XXXX
+#'
+#' The function will XXXX
+#'
+#' @param tab.query The query configuration(s)
+#' @param tab.ref The reference configurations to search through
+#' @param drop.query.replicatesQ If there are repeated entries in tab.query, drop them so their frequencies aren't double counted
+#'
+#' @return The function will XX
+#'
+#'
+#' @export
+count_row_matches <- function(tab.query, tab.ref, drop.query.replicatesQ=T, node.names=NULL) {
+
+  # Prep query configurations. Make sure they are in a matrix in case they were passed in as a vector or a single character string:
+  if(class(tab.query)[1] == "numeric"){             # If just one input search configuration as a vector
+    qvec <- as.matrix(paste(tab.query,collapse="")) # Glue the states of the query configuration together and put in matrix format so we can write one loop over rows later
+  } else if(class(tab.query)[1] == "character"){    # If just one input search configuration as a character string
+    qvec <- as.matrix(tab.query)                    # Glue the states of the query configuration together and put in matrix format so we can write one loop over rows later
+  } else {                                          # If multiple queries are passed in as a matrix already
+    qvec <- sapply(1:nrow(tab.query), function(xx){paste(tab.query[xx,],collapse="")})
+  }
+
+  # Prep reference configurations. They should already be in a matrix:
+  if(class(tab.ref)[1] == "character") {
+    # Assume reference configurations are already glued together into strings
+    # This should save time when using the function recursively.
+    rvec <- tab.ref
+  } else {
+    # If not, glue the states of the configurations together into strings
+    rvec <- sapply(1:nrow(tab.ref), function(xx){paste(tab.ref[xx,], collapse="")})
+  }
+
+  # First drop repeated configs from the queries if requested:
+  if(drop.query.replicatesQ == T) {
+
+    qvec.reduced <- qvec
+    for(i in 1:length(qvec)) {
+      row.matches <- which(qvec.reduced == qvec[i])
+
+      if(length(row.matches) > 1) {
+        drop.idxs <- row.matches[-1] # If more than one found, keep the first and drop the rest
+        qvec.reduced <- qvec.reduced[-drop.idxs]
+      }
+
+    }
+    qvec <- qvec.reduced
+    #print(qvec)
+  }
+  #print(qvec)
+
+  num.query.rows <- length(qvec)
+  freqs          <- NULL
+  query.configs  <- NULL
+  for(i in 1:num.query.rows){
+
+    row.matches <- which(rvec == qvec[i])
+    freq        <- length(row.matches)
+    freqs       <- c(freqs, freq)
+
+    a.query.config <- as.numeric(strsplit(qvec[i],split = "")[[1]])
+    query.configs  <- rbind(query.configs, a.query.config)
+  }
+
+  if(!is.null(node.names)) {
+    colnames(query.configs) <- node.names
+  }
+
+  num.nodes                                <- ncol(tab.ref)
+  config.freq.frame                        <- data.frame(query.configs, freqs)
+  colnames(config.freq.frame)[num.nodes+1] <- "Freq"
+  rownames(config.freq.frame)              <- NULL
+
+  return(config.freq.frame)
+
+}
+
+
+#' Get the frequencies of configurations
+#'
+#' Get the frequencies of configurations. Uses count.row.matches to get partial frequency table
+#' for samples only, but can also get all frequencies (i.e. all the 0 ones too) from the full
+#' contingency table.
+#'
+#'
+#' @param XX XXXXXX
+#'
+#' @return The function will XX
+#'
+#'
+#' @export
+get_configuration_frequencies <- function(sample.mat, type="full", empirical.distributionQ=F) {
+
+  if(type == "full"){
+    sample.contingency <- xtabs(~., data=as.data.frame(sample.mat))
+    sample.freqs       <- as.data.frame(sample.contingency)
+  } else if(type == "partial") {
+     sample.freqs       <- count_row_matches(tab.query = sample.mat, tab.ref = sample.mat, drop.query.replicatesQ=T, node.names=NULL)
+  } else {
+    stop("type must be full or partial")
+  }
+  #print(sample.freqs)
+
+  if(empirical.distributionQ == T) {
+    empdist <- sample.freqs$Freq/sum(sample.freqs$Freq)
+    sample.freqs <- data.frame(sample.freqs, empdist)
+  }
+
+  return(sample.freqs)
+
+}
+
+
 #' Spits out permutation to re-order configs in targ with respect to ref
 #'
 #' XXXX
@@ -406,11 +568,13 @@ edges2adj <- function(edge.mat, n.nodes = NULL, plotQ=FALSE){
   rownames(adj.mat) <- 1:num.nods
 
   if(plotQ==TRUE){
-    new.gph <- as(adj.mat,"graphNEL")
+    #new.gph <- as(adj.mat,"graphNEL")
+    new.gph <- as(adj.mat,"igraph")
     if(!is.null(dev.list())){
       dev.off()
     }
-    iplot(new.gph)
+    #iplot(new.gph)
+    plot(new.gph)
   }
 
   return(adj.mat)

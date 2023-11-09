@@ -7,7 +7,9 @@
 KLD(px, py, base = exp(1))
 }
 \arguments{
-\item{XX}{The XX}
+\item{px}{vector of probability densities p(x)}
+
+\item{py}{vector of probability densities p(y)}
 }
 \value{
 The function will XX
