@@ -2,7 +2,7 @@ library(CRFutil)
 
 # Put together the Koller-Freidman "Misconception" MRF model and get a sample from it:
 grphf <- ~A:B + B:C + C:D + D:A
-gp <- ug(grphf, result = "graph")
+gp <- ug(grphf, result = "igraph")
 dev.off()
 iplot(gp)
 
@@ -57,7 +57,7 @@ known.model$node.pot
 known.model$edge.pot
 
 # Check: Get same "Misconception" config probs?:
-pot.info <- make.gRbase.potentials(known.model, node.names = gp@nodes, state.nmes = c("0","1"))
+pot.info <- make.gRbase.potentials(known.model, node.names = V(gp), state.nmes = c("0","1"))
 pot.info
 
 gR.dist.info    <- distribution.from.potentials(pot.info$node.potentials, pot.info$edge.potentials)
@@ -132,7 +132,7 @@ fit$nll
 # Examine the gradient terms at the minimum in more detail:
 N.E.hat.theta.phi <- num.samps * feature.means(fit, infr.meth)
 s                 <- fit$par.stat
-grad              <- E.hat.theta.phi - s
+grad              <- N.E.hat.theta.phi - s
 cbind(N.E.hat.theta.phi, s, grad)
 
 
@@ -146,6 +146,6 @@ lbp.margials.info
 
 #
 # Check
-train.mrf(fit, samps, nll=mrf.junction.nll, infer.method = infer.junction, trace=1)
+train.mrf(fit, samps, nll=mrf.junction.nll, infer.method = infer.junction, trace=2)
 fit$par
 fit$gradient

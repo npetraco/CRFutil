@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulation_util.R
 \name{sim.field.random.simplest}
 \alias{sim.field.random.simplest}
-\title{Simulate an MRF with random unary (node) and pair (edge) potentials.}
+\title{Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.}
 \usage{
 sim.field.random.simplest(adjacentcy.matrix, num.states, num.sims, seed = NULL)
 }
@@ -13,8 +13,8 @@ sim.field.random.simplest(adjacentcy.matrix, num.states, num.sims, seed = NULL)
 The function will XX
 }
 \description{
-Simulate an MRF with random unary (node) and pair (edge) potentials.
+Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.
 }
 \details{
-Uses simplest standard parameterization I can tink of: tau1 = tau2 ..., w11=w22, w12=w21, ...
+Uses simplest standard parameterization I can think of: tau1 = tau2 ..., w11=w22, w12=w21, ...
 }

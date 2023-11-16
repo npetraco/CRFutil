@@ -136,52 +136,6 @@ row.match <- function (x, table, nomatch = NA)   # **********NEEDS TO BE C
   match(cx, ct, nomatch = nomatch)
 }
 
-#' A quick and dirty function to find the frequency of a configuration within a sample of configurations
-#'
-#' XXXX
-#'
-#' The function will XXXX
-#'
-#' @param tab.dat The query configuration(s)
-#' @param tab.ref The reference configurations to search through
-#'
-#' @return The function will XX
-#'
-#'
-#' @export
-count.row.matches_SAFE <- function(tab.dat, tab.ref) {
-
-  if(class(tab.ref)[1] == "character") {
-    # Assume reference configurations are already glued together into strings
-    # This should save time when using the function recursively.
-    rvec <- tab.ref
-  } else {
-    # If not, glue the states of the configurations together into strings
-    rvec <- sapply(1:nrow(tab.ref), function(xx){paste(tab.ref[xx,], collapse="")})
-  }
-
-  if(class(tab.dat)[1] == "numeric"){             # If just one input search configuration
-    qvec        <- paste(tab.dat,collapse="")  # Glue the states of the query configuration together
-    row.matches <- which(rvec == qvec)         # See where the query string appears in the reference strings
-    freq        <- length(row.matches)
-    freqs       <- freq
-
-  } else {
-    num.rows <- nrow(tab.dat)
-    freqs    <- numeric(num.rows)
-    qvec     <- sapply(1:num.rows, function(xx){paste(tab.dat[xx,],collapse="")})
-
-    for(i in 1:num.rows) {
-      row.matches <- which(rvec == qvec[i])
-      freq        <- length(row.matches)
-      freqs[i]    <- freq
-    }
-
-  }
-
-  return(freqs)
-}
-
 
 #' A quick and dirty function to find the frequency of a configuration within a sample of configurations
 #'

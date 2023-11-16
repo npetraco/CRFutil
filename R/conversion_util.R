@@ -145,9 +145,9 @@ loglin2crf <- function(log.linear.model.obj, standard.potentialsQ=T, plotQ=F) {
 }
 
 
-#' XXXX
+#' Pull info needed for a crf object out of a glmnet fit output
 #'
-#' XXXX
+#' Pull info needed for a crf object out of a glmnet fit output
 #'
 #' @details XXXX
 #'
@@ -156,12 +156,12 @@ loglin2crf <- function(log.linear.model.obj, standard.potentialsQ=T, plotQ=F) {
 #'
 #'
 #' @export
-glmnet_logistic_fit2graph_info <- function(a.glmnet.logistic.fit, num.nodes, crf.obj=NULL, lambda="lambda.1se", plotQ=F){
+glmnet2graph_info <- function(a.glmnet.fit, num.nodes, crf.obj=NULL, lambda="lambda.1se", plotQ=F){
 
-  if(is.null(crf.obj)) { # If no crf.obj container is passed in, use a saturated graph
+  if(is.null(crf.obj)) { # If no crf.obj container is passed in, instantiate a saturated graph
 
     if(is.null(num.nodes)) {
-      stop("num.nodes in the glmnet fit must be specified if no crf.obj is specified!")
+      stop("num.nodes used for the glmnet fit must be specified if no crf.obj is specified!")
     }
 
     g.saturated.start           <- erdos.renyi.game(num.nodes, 1, typ="gnp")
@@ -177,7 +177,7 @@ glmnet_logistic_fit2graph_info <- function(a.glmnet.logistic.fit, num.nodes, crf
 
   num.nodes.loc <- a.crf.loc$n.nodes
 
-  loc.fit.coefs <- as.numeric(coef(a.glmnet.logistic.fit, s = lambda))
+  loc.fit.coefs <- as.numeric(coef(a.glmnet.fit, s = lambda))
 
   # Indices of parameters with non-zero values. We use these below to get the non-zero edge parameters
   # **NOTE: Assumes no intercept fit so subtract 1 from non-zero indices
@@ -185,7 +185,7 @@ glmnet_logistic_fit2graph_info <- function(a.glmnet.logistic.fit, num.nodes, crf
 
   # Find which nodes/edges are associated with which (non-zero) params. **NOTE, assumes parameterization is standard pairwise
   prms2nds.lst <- params2nodes.list(a.crf.loc)[nonz.idxs]
-  print(prms2nds.lst)
+  #print(prms2nds.lst)
 
   prm2edge.info.mat <- NULL
   for(i in 1:length(prms2nds.lst)) {
@@ -212,7 +212,7 @@ glmnet_logistic_fit2graph_info <- function(a.glmnet.logistic.fit, num.nodes, crf
   if(plotQ==T) {
     # Recover the graph:
     adj.recovered.loc <- edges2adj(prm2edge.info.mat[,c(3,4)], n.nodes = num.nodes.loc)
-    print(adj.recovered.loc)
+    #print(adj.recovered.loc)
 
     #grph.recovered.loc <- adj2formula(adj.recovered.loc, edge.only.formulaQ = T, Xoption = F)
     #gp.recovered.loc   <- ug(grph.recovered.loc, result = "igraph")

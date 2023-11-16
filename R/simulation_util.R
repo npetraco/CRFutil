@@ -1,6 +1,6 @@
-#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#' Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.
 #'
-#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#' Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.
 #'
 #' Uses standard parameterization w11=w22, w12=w21
 #'
@@ -74,11 +74,11 @@ sim.field.random <- function(adjacentcy.matrix, num.states, num.sims, seed=NULL)
 
 }
 
-#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#' Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.
 #'
-#' Simulate an MRF with random unary (node) and pair (edge) potentials.
+#' Simulate an MRF with random unary (node) and pair (edge) potentials using a specified adjacency matrix.
 #'
-#' Uses simplest standard parameterization I can tink of: tau1 = tau2 ..., w11=w22, w12=w21, ...
+#' Uses simplest standard parameterization I can think of: tau1 = tau2 ..., w11=w22, w12=w21, ...
 #'
 #' @param XX The XX
 #' @return The function will XX
@@ -150,6 +150,92 @@ sim.field.random.simplest <- function(adjacentcy.matrix, num.states, num.sims, s
   return(mrf.sim.info)
 
 }
+
+
+#' Simulate an random MRF with random unary (node) and pair (edge) potentials.
+#'
+#' Simulate an random MRF with random unary (node) and pair (edge) potentials.
+#'
+#' Uses standard parameterization w11=w22, w12=w21. Graph is generated with erdos.renyi.game
+#' in igraph. If an edge appears in the graph, a relatively high to high potential (i.e. non-zero)
+#' should be generated to ensure the edge is potentially strong enough to be found from a random
+#' sample from the graph. However, the user can choose the the general strength and variability of
+#' the edge and node potentials though the edge.pot.mean/sd and node.pot.mean/sd arguments. They
+#' are generated with a t-distribution. The default nu is 30 making the random selections approximately
+#' normal. The number of edges in a randomly generated graph can be chosen by specification or by
+#' probability.
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+sim.random.field <- function(adj.mat=NULL, num.nodes, num.edges=NULL, prob.edge=1, node.pot.nu=30, node.pot.mean, node.pot.sd, edge.pot.nu=30, edge.pot.mean, edge.pot.sd, num.sims, seed.node.pots=NULL, seed.edge.pots=NULL, seed.sample=NULL, plotQ=F) {
+
+  if(is.null(adj.mat)) { # If no adjacency matrix is specified, generate one
+
+    num.nodes.loc <- num.nodes
+
+    if(!is.null(num.edges)) {
+      graph.loc <- erdos.renyi.game(n = num.nodes.loc, p.or.m = num.edges, type = "gnm", directed = F, loops = F)
+    } else {
+      graph.loc <- erdos.renyi.game(n = num.nodes.loc, p.or.m = prob.edge, type = "gnp", directed = F, loops = F)
+    }
+
+    adj.mat.loc           <- as.matrix(as_adj(graph.loc))
+    colnames(adj.mat.loc) <- 1:num.nodes.loc
+    rownames(adj.mat.loc) <- 1:num.nodes.loc
+
+  } else {                  # If an adjacency matric is specified, use that.
+    num.nodes.loc <- num.nodes
+    adj.mat.loc   <- adj.mat
+    colnames(adj.mat.loc) <- 1:num.nodes.loc # Id adjacency matrix has row/col, names, just number them.
+    rownames(adj.mat.loc) <- 1:num.nodes.loc
+
+    graph.loc <- graph_from_adjacency_matrix(adjmatrix = adj.mat.loc, mode = "undirected")
+  }
+
+  # if(plotQ==T) {
+  #   plot(graph.loc)
+  # }
+
+  model.loc <- make.empty.field(adj.mat = adj.mat.loc, parameterization.typ = "standard", plotQ = plotQ)
+  #print(model.loc$n.nodes)
+  #print(model.loc$n.edges)
+
+  if(!is.null(seed.node.pots)){
+    set.seed(seed.node.pots)
+  }
+  # Node pots/pars. Abs the pots to make sure they're positive
+  node.pot.vec.loc <- abs(ggdist::rstudent_t(n = model.loc$n.nodes, df = node.pot.nu, mu = node.pot.mean, sigma = node.pot.sd))
+  node.par.loc     <- log(node.pot.vec.loc)
+
+  if(!is.null(seed.edge.pots)){
+    set.seed(seed.edge.pots)
+  }
+  # Edge pots/pars. Abs the pots to make sure they're positive
+  edge.pot.vec.loc <- abs(ggdist::rstudent_t(n = model.loc$n.edges, df = edge.pot.nu, mu = edge.pot.mean, sigma = edge.pot.sd))
+  edge.par.loc     <- log(edge.pot.vec.loc)
+
+  model.loc$par <- c(node.par.loc, edge.par.loc)
+  out.pots.loc  <- make.pots(parms = model.loc$par, crf = model.loc, replaceQ = T)
+  #dump.crf(model.loc)
+
+  if(!is.null(seed.sample)){
+    set.seed(seed.sample)
+  }
+  model.loc.samples <- sample.junction(model.loc, num.sims)
+  colnames(model.loc.samples) <- as.character(1:num.nodes.loc)
+  sim.info <- list(
+    model.loc,
+    model.loc.samples
+  )
+  names(sim.info) <- c("model", "samples")
+
+  return(sim.info)
+
+}
+
 
 #' Simulate an MRF with random unary (node) and pair (edge) potentials.
 #'

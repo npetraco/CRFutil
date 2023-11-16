@@ -119,3 +119,82 @@ make.lattice <- function(num.rows, num.cols, node.names.vec=NULL, cross.linksQ=T
   return(the.grphf.eq)
 
 }
+
+
+#' Send in two or more models in the form of a list of crf objects or edge matrices and compare edges
+#'
+#' Send in two or more models in the form of a list of crf objects or edge matrices and compare edges
+#'
+#' Assumes all models have the same number of nodes and node names are just numbers
+#'
+#' @param XX The XX
+#' @return The function will XX
+#'
+#'
+#' @export
+compare_edges <- function(model.list, num.nodes=NULL){
+
+  num.models <- length(model.list)
+
+  model.type <- class(model.list[[1]]) # Look at the first element of the list and determine the data's type
+  if(model.type == "CRF") {
+    print("Models are CRF objects.")
+
+    crf.obj.loc           <- model.list[[1]]
+    num.nodes.loc         <- crf.obj.loc$n.nodes
+    saturated.edge.matrix <- array(-1, c(num.nodes.loc*(num.nodes.loc-1)/2, 2))
+    print(dim(saturated.edge.matrix))
+
+    # Enumerate all possible edges. This will be the reference to compare models
+    count <- 1
+    for(i in 1:num.nodes.loc) {
+      for(j in 1:num.nodes.loc) {
+        if(i < j) {
+          #print(count)
+          saturated.edge.matrix[count, 1] <- i
+          saturated.edge.matrix[count, 2] <- j
+          count <- count + 1
+        }
+      }
+    }
+    #print(saturated.edge.matrix)
+
+    edgeQ.mat <- NULL
+    for(i in 1:num.models){
+
+      crf.obj.loc <- model.list[[i]]
+      edge.mat.loc <- crf.obj.loc$edges
+      #print(edge.mat.loc)
+
+      #edgeQ.vec <- numeric(nrow(saturated.edge.matrix))
+      edgeQ.vec <- array(-1, nrow(saturated.edge.matrix))
+      for(j in 1:nrow(saturated.edge.matrix)) {
+        #edgeQ.vec[j] <- as.numeric( ((saturated.edge.matrix[j,1] %in% edge.mat.loc[,1]) & (saturated.edge.matrix[j,2] %in% edge.mat.loc[,2]) ) | (saturated.edge.matrix[j,2] %in% edge.mat.loc[,1]) & (saturated.edge.matrix[j,1] %in% edge.mat.loc[,2]) )
+        # Number of times (possible) edge observed in edge matrix of graph. Should be 0 or 1.
+        # If two or more, throw an error.
+        num.times.edge.obs <- sum(sapply(1:nrow(edge.mat.loc), function(xx){sum(sort(saturated.edge.matrix[j,]) == sort(edge.mat.loc[xx,])) == 2}))
+        if(num.times.edge.obs >= 2) {
+          print(saturated.edge.matrix[j,])
+          stop(paste0("Edge above appears in edge matrix of graph ", i, "  more than once. Something is wrong!"))
+        }
+
+        edgeQ.vec[j] <- num.times.edge.obs # Should be 0 or 1 at this point
+
+      }
+      #print(cbind(saturated.edge.matrix, edgeQ.vec))
+      edgeQ.mat <- cbind(edgeQ.mat, edgeQ.vec)
+
+    }
+
+  } else if( ("matrix" %in% model.type) | ("array" %in% model.type) ) {
+    print("Models are edge matrices.")
+
+    # *********Need num.nodes for these
+
+  } else {
+    stop("model.list must be a list of CRF objects or edge matrices!")
+  }
+
+  print(data.frame(saturated.edge.matrix, edgeQ.mat))
+
+}

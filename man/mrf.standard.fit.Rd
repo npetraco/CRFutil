@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_util.R
 \name{mrf.standard.fit}
 \alias{mrf.standard.fit}
-\title{Fit a MRF paramiterized in the standard way}
+\title{Fit a MRF parameterized in the standard way}
 \usage{
 mrf.standard.fit(
   samples,
@@ -19,7 +19,7 @@ mrf.standard.fit(
 The function will XX
 }
 \description{
-Fit a MRF paramiterized in the standard way
+Fit a MRF parameterized in the standard way
 }
 \details{
 The function will XXXX
