@@ -4,7 +4,7 @@
 \alias{plot_crf}
 \title{Plot a crf object}
 \usage{
-plot_crf(crf.obj)
+plot_crf(crf.obj, type = "g", samples = NULL)
 }
 \arguments{
 \item{XX}{The XX}

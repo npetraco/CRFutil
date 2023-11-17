@@ -2,7 +2,7 @@
 % Please edit documentation in R/graph_util.R
 \name{compare_edges}
 \alias{compare_edges}
-\title{Send in two or more models in the form of a list of crf objects or edge matrices and compare edges}
+\title{XXXX}
 \usage{
 compare_edges(model.list, num.nodes = NULL)
 }
@@ -13,8 +13,8 @@ compare_edges(model.list, num.nodes = NULL)
 The function will XX
 }
 \description{
-Send in two or more models in the form of a list of crf objects or edge matrices and compare edges
+XXXX
 }
 \details{
-Assumes all models have the same number of nodes and node names are just numbers
+XXXX
 }

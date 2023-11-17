@@ -1,18 +1,18 @@
 library(CRFutil)
 
 knm <- sim.random.field(
-  num.nodes=10, num.edges=13, plotQ = T,
+  num.nodes=10, num.edges=9, plotQ = T,
   node.pot.nu   = 30,
-  node.pot.mean = 1,
-  node.pot.sd   = 3,
+  node.pot.mean = 2.1,
+  node.pot.sd   = 0.5,
   edge.pot.nu   = 30,
-  edge.pot.mean = 0,
-  edge.pot.sd   = 3,
+  edge.pot.mean = 1.1,
+  edge.pot.sd   = 0.5,
   num.sims      = 100)
 knm.crf <- knm$model
 samps   <- knm$samples
-mrf.sample.plot(samps)
-plot_crf(knm.crf)
+#mrf.sample.plot(samps)
+plot_crf(knm.crf, type="gp", samples=samps) # Include option to plot potentials and graph in a 2x2 plot
 
 knm.dist <- compute.full.distribution(knm.crf)$joint.distribution
 
@@ -22,7 +22,7 @@ g.start             <- erdos.renyi.game(ncol(samps), 1, typ="gnp")
 adj.start           <- as.matrix(as_adj(g.start))
 colnames(adj.start) <- 1:ncol(samps)
 rownames(adj.start) <- 1:ncol(samps)
-satm                 <- make.empty.field(adj.mat = adj.start, parameterization.typ = "standard", plotQ = T)
+satm                 <- make.empty.field(adj.mat = adj.start, parameterization.typ = "standard", plotQ = F)
 
 # Compute the delta-alpha matrix given the sampled configs:   # ***********ADD nfolds arguement
 f0               <- function(y){ as.numeric(c((y==1),(y==2))) }
@@ -40,7 +40,7 @@ fit.glmn.logis.mle$par.stat <- mrf.stat(fit.glmn.logis.mle, samps)
 gradient <- function(par, crf, ...) { crf$gradient }
 
 # MLE on the specified graph given the samples:
-infr.meth <- infer.exact   # inference method needed for Z and marginals calcs
+infr.meth <- infer.junction   # inference method needed for Z and marginals calcs
 opt.info  <- stats::optim(    # optimize parameters
   par          = fit.glmn.logis.mle$par,       # theta
   fn           = negloglik,     # objective function
@@ -57,6 +57,7 @@ fit.glmn.logis.mle$gradient
 fit.glmn.logis.mle$nll
 
 dump.crf(fit.glmn.logis.mle)
+plot_crf(fit.glmn.logis.mle, type = "ge")
 
 fit.glmn.logis.dist <- compute.full.distribution(fit.glmn.logis)$joint.distribution
 fit.glmn.logis.mle.dist <- compute.full.distribution(fit.glmn.logis.mle)$joint.distribution
@@ -81,3 +82,4 @@ compare_edges(model.list=list(knm.crf, fit.glmn.logis), num.nodes=NULL)
 plot_crf(knm.crf)
 plot_crf(fit.glmn.logis)
 fit.glmn.logis$edges
+
